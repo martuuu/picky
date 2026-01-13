@@ -1,12 +1,52 @@
 # 🎨 FRONTEND ROADMAP - Picky
 
-**Última Actualización:** 13 Enero 2026  
-**Estado:** 🟡 **MVP Prototipo @ 0%** (Comenzando desde cero)  
+**Última Actualización:** 14 Enero 2026 - 01:30 hs  
+**Estado:** � **MVP Prototipo @ 53%** (9/17 pantallas completas)  
 **Objetivo:** Sistema Scan & Go para tiendas físicas (Mobile First)
 
 ---
 
-## 📋 RESUMEN EJECUTIVO
+## 📊 PROGRESO ACTUAL
+
+### **✅ Fase 1: Setup Inicial (100% Completado)**
+- ✅ Proyecto Next.js 16.1.1 con TypeScript
+- ✅ Shadcn/UI + 16 componentes instalados
+- ✅ Zustand stores (Cart + User con persist)
+- ✅ Mock data (20 productos bazar + 6 categorías + 2 tiendas)
+- ✅ TypeScript interfaces completas
+- ✅ React Query configurado
+- ✅ Servidor corriendo en localhost:3000
+
+### **🎉 Fase 2: Cliente Mobile (90% Completado - 9/10 pantallas)**
+
+**✅ Completadas:**
+1. **Landing Principal** - Home con selector de portales
+2. **Landing Tienda** - Bienvenida + inicialización de sesión
+3. **Catálogo** - Grid 2 col, búsqueda, filtros por categoría, badges de stock/descuentos
+4. **Escáner QR** - Camera real + simulador demo + input manual (sin validación)
+5. **Product Detail Page (PDP)** - Carousel imágenes, specs accordion, ofertas bulk, related products
+6. **Carrito** - Edición inline, stepper de progreso, ofertas dinámicas, resumen con descuentos
+7. **Checkout & Pago** ✅ - Simulación MercadoPago + validación inline
+8. **Estado del Pedido** ✅ - Real-time tracking con auto-transiciones + ofertas del bar 40% OFF + sugerencia playground
+9. **Confirmación** ✅ - QR retiro + confetti + download/share
+
+**⏳ Pendiente:**
+10. **Modal Ofertas** - Bottom sheet automático
+
+### **⏳ Fase 3: Picker Desktop (0% - No iniciado - NEXT PRIORITY 🎯)**
+- Kanban de pedidos
+- Modal detalle de pedido
+- Escaneo QR retiro
+
+### **⏳ Fase 4: Admin Dashboard (0% - No iniciado)**
+- Analytics + Charts (Recharts)
+- Generación masiva QR
+- Gestión productos
+- Configuración tienda
+
+---
+
+## �📋 RESUMEN EJECUTIVO
 
 **Picky** es una PWA de "Smart Shopping" que transforma la experiencia de compra en tiendas físicas. El MVP se divide en **3 experiencias principales**:
 
@@ -16,19 +56,19 @@
 
 **Total:** 17 pantallas core + componentes reutilizables  
 **Duración estimada:** 25-30 días de desarrollo  
-**Stack:** Next.js 15 + TypeScript + Shadcn/UI + Zustand + React Query
+**Stack:** Next.js 16.1.1 + TypeScript 5 + Shadcn/UI + Zustand + React Query
 
 **Desglose Cliente Mobile (10 pantallas):**
-1. Landing Principal (home con login)
-2. Landing Tienda (bienvenida del local)
-3. Escáner QR
-4. Catálogo de Productos
-5. PDP (Product Detail Page)
-6. Modal Ofertas Combinadas (popup automático)
-7. Carrito de Compras
-8. Checkout & Pago
-9. Estado del Pedido (cliente esperando)
-10. Confirmación de Retiro
+1. ✅ Landing Principal (home con login)
+2. ✅ Landing Tienda (bienvenida del local)
+3. ✅ Escáner QR (con simulador + input manual)
+4. ✅ Catálogo de Productos (búsqueda, filtros, grid)
+5. ✅ PDP (Product Detail Page - completa)
+6. ✅ Carrito de Compras (gestión completa)
+7. ⏳ Checkout & Pago (PRÓXIMO)
+8. ⏳ Estado del Pedido (cliente esperando)
+9. ⏳ Confirmación de Retiro
+10. ⏳ Modal Ofertas Combinadas (popup automático)
 
 ---
 
@@ -748,7 +788,7 @@ vercel
 
 ---
 
-### **2.1 Pantalla Landing/Onboarding (1 día)**
+### ✅ **2.1 Pantalla Landing/Onboarding (1 día)** - **COMPLETADO**
 
 **Ruta:** `/tienda/[storeId]/page.tsx`
 
@@ -906,7 +946,7 @@ export default function StoreLandingPage() {
 
 ---
 
-### **2.2 Pantalla Catálogo de Productos (1.5 días)**
+### ✅ **2.2 Pantalla Catálogo de Productos (1.5 días)** - **COMPLETADO**
 
 **Ruta:** `/tienda/[storeId]/catalogo/page.tsx`
 
@@ -1156,7 +1196,7 @@ export function formatPrice(priceInCents: number): string {
 
 ---
 
-### **2.3 Pantalla QR Scanner (1 día)**
+### ✅ **2.3 Pantalla QR Scanner (1 día)** - **COMPLETADO CON EXTRAS**
 
 **Ruta:** `/tienda/[storeId]/escanear/page.tsx`
 

@@ -1,0 +1,28 @@
+{
+  "stores": [
+    {
+      "id": "store-001",
+      "name": "Bazar Casa Bella",
+      "description": "Todo para tu hogar desde 1995",
+      "logo": "/images/stores/casa-bella-logo.png",
+      "address": "Av. Corrientes 1234, CABA",
+      "phone": "+54 11 4567-8900",
+      "email": "info@casabella.com.ar",
+      "welcomeMessage": "¡Bienvenido a Bazar Casa Bella! Escaneá productos y comprá sin cargar peso.",
+      "primaryColor": "#8b5cf6",
+      "isActive": true
+    },
+    {
+      "id": "store-002",
+      "name": "Bazar Don José",
+      "description": "Todo para tu hogar en un solo lugar",
+      "logo": "/images/stores/don-jose-logo.png",
+      "address": "Av. Rivadavia 5678, CABA",
+      "phone": "+54 11 4321-0987",
+      "email": "contacto@donjose.com.ar",
+      "welcomeMessage": "¡Hola! Descubrí la nueva forma de comprar en Don José.",
+      "primaryColor": "#2563eb",
+      "isActive": true
+    }
+  ]
+}

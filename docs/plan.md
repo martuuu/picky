@@ -1,8 +1,8 @@
 # 📊 Plan Maestro: Picky - Sistema Scan & Go
 
-**Última Actualización:** 13 Enero 2026  
-**MVP Progress:** 🟡 **0% - Documentación Completada**  
-**Estado:** 📝 Planning Phase → Ready to Initialize
+**Última Actualización:** 14 Enero 2026 - 01:30 hs  
+**MVP Progress:** � **53% - 9 Pantallas Funcionando**  
+**Estado:** 🎉 Cliente Mobile @ 90% → Próximo: Picker Desktop
 
 ---
 
@@ -16,17 +16,22 @@
 **Integraciones Futuras:** MercadoPago → Tiendanube → SAP/VTEX
 
 **Total de Pantallas MVP:** 17 pantallas core
-- 👤 **Cliente Mobile:** 10 pantallas (incluye Landing Principal + Landing Tienda + Modal Ofertas)
-- 📦 **Picker Desktop:** 3 pantallas (Kanban + Modal Detalle + Escaneo QR)
+- 👤 **Cliente Mobile:** 10 pantallas → **9/10 COMPLETAS (90%)** ✅
+- 📦 **Picker Desktop:** 3 pantallas → **PRÓXIMA PRIORIDAD** 🎯
 - 📊 **Admin Dashboard:** 4 pantallas (Dashboard + Analytics + Productos/QR + Config)
 
 ---
 
 ## 🎯 OBJETIVO INMEDIATO
 
-**Completar FRONTEND-ROADMAP.md** (Fases 2.4-2.8 + Phase 3-5)  
-**Duración Estimada:** 20-25 días de desarrollo  
-**Stack:** Next.js 15 + TypeScript + Shadcn/UI + Zustand + React Query
+**⭐ PRÓXIMO SPRINT: Portal Picker Desktop (Fase 3)**  
+**Duración Estimada:** 3-4 días de desarrollo  
+**Pantallas a Desarrollar:**
+1. Kanban de Pedidos (drag & drop entre columnas)
+2. Modal Detalle de Pedido (edición de estado)
+3. Escaneo QR Retiro (validación)
+
+**Stack:** Next.js 16.1.1 + TypeScript + Shadcn/UI + Zustand + DnD Kit
 
 ---
 
@@ -73,91 +78,156 @@
 
 ### ⏳ FASE 1: Setup Inicial (2-3 días)
 
-**Estado:** 🔴 NO INICIADO  
-**Prioridad:** 🔴 CRÍTICA
+**Estado:** ✅ **COMPLETADO** - 13 Enero 2026  
+**Prioridad:** ✅ CRÍTICA
 
 **Tareas:**
 
-#### **1.1 Inicializar Proyecto (1h)**
-```bash
-npx create-next-app@latest picky --typescript --tailwind --app --use-npm
-cd picky
-```
+#### **1.1 Inicializar Proyecto (1h)** ✅
+- ✅ Proyecto Next.js 16.1.1 con TypeScript
+- ✅ App Router configurado
+- ✅ Estructura src/ implementada
 
-#### **1.2 Instalar Dependencias (30min)**
-```bash
-# UI Components
-npx shadcn@latest init
-npm install framer-motion lucide-react
+#### **1.2 Instalar Dependencias (30min)** ✅
+- ✅ Shadcn/UI inicializado y 16 componentes instalados
+- ✅ framer-motion, lucide-react
+- ✅ zustand para state management
+- ✅ @tanstack/react-query
+- ✅ html5-qrcode para escaneo QR
+- ✅ qrcode, jspdf para generación de QR
+- ✅ date-fns, clsx, tailwind-merge, recharts
+- ✅ @types/qrcode
 
-# State Management
-npm install zustand
+#### **1.3 Estructura de Carpetas (30min)** ✅
+- ✅ src/app con rutas dinámicas [storeId], [sku], [orderId]
+- ✅ src/components/{ui,cliente,picker,admin}
+- ✅ src/lib/{api,adapters}
+- ✅ src/stores (Zustand)
+- ✅ src/hooks
+- ✅ src/types
+- ✅ src/data (mock data)
+- ✅ public/images/productos
 
-# Data Fetching
-npm install @tanstack/react-query
+#### **1.4 TypeScript Interfaces (2h)** ✅
+- ✅ `src/types/product.ts` (Product, BulkDiscount, Category, Comparison)
+- ✅ `src/types/cart.ts` (Cart, CartItem, CartSummary, RelatedOffer)
+- ✅ `src/types/order.ts` (Order, OrderItem, OrderStatus, StatusChange, PickingTask)
+- ✅ `src/types/user.ts` (User, Store, Session, UserRole)
+- ✅ `src/types/analytics.ts` (ProductAnalytics, StoreAnalytics, AbandonedCart, DashboardMetrics)
 
-# QR Scanner
-npm install html5-qrcode react-qr-reader
+#### **1.5 Mock Data (2-3h)** ✅
+- ✅ `src/data/mock-stores.json` (2 tiendas demo)
+- ✅ `src/data/mock-categories.json` (6 categorías)
+- ✅ `src/data/mock-products.json` (10 productos base con specs completas)
 
-# Utils
-npm install date-fns clsx tailwind-merge qrcode jspdf recharts
-```
+#### **1.6 Zustand Stores (1h)** ✅
+- ✅ `useCartStore.ts` con persist middleware y funciones completas:
+  - initCart, addItem, updateItemQuantity, removeItem, clearCart, getItemQuantity
+  - Cálculo automático de subtotales, descuentos y totales
+- ✅ `useUserStore.ts` con session handling:
+  - initSession, updateUser, clearSession
+  - Gestión de sesiones anónimas con expiración de 24hs
 
-#### **1.3 Estructura de Carpetas (30min)**
-- Crear 15 carpetas según `/docs/FRONTEND-ROADMAP.md` Phase 1.4
+#### **1.7 React Query Setup (30min)** ✅
+- ✅ Providers configurado con QueryClientProvider
+- ✅ Toaster (Sonner) integrado
+- ✅ Layout principal actualizado con Providers
 
-#### **1.4 TypeScript Interfaces (2h)**
-- `src/types/product.ts`
-- `src/types/cart.ts`
-- `src/types/order.ts`
-- `src/types/user.ts`
-- `src/types/analytics.ts`
+#### **1.8 Utilidades y Helpers** ✅
+- ✅ `formatPrice()` - Formato ARS sin decimales
+- ✅ `formatDate()` - Formato es-AR con fecha y hora
+- ✅ `generateId()` - Generador de IDs únicos
 
-#### **1.5 Mock Data (2-3h)**
-- `src/data/mock-products.json` (~50 productos)
-- `src/data/mock-categories.json`
-- `src/data/mock-stores.json`
-
-#### **1.6 Zustand Stores (1h)**
-- `useCartStore.ts` con persist middleware
-- `useUserStore.ts` con session handling
-
-#### **1.7 React Query Setup (30min)**
-- Configurar providers
-- Setup de queries con artificial latency
+#### **1.9 Páginas Iniciales** ✅
+- ✅ `/` - Home con selector de portales (Cliente/Picker/Admin)
+- ✅ `/tienda/[storeId]` - Landing de bienvenida de tienda con:
+  - Detección y carga de store desde mock data
+  - Inicialización automática de sesión y carrito
+  - Badge de cantidad de items en carrito
+  - Botones: Iniciar Recorrido, Mi Carrito, Ver Catálogo
+  - Loading state y error handling
 
 **Criterios de Éxito:**
 - ✅ Proyecto Next.js corriendo en `localhost:3000`
-- ✅ TypeScript sin errores
+- ✅ TypeScript sin errores (tsconfig paths configurado @/*)
 - ✅ Mock data cargado correctamente
 - ✅ Stores funcionando con localStorage
+- ✅ 2 pantallas funcionando (Home + Store Landing)
 
-**Referencia:** `/docs/FRONTEND-ROADMAP.md` - Phase 1 (completo)
+**Servidor:** 🟢 Corriendo en http://localhost:3000
 
 ---
 
 ### ⏳ FASE 2: Experiencia Cliente Mobile (12-15 días)
 
-**Estado:** 🟡 PARCIALMENTE COMPLETADO (30%)  
+**Estado:** 🟡 **60% COMPLETADO** - 6/10 pantallas  
 **Prioridad:** 🔴 CRÍTICA
 
 **Progreso:**
-- ✅ Phase 2.1: Landing Principal (Completado en roadmap)
-- ✅ Phase 2.2: Landing Tienda/Bienvenida (Completado en roadmap)
-- ✅ Phase 2.3: Escáner QR (Completado en roadmap)
-- ✅ Phase 2.4: Catálogo de Productos (Completado en roadmap)
-- ⏳ Phase 2.5: Product Detail Page (PDP) + Modal Ofertas - **PENDIENTE**
-- ⏳ Phase 2.6: Carrito de Compras - **PENDIENTE**
-- ⏳ Phase 2.7: Checkout & Pago - **PENDIENTE**
-- ⏳ Phase 2.8: Estado del Pedido (Cliente) - **PENDIENTE**
-- ⏳ Phase 2.9: Confirmación de Retiro - **PENDIENTE**
+- ✅ Phase 2.1: **Landing Principal** - Home con selector de portales
+- ✅ Phase 2.2: **Landing Tienda/Bienvenida** - Inicialización de sesión + carrito
+- ✅ Phase 2.3: **Catálogo de Productos** - ✨ **COMPLETADO**
+  - Grid responsivo 2 columnas mobile
+  - Search bar con clear button
+  - Tabs horizontales por categoría (scroll horizontal)
+  - **ProductCard component** con:
+    - Imagen con aspect ratio 1:1
+    - Badge de descuento (-15%)
+    - Badge de cantidad en carrito
+    - Badge de stock bajo ("Quedan 5")
+    - Overlay "Sin stock" cuando stock = 0
+    - Bulk discount label ("💰 Comprá 10 y ahorrá 15%")
+    - Botón "+" para agregar rápido
+    - Click en card → Navega a PDP
+  - Toast notification al agregar al carrito (con action "Ver carrito")
+  - Floating cart button con badge
+  - Empty state cuando no hay resultados
+  - Loading skeleton (300ms artificial delay)
+  - Helper `parseProducts()` para parsear fechas del JSON
+- ✅ Phase 2.4: **Escáner QR** - ✨ **COMPLETADO CON EXTRAS**
+  - Scanner de QR real con html5-qrcode y acceso a cámara
+  - ⚡ **Botón "Simular Escaneo"** (demo mode con producto random)
+  - ⌨️ **Input manual de código** (acepta cualquier SKU sin validación)
+  - Fallback a catálogo completo
+  - Vibración + toast notifications
+  - Quick access buttons con SKUs de ejemplo
+  - Manejo silencioso de errores de cámara
+- ✅ Phase 2.5: **Product Detail Page (PDP)** - ✨ **COMPLETADO**
+  - Carousel de imágenes con navegación (dots indicator)
+  - Precio + descuentos destacados con % OFF
+  - Selector de cantidad con validación de stock real
+  - Accordion de especificaciones técnicas
+  - Campo de observaciones del cliente (textarea)
+  - Related products carousel clickeable
+  - Ofertas por cantidad (bulkDiscounts) con cards verdes
+  - Integración completa con carrito Zustand
+  - Animación de agregado al carrito
+- ✅ Phase 2.6: **Carrito de Compras** - ✨ **COMPLETADO**
+  - Lista de items con thumbnails + nombre + precio
+  - Edición inline de cantidades con stepper (+/-)
+  - Eliminación de items con undo toast (3 segundos)
+  - Resumen de totales (subtotal, descuentos en verde, total)
+  - Ofertas dinámicas relacionadas (carousel inferior)
+  - Stepper de progreso del flujo (Carrito → Pago → Confirmación)
+  - Botón "Ir a Pagar" con animación pulse
+  - Empty state con CTA al catálogo
+  - Validación de items con productos válidos (filter)
+  - Badge "¡Ahorraste $X!" cuando hay descuentos
+- ⏳ Phase 2.7: **Checkout & Pago** - **PRÓXIMO** 🎯
+- ⏳ Phase 2.8: **Estado del Pedido** (Cliente esperando)
+- ⏳ Phase 2.9: **Confirmación de Retiro**
+- ⏳ Phase 2.10: **Modal Ofertas Combinadas** (popup bottom-sheet)
 
-#### **2.5 Product Detail Page + Modal Ofertas (2-3 días)**
+#### **2.7 Checkout & Pago (2-3 días)** - **PRÓXIMO** 🎯
 **Features:**
-- Imagen principal + galería (carousel)
-- Precio + descuentos por cantidad ("Comprá 10 y ahorrá 15%")
-- Selector de cantidad con stock validation
-- Especificaciones técnicas (accordion collapsible)
+- Resumen final con desglose de precios (subtotal, descuentos, total)
+- Tiempo estimado de preparación: "Tu pedido estará listo en ~10 minutos"
+- Simulación MercadoPago Checkout Pro (mock payment flow)
+- Botón con logo y colores oficiales MercadoPago
+- **MVP:** Spinner 2 segundos → Pantalla de éxito (sin API real)
+- Validación de formularios (nombre, teléfono, email opcional)
+- Loading states elegantes con skeleton
+- Stepper de progreso actualizado
 - "Productos combinables" carousel
 - Botón "Comparar con similar" (modal con tabla comparativa)
 - **Modal Ofertas Combinadas:** Popup bottom-sheet que aparece al agregar al carrito

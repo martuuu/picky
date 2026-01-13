@@ -2,102 +2,585 @@
 
 ## 1. Visión del Proyecto
 
-**Picky** es una PWA de "Smart Shopping" diseñada para transformar la experiencia de compra en tiendas físicas (Corralones, Bazares, Ferreterías, Mayoristas). El cliente escanea productos con su celular - puede comprar desde catalogo tambine -, crea un carrito virtual sin carga física, paga online y retira su pedido preparado.
+**Picky** es una Progressive Web Application (PWA) de "Smart Shopping" diseñada para transformar la experiencia de compra en tiendas físicas. El sistema permite a los clientes escanear productos con su dispositivo móvil, crear un carrito virtual sin carga física, pagar online y retirar su pedido preparado.
 
-**Filosofía:** "Scan & Go". El cliente navega liviano, escanea lo que quiere, paga desde el celular y retira todo empaquetado.
+**Filosofía Core:** "Scan & Go". El cliente navega liviano por la tienda, escanea lo que desea, paga desde el celular y retira todo empaquetado en punto de retiro.
 
-**Estado Actual:**
-* 🟡 **Fase:** MVP Prototipo (Frontend-First)
-* 🎯 **Objetivo:** Simular flujo completo (Cliente Mobile + Picking Desktop + Admin Dashboard) con Mock Data + LocalStorage para validar UX/UI antes de integrar backend real
-* 🏗 **Arquitectura Futura:** Provider Agnostic (Tiendanube → SAP → VTEX vía Middleware)
-* 📱 **Mobile First:** Cliente 100% mobile, Admin/Picker desktop-oriented
-* 🎨 **Inspiración UI:** PedidosYa (sin rojo), colores a definir (ej: verde/azul moderno)
+### Estado Actual del Desarrollo
 
----
+**Fase:** MVP Prototipo (Frontend-First Approach)  
+**Progreso:** 15% - Setup completo + 2 pantallas core  
+**Servidor:** 🟢 http://localhost:3000
 
-## 2. Stack Tecnológico (MVP Prototipo)
+**Objetivo Estratégico:**
+- ✅ Simular flujo completo (Cliente Mobile + Picker Desktop + Admin Dashboard)
+- ✅ Validar UX/UI con usuarios reales antes de invertir en backend
+- ✅ Demo funcional para stakeholders e inversores
+- ✅ Arquitectura escalable preparada para integraciones enterprise
 
-**Frontend (PWA - Mobile First):**
-* **Framework:** Next.js 15+ (App Router, Turbopack)
-* **Lenguaje:** TypeScript 5+ (Estricto, types desde día 1)
-* **UI Kit:** Shadcn/UI + Tailwind CSS + Lucide Icons
-* **State Management:** Zustand (carrito global, sesión usuario) + React Query (mocking de APIs)
-* **Escaneo QR:** `html5-qrcode` o `react-qr-reader` (permisos de cámara)
-* **Animaciones:** Framer Motion (transiciones, modals)
-* **Diseño:** Inspirado en PedidosYa (cards, categorías, colores modernos)
-
-**Backend (Simulado en Prototipo):**
-* **Mocking:** Server Actions de Next.js con `await new Promise(resolve => setTimeout(resolve, 500))` para simular latencia
-* **Persistencia:** `localStorage` para carrito, usuario, órdenes activas (se pierde al cerrar navegador, no hay DB real)
-* **Mock Data:** Archivo `src/data/mock-products.json` con ~50 productos (nombre, SKU, precio, imagen, stock, categoría)
-* **Integraciones Futuras:** MercadoPago Sandbox + Tiendanube Dev API (post-MVP)
-
-**Arquitectura de Producción (Post-Prototipo):**
-* **Middleware:** Node.js / Vercel Serverless Functions (Adapter Pattern)
-* **Database:** PostgreSQL (para órdenes, usuarios, analytics)
-* **Integraciones:** Tiendanube REST API → SAP Service Layer → VTEX API (según cliente)
-* **Pagos:** MercadoPago Production API
+**Arquitectura Futura:** Provider Agnostic (Tiendanube → SAP → VTEX vía Middleware Layer)  
+**Approach:** Mobile First (Cliente 100% mobile, Admin/Picker desktop-oriented)  
+**Inspiración UI:** PedidosYa, Rappi, Uber Eats (sin usar rojo corporativo)
 
 ---
 
-## 3. Arquitectura del Sistema (Middleware Pattern)
+## 2. Stack Tecnológico y Decisiones de Arquitectura
 
-Aunque el MVP sea solo frontend, el código debe respetar la estructura de integración futura.
+### Frontend Stack (Production-Ready)
 
-**Patrón de Adaptador (Adapter Pattern):**
+**Framework:** Next.js 16.1.1  
+- ✅ App Router para rutas tipadas y layouts anidados
+- ✅ Turbopack para compilación ultra-rápida en desarrollo
+- ✅ Server Components por defecto (Client Components solo donde necesario)
+- ✅ Optimización automática de imágenes y fuentes
 
-El Frontend **nunca** llama a Tiendanube/SAP directamente. Siempre llama a una capa intermedia "Picky API Layer" que decide a qué provider consultar.
+**Lenguaje:** TypeScript 5+ (Strict Mode)  
+- ✅ Types desde día 1 (cero `any` permitido en producción)
+- ✅ Interfaces segregadas por dominio (Product, Cart, Order, User, Analytics)
+- ✅ Path aliases configurado (`@/*` → `src/*`)
+- ✅ JSON imports tipados (mock data con validación de schema)
 
+**UI Layer:** Shadcn/UI + Tailwind CSS 4  
+- ✅ 16 componentes primitivos instalados (Radix UI bajo el capó)
+- ✅ Sistema de diseño escalable con theme tokens
+- ✅ Componentes reutilizables y composables
+- ✅ Accesibilidad (WCAG AA) integrada por defecto
+- ✅ Dark mode ready (aunque MVP usa solo light mode)
+
+**State Management:** Zustand 5 + React Query  
+- ✅ Zustand para estado global persistente (Cart, User Session)
+- ✅ Middleware `persist` para localStorage sync
+- ✅ React Query para data fetching con cache inteligente
+- ✅ Optimistic updates preparados para integraciones reales
+
+**QR Technology Stack:**
+- ✅ `html5-qrcode` para lectura (cámara device)
+- ✅ `qrcode` + `jspdf` para generación masiva (admin panel)
+- ✅ Permisos de cámara con fallback a input manual
+
+**Animations & Interactions:** Framer Motion  
+- ✅ Transiciones fluidas entre vistas
+- ✅ Micro-interactions en botones y cards
+- ✅ Confetti animations para celebrar eventos (pedido listo)
+- ✅ Skeleton loaders para perceived performance
+
+**Charts & Analytics:** Recharts 3  
+- ✅ Line charts (ventas por hora)
+- ✅ Bar charts (top productos)
+- ✅ Funnel charts (conversión)
+- ✅ Responsive y performant
+
+---
+
+### Backend Simulado (MVP Strategy)
+
+**Principio Core:** "Mock todo, pero con estructura de producción"
+
+**Mocking Layer:** Server Actions de Next.js  
 ```typescript
-// Interfaz Unificada (consumida por Frontend)
-interface IProduct {
-  id: string;
-  sku: string;
-  name: string;
-  price: number;
-  stock: number;
-  imageUrl: string;
-  category: string;
+// Server Actions simulan latencia real
+export async function getProducts() {
+  'use server';
+  await new Promise(resolve => setTimeout(resolve, 500)); // Latencia artificial
+  return mockProducts;
 }
-
-// El Frontend consume:
-useProduct(sku) -> PickyMiddleware -> (Switch Provider) -> Tiendanube/SAP/Mock
 ```
 
-**Estrategia MVP (Prototipo):**
+**Persistencia:** localStorage con TTL  
+- ✅ Cart persiste 24 horas
+- ✅ Session persiste hasta logout manual
+- ✅ Orders persisten 7 días (luego auto-archive)
 
-El "Picky Middleware" devolverá datos de `src/data/mock-products.json` en lugar de llamar a APIs reales, pero la estructura de la llamada será idéntica a la versión de producción.
+**Mock Data Structure:**
+- `src/data/mock-products.json` - 10+ productos con specs completas
+- `src/data/mock-categories.json` - Taxonomía de productos
+- `src/data/mock-stores.json` - Multi-tenant ready (2 tiendas demo)
 
-**Ventajas:**
-- ✅ Cambiar de Mock → Tiendanube solo requiere modificar el middleware, frontend intacto
-- ✅ Escalable: Agregar SAP/VTEX solo suma un nuevo "adapter" en el middleware
-- ✅ Seguridad: Credenciales de APIs nunca expuestas en el cliente
+**Ventajas del Approach:**
+- ✅ Deploy en segundos (Vercel serverless)
+- ✅ Costo $0 en infraestructura durante validación
+- ✅ Cambios de UI sin migraciones de base de datos
+- ✅ Demo instantáneo para stakeholders
 
 ---
 
-## 4. User Flows y Módulos
+### Arquitectura de Producción (Post-Validación)
 
-El sistema se divide en **3 experiencias (Roles)** dentro de la misma WebApp:
+**Middleware Layer (Adapter Pattern)**
 
-### A. Experiencia Cliente (Mobile App)
+El código está preparado para que el frontend **nunca** llame directamente a APIs externas. Siempre consume una capa intermedia "Picky API" que decide el provider.
 
-**Público:** Consumidores finales que visitan la tienda física  
+```typescript
+// Interfaz unificada (agnóstica del backend)
+interface IProductProvider {
+  getProducts(): Promise<Product[]>;
+  getProduct(sku: string): Promise<Product>;
+  updateStock(sku: string, quantity: number): Promise<void>;
+}
+
+// Implementaciones intercambiables
+class MockProvider implements IProductProvider { /* ... */ }
+class TiendanubeProvider implements IProductProvider { /* ... */ }
+class SAPProvider implements IProductProvider { /* ... */ }
+class VTEXProvider implements IProductProvider { /* ... */ }
+
+// El frontend solo conoce la interfaz
+const provider = getProvider(); // Switch en runtime
+const products = await provider.getProducts();
+```
+
+**Beneficios Arquitectura:**
+- ✅ Cambiar de Mock → Tiendanube solo requiere config (cero cambios en UI)
+- ✅ Multi-tenant: cada tienda puede usar diferente backend
+- ✅ A/B testing de providers sin riesgo
+- ✅ Rollback instantáneo si un provider falla
+
+**Database Layer (Futuro):**
+- PostgreSQL 15+ (Vercel Postgres o Supabase)
+- Prisma ORM con migraciones versionadas
+- Row Level Security (RLS) para multi-tenancy
+- Realtime subscriptions para live updates (Picker → Cliente)
+
+---
+
+## 3. Principios de Desarrollo y Buenas Prácticas
+
+### 🎯 Principios Core
+
+**1. Mobile-First, Always**
+- Toda vista de Cliente se diseña para 320px primero
+- Desktop es progressive enhancement
+- Touch targets mínimos de 44x44px (Apple HIG)
+- Scroll natural sin scroll hijacking
+
+**2. Performance Budget**
+- First Contentful Paint < 1.5s
+- Time to Interactive < 3s
+- Lighthouse Score > 95 en mobile
+- Bundle size < 200KB (gzipped)
+
+**3. Accesibilidad No Negociable**
+- WCAG 2.1 AA mínimo
+- Keyboard navigation completa
+- Screen readers tested (VoiceOver, NVDA)
+- Color contrast ratio > 4.5:1
+
+**4. TypeScript Estricto**
+```typescript
+// ❌ NUNCA
+const data: any = await fetch('/api');
+
+// ✅ SIEMPRE
+const data: Product[] = await getProducts();
+```
+
+**5. Component Composition over Props Drilling**
+```typescript
+// ❌ Evitar
+<ProductCard 
+  name={name} 
+  price={price} 
+  stock={stock} 
+  onAdd={onAdd} 
+  showBadge={true}
+  badgeCount={5}
+  // ... 20 props más
+/>
+
+// ✅ Preferir
+<ProductCard product={product}>
+  <ProductCard.Image />
+  <ProductCard.Info />
+  <ProductCard.Actions>
+    <AddToCartButton />
+  </ProductCard.Actions>
+</ProductCard>
+```
+
+---
+
+### 🔒 Seguridad (Preparación para Producción)
+
+**1. Nunca exponer credenciales en cliente**
+```typescript
+// ❌ CRÍTICO: Nunca hacer esto
+const API_KEY = 'sk_live_123456789';
+
+// ✅ Usar variables de entorno en Server Actions
+export async function createPayment() {
+  'use server';
+  const apiKey = process.env.MERCADOPAGO_SECRET_KEY;
+  // ...
+}
+```
+
+**2. Input Sanitization**
+```typescript
+// Observaciones del cliente siempre sanitizadas
+const sanitizedObservation = observation
+  .trim()
+  .slice(0, 200) // Max length
+  .replace(/<script>/gi, ''); // Prevent XSS
+```
+
+**3. CORS y CSP Headers (Next.js config)**
+```typescript
+// next.config.ts
+const config = {
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          { key: 'X-Frame-Options', value: 'DENY' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+        ],
+      },
+    ];
+  },
+};
+```
+
+**4. Rate Limiting (Futuro con Vercel Edge Functions)**
+```typescript
+// Prevenir abuso de escaneo masivo
+const limiter = new Ratelimit({
+  redis: Redis.fromEnv(),
+  limiter: Ratelimit.slidingWindow(10, '10s'),
+});
+```
+
+---
+
+### ⚡ Optimización y Performance
+
+**1. Image Optimization**
+```tsx
+// Next.js optimiza automáticamente
+<Image
+  src="/products/cemento.jpg"
+  alt="Cemento Loma Negra"
+  width={400}
+  height={400}
+  loading="lazy"
+  placeholder="blur"
+  blurDataURL={blurDataURL}
+/>
+```
+
+**2. Code Splitting por Ruta**
+```typescript
+// Lazy load de componentes pesados
+const AdminDashboard = dynamic(() => import('@/components/admin/Dashboard'), {
+  loading: () => <Skeleton />,
+  ssr: false, // Admin no necesita SSR
+});
+```
+
+**3. Zustand Stores con Selective Subscriptions**
+```typescript
+// ❌ Re-renderiza todo
+const cart = useCartStore();
+
+// ✅ Solo subscribe a lo necesario
+const itemsCount = useCartStore(state => state.cart?.items.length || 0);
+```
+
+**4. React Query con Smart Cache**
+```typescript
+const { data: products } = useQuery({
+  queryKey: ['products', categoryId],
+  queryFn: () => getProducts(categoryId),
+  staleTime: 5 * 60 * 1000, // 5 minutos
+  cacheTime: 30 * 60 * 1000, // 30 minutos
+  refetchOnMount: false,
+  refetchOnWindowFocus: false,
+});
+```
+
+**5. Debounce en Search**
+```typescript
+// Evitar búsqueda por cada keystroke
+const debouncedSearch = useMemo(
+  () => debounce((term: string) => setSearchTerm(term), 300),
+  []
+);
+```
+
+---
+
+### 🎨 UX/UI Guidelines
+
+**1. Loading States Siempre Visibles**
+- Skeletons para listas (más natural que spinners)
+- Progress bars para procesos largos (>3s)
+- Optimistic updates cuando es seguro
+
+**2. Error Handling Humano**
+```typescript
+// ❌ Técnico
+"Error: ECONNREFUSED 127.0.0.1:5432"
+
+// ✅ Humano
+"No pudimos cargar los productos. Verificá tu conexión e intentá nuevamente."
+```
+
+**3. Feedback Inmediato**
+- Vibración al escanear QR exitoso
+- Sonido (opcional) cuando pedido está listo
+- Confetti al completar compra
+- Toast notifications para acciones exitosas
+
+**4. Empty States con CTA**
+```tsx
+// Carrito vacío
+<EmptyState
+  icon={<ShoppingCart />}
+  title="Tu carrito está vacío"
+  description="Escaneá productos o explorá el catálogo"
+  action={<Button>Ver Catálogo</Button>}
+/>
+```
+
+**5. Confirmaciones para Acciones Destructivas**
+```typescript
+// Antes de eliminar carrito completo
+<AlertDialog>
+  <AlertDialogTitle>¿Vaciar carrito?</AlertDialogTitle>
+  <AlertDialogDescription>
+    Se eliminarán {itemsCount} productos. Esta acción no se puede deshacer.
+  </AlertDialogDescription>
+  <AlertDialogAction onClick={clearCart}>Vaciar</AlertDialogAction>
+</AlertDialog>
+```
+
+---
+
+### 📱 PWA Best Practices
+
+**1. Manifest.json Completo**
+```json
+{
+  "name": "Picky - Smart Shopping",
+  "short_name": "Picky",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#16a34a",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
+```
+
+**2. Service Worker para Offline**
+```typescript
+// Cachear assets críticos
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open('picky-v1').then((cache) => {
+      return cache.addAll([
+        '/',
+        '/globals.css',
+        '/mock-products.json',
+      ]);
+    })
+  );
+});
+```
+
+**3. Add to Home Screen Prompt**
+```typescript
+// Detectar si puede instalarse
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  showInstallButton();
+});
+```
+
+---
+
+### 🧪 Testing Strategy (Futuro)
+
+**Unit Tests:** Vitest + Testing Library
+- Componentes aislados
+- Zustand stores
+- Utility functions
+
+**Integration Tests:** Playwright
+- User flows completos
+- Cross-browser (Chrome, Safari, Firefox)
+- Mobile viewport testing
+
+**E2E Tests Críticos:**
+1. Escanear producto → Agregar a carrito → Checkout → Pago
+2. Picker recibe pedido → Prepara items → Marca listo
+3. Cliente retira pedido → Validación QR → Confirmación
+
+---
+
+### 📊 Analytics & Monitoring (Post-MVP)
+
+**Events Tracking:**
+```typescript
+// Eventos críticos del funnel
+trackEvent('PRODUCT_SCANNED', { sku, categoryId });
+trackEvent('ADD_TO_CART', { productId, quantity });
+trackEvent('CHECKOUT_STARTED', { total, itemsCount });
+trackEvent('PAYMENT_SUCCESS', { orderId, total, method });
+trackEvent('ORDER_COMPLETED', { orderId, prepTime });
+```
+
+**Error Monitoring:** Sentry
+- Captura de errores en producción
+- Source maps para debugging
+- User context (sin PII)
+
+---
+
+## 4. User Flows y Arquitectura de Experiencias
+
+El sistema se estructura en **3 experiencias independientes** (pero comunicadas en tiempo real):
+
+### A. Experiencia Cliente (Mobile PWA)
+
+**Target:** Consumidores finales en tienda física  
 **Dispositivo:** 100% Mobile (iOS/Android/Mobile Web)  
-**Inspiración UI:** PedidosYa (cards, categorías, scroll fluido)
+**Inspiración:** PedidosYa, Rappi, Uber Eats
 
-#### **1. Onboarding/Landing (Pantalla 1)**
+**Flow Principal (Happy Path):**
+```
+1. Cliente escanea QR en entrada → Accede a /tienda/{storeId}
+2. Ve bienvenida personalizada + info de la tienda
+3. Opción A: Escanea productos con cámara → Llega a PDP
+   Opción B: Explora catálogo → Busca/filtra → Selecciona producto
+4. En PDP: Ajusta cantidad, lee specs, ve ofertas
+5. Agrega a carrito → Modal automático con productos relacionados
+6. Repite 3-5 hasta completar compra
+7. Va a carrito → Revisa items, ajusta cantidades
+8. Checkout → Ingresa datos (nombre, teléfono opcional)
+9. Paga → Simulación MercadoPago (MVP) / Real (Producción)
+10. Espera preparación → Ve tiempo estimado + estado realtime
+11. Recibe notificación → "¡Tu pedido está listo! 🎉"
+12. Muestra QR en punto de retiro
+13. Empleado escanea → Entrega productos
+14. Cliente confirma retiro → Rating opcional → Nueva compra
+```
 
-* **Entrada:** Cliente escanea QR en la entrada del local **O** ingresa manualmente a `picky.app/tienda/{id}`
-* **UI:** Landing con bienvenida: "¡Hola! Bienvenido a la experiencia Picky en **Ferretería El Tornillo**"
-* **CTAs:**
-  - 🎯 Botón principal: "Iniciar Recorrido" (activa cámara para escanear)
-  - 🛒 Botón secundario: "Ver Mi Carrito" (si ya tiene items guardados)
-  - 🔍 Botón terciario: "Ver Catálogo" (lista completa de productos)
+**Pantallas Críticas (10 total):**
+- ✅ Landing Principal (Portal Selector)
+- ✅ Landing Tienda (Bienvenida + Inicialización)
+- 🔄 Escáner QR (html5-qrcode)
+- 🔄 Catálogo (Grid + Tabs + Search)
+- 🔄 PDP (Carousel + Specs + Bulk Discounts)
+- 🔄 Modal Ofertas (Bottom Sheet Automático)
+- 🔄 Carrito (Lista + Resumen + Ofertas)
+- 🔄 Checkout (Form + Payment)
+- 🔄 Estado Pedido (Stepper + QR + Notificaciones)
+- 🔄 Confirmación (Success + Rating + Nueva Compra)
 
-#### **2. Catálogo de Productos (Pantalla 2)**
+---
 
-* **UI:** Lista/Grid de productos estilo PedidosYa
-* **Categorías:** Tabs horizontales (Cemento, Herramientas, Pintura, etc.)
+### B. Experiencia Picker (Desktop App)
+
+**Target:** Empleados de depósito/almacén  
+**Dispositivo:** Desktop/Tablet con teclado  
+**Inspiración:** Trello, Asana, Notion
+
+**Flow Principal:**
+```
+1. Picker accede a /picker → Ve Kanban de 4 columnas
+2. Recibe notificación → Nuevo pedido en "A Preparar"
+3. Click en pedido → Modal con detalle completo
+4. Inicia preparación → Pedido pasa a "En Proceso"
+5. Recorre depósito → Marca checkboxes por item recolectado
+6. Verifica productos → Click en item para ver imagen grande
+7. Completa todos los items → Botón "LISTO PARA ENTREGAR"
+8. Pedido pasa a "Listos" → Cliente recibe push notification
+9. Cliente llega a retirar → Muestra QR
+10. Picker escanea QR → Valida orden
+11. Entrega productos → Confirma entrega
+12. Pedido pasa a "Entregados" → Auto-archiva en 2hs
+```
+
+**Pantallas (3 total):**
+- 🔄 Kanban Board (4 columnas drag & drop)
+- 🔄 Modal Detalle (Lista items + Progress bar + Timeline)
+- � Escaneo QR Retiro (Validación + Confirmación)
+
+**Features Clave:**
+- 🔊 Sonido al recibir nuevo pedido
+- ⏱️ Timer automático por pedido (tracking de eficiencia)
+- 📍 Items ordenados por ubicación física (pasillo/estante)
+- 🚨 Alertas de stock faltante
+- 📊 Métricas en tiempo real (pedidos/hora, tiempo promedio)
+
+---
+
+### C. Experiencia Admin (Desktop Dashboard)
+
+**Target:** Dueño/Gerente de tienda  
+**Dispositivo:** Desktop (pantalla grande)  
+**Inspiración:** Google Analytics, Metabase, Shopify Admin
+
+**Flow Principal:**
+```
+1. Admin accede a /admin → Dashboard con KPIs
+2. Monitorea ventas en tiempo real
+3. Analiza embudos de conversión
+4. Gestiona catálogo de productos
+5. Genera QR codes para imprimir
+6. Configura descuentos y ofertas
+7. Revisa carritos abandonados
+8. Exporta reportes (CSV/PDF)
+```
+
+**Pantallas (4 total):**
+- 🔄 Dashboard Principal (KPIs + Gráficos + Alertas)
+- 🔄 Analytics (Funnel + Carritos Abandonados + Heatmaps)
+- 🔄 Gestión Productos (CRUD + QR Generator)
+- 🔄 Configuración (Store Settings + Usuarios + Descuentos)
+
+**Gráficos Críticos:**
+- 📈 Ventas por hora (line chart comparativo)
+- 📊 Top productos (bar chart horizontal)
+- 🔥 Heatmap: Escaneos vs Compras
+- 🎯 Funnel de conversión (4 etapas)
+
+---
+
+### Comunicación entre Experiencias (Realtime)
+
+**Tecnología (Futuro):**
+- WebSockets (Pusher/Ably) para updates en vivo
+- BroadcastChannel API para sync entre tabs
+- Server-Sent Events (SSE) para notificaciones unidireccionales
+
+**Events Críticos:**
+```typescript
+// Cliente → Picker
+CLIENT_PAID → NOTIFY_PICKER(newOrder)
+
+// Picker → Cliente  
+PICKER_STARTED_PREP → UPDATE_CLIENT_STATUS('preparing')
+PICKER_COMPLETED → NOTIFY_CLIENT('ready') + CONFETTI + SOUND
+
+// Admin → All
+ADMIN_UPDATED_STOCK → REFRESH_CATALOG()
+ADMIN_CREATED_OFFER → SHOW_OFFER_BANNER()
+```
 * **Cards:** Imagen, nombre, precio, stock badge ("Quedan 5"), botón "Agregar"
 * **Búsqueda:** Input con filtro en tiempo real
 * **Estado:** Si producto ya está en carrito, mostrar badge "(2)" en card
@@ -433,9 +916,220 @@ Cuando el usuario agrega un producto al carrito, si hay ofertas relacionadas:
 
 ---
 
-## 5. Estructura de Carpetas del Proyecto
+## 5. Roadmap de Integración Post-MVP
 
-```text
+### Fase 1: Validación con Usuarios Reales (Actual - MVP)
+**Duración:** 3-4 semanas  
+**Objetivo:** Validar UX/UI con 2-3 clientes pilot
+
+**Entregables:**
+- ✅ 17 pantallas funcionando con mock data
+- ✅ Demo deployado en Vercel
+- ✅ Métricas de uso capturadas (Analytics simulados)
+- ✅ Feedback de usuarios recopilado
+
+---
+
+### Fase 2: Integración MercadoPago (3-4 días)
+**Objetivo:** Procesar pagos reales en Sandbox
+
+**Tasks:**
+- Implementar Server Actions para crear preferencias
+- Webhook handler para notificaciones de pago
+- Testing con tarjetas de prueba
+- UI de estados de pago (approved, pending, rejected)
+
+**Referencia:** `/docs/backend-roadmap.md` - Phase 1
+
+---
+
+### Fase 3: Integración Tiendanube Dev API (4-5 días)
+**Objetivo:** Sincronizar catálogo real desde Tiendanube
+
+**Tasks:**
+- TiendanubeAdapter class (Adapter Pattern)
+- Sync bidireccional (Picky → Tiendanube, Tiendanube → Picky)
+- Webhook listener para cambios de stock
+- UI de configuración en Admin Panel
+
+**Referencia:** `/docs/backend-roadmap.md` - Phase 2
+
+---
+
+### Fase 4: PostgreSQL + Prisma (5-7 días)
+**Objetivo:** Reemplazar localStorage por DB persistente
+
+**Tasks:**
+- Schema completo (Store, Product, User, Order, Analytics)
+- Migrations versionadas
+- Row Level Security para multi-tenant
+- Server Actions con Prisma
+
+**Referencia:** `/docs/backend-roadmap.md` - Phase 3
+
+---
+
+### Fase 5: Realtime con WebSockets (3-4 días)
+**Objetivo:** Updates en vivo entre experiencias
+
+**Tasks:**
+- Integración Pusher/Ably
+- Events: ORDER_CREATED, ORDER_READY, STOCK_UPDATED
+- BroadcastChannel para sync multi-tab
+- Reconexión automática
+
+---
+
+### Fase 6: Analytics Real + Dashboard (3-4 días)
+**Objetivo:** Tracking de eventos y reportes
+
+**Tasks:**
+- Event tracking (Mixpanel/Amplitude)
+- Funnel analysis
+- Reportes exportables (CSV/PDF)
+- Scheduled jobs para reportes diarios
+
+**Referencia:** `/docs/backend-roadmap.md` - Phase 4
+
+---
+
+### Fase 7: SAP/VTEX Adapters (Enterprise - Futuro)
+**Objetivo:** Soportar clientes enterprise
+
+**Tasks:**
+- SAPAdapter (Service Layer)
+- VTEXAdapter (REST API)
+- Multi-provider per store (config-driven)
+- A/B testing de providers
+
+**Referencia:** `/docs/middleware-tiendanube-sap.md`
+
+---
+
+## 6. Deployment Strategy
+
+### MVP (Actual)
+**Platform:** Vercel (Hobby Plan - Free)  
+**Deploy:** Push to main → Auto deploy  
+**URL:** https://picky-app.vercel.app (o custom domain)  
+**Performance:** Edge Functions (ultra-fast cold starts)
+
+### Production (Futuro)
+**Platform:** Vercel Pro ($20/month)  
+**Database:** Vercel Postgres ($20/month) o Supabase  
+**Realtime:** Pusher Channels ($49/month)  
+**Monitoring:** Sentry ($26/month)  
+**Total:** ~$115/month para 1,000 pedidos/día
+
+---
+
+## 7. KPIs de Éxito del MVP
+
+### UX Metrics
+- ✅ Time to First Scan < 30 segundos
+- ✅ Add to Cart Success Rate > 90%
+- ✅ Checkout Completion Rate > 75%
+- ✅ Average Order Value > $5,000 ARS
+
+### Technical Metrics
+- ✅ Lighthouse Score > 95 (Mobile)
+- ✅ First Contentful Paint < 1.5s
+- ✅ Time to Interactive < 3s
+- ✅ Zero critical accessibility issues
+
+### Business Metrics
+- ✅ Customer Satisfaction > 4.5/5 stars
+- ✅ Picker Efficiency > 3 pedidos/hora
+- ✅ Stock Accuracy > 98%
+- ✅ Return Customer Rate > 40%
+
+---
+
+## 8. Documentos Relacionados
+
+### Para Developers
+- 📄 **`/docs/plan.md`** - Roadmap maestro con progreso actualizado
+- 📄 **`/docs/frontend-roadmap.md`** - Fases detalladas de desarrollo frontend
+- 📄 **`/docs/backend-roadmap.md`** - Integraciones post-MVP (5 fases)
+- 📄 **`README.md`** - Quick start guide y arquitectura
+
+### Para Stakeholders
+- 📄 **`/docs/pages-prototype.md`** - Wireframes y flujos de usuario
+- 📄 **`/docs/middleware-tiendanube-sap.md`** - Arquitectura de integraciones enterprise
+
+---
+
+## 9. Contacto y Equipo
+
+**Desarrollador Senior:** Responsable de arquitectura y desarrollo frontend  
+**Stack:** Next.js 16, TypeScript 5, Shadcn/UI, Zustand, React Query  
+**Metodología:** Agile con sprints de 1 semana  
+**Testing:** Manual en MVP, automatizado en producción  
+
+**Última Actualización:** 13 Enero 2026 - 19:00 hs  
+**Versión:** 0.1.0 (MVP en desarrollo)  
+**Servidor:** 🟢 http://localhost:3000
+
+---
+
+## 10. Notas Técnicas para IA Assistants
+
+Este documento sirve como **contexto completo** para asistentes de IA que trabajen en el proyecto Picky.
+
+**Principios de desarrollo:**
+1. TypeScript estricto (cero `any`)
+2. Mobile-first approach
+3. Component composition sobre props drilling
+4. Performance budget: < 200KB bundle
+5. Accesibilidad no negociable (WCAG AA)
+
+**Estructura de archivos:**
+- `src/app/` - Next.js App Router
+- `src/components/ui/` - Shadcn primitives (DO NOT EDIT)
+- `src/components/{cliente,picker,admin}/` - Custom components
+- `src/stores/` - Zustand global state
+- `src/types/` - TypeScript interfaces
+- `src/data/` - Mock JSON data
+
+**Comandos útiles:**
+```bash
+npm run dev       # Start dev server
+npm run build     # Production build
+npm run lint      # Run ESLint
+```
+
+**Cuando agregues features:**
+1. Actualizar interfaces TypeScript primero
+2. Crear mock data si es necesario
+3. Implementar UI component
+4. Actualizar `/docs/plan.md` con progreso
+5. Testing manual antes de commit
+
+**Prohibido en el código:**
+- ❌ `any` types
+- ❌ Inline styles (usar Tailwind)
+- ❌ Console.logs en producción
+- ❌ Hardcoded API keys
+- ❌ Magic numbers (usar constants)
+
+**Preferido:**
+- ✅ Functional components
+- ✅ TypeScript interfaces exportadas
+- ✅ Reusable utility functions
+- ✅ Semantic HTML
+- ✅ Descriptive variable names
+
+---
+
+**FIN DEL DOCUMENTO**
+
+Para comenzar a desarrollar, ejecutar:
+```bash
+cd /Users/martinnavarro/Documents/picky
+npm run dev
+```
+
+Luego abrir http://localhost:3000 para ver el progreso actual.text
 /picky
 ├── /src
 │   ├── /app                          # Next.js App Router

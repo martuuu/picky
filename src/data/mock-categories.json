@@ -1,0 +1,40 @@
+{
+  "categories": [
+    {
+      "id": "cat-001",
+      "name": "Cocina y Mesa",
+      "icon": "�️",
+      "productsCount": 45
+    },
+    {
+      "id": "cat-002",
+      "name": "Limpieza",
+      "icon": "🧹",
+      "productsCount": 32
+    },
+    {
+      "id": "cat-003",
+      "name": "Decoración",
+      "icon": "🖼️",
+      "productsCount": 28
+    },
+    {
+      "id": "cat-004",
+      "name": "Organización",
+      "icon": "�",
+      "productsCount": 38
+    },
+    {
+      "id": "cat-005",
+      "name": "Textil y Baño",
+      "icon": "�",
+      "productsCount": 25
+    },
+    {
+      "id": "cat-006",
+      "name": "Iluminación",
+      "icon": "�",
+      "productsCount": 18
+    }
+  ]
+}
