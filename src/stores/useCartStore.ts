@@ -73,7 +73,6 @@ export const useCartStore = create<CartStore>()(
             addedAt: new Date(),
             unitPrice: product.price,
             totalPrice: product.price * quantity,
-            appliedDiscount: 0,
           };
           updatedItems = [...cart.items, newItem];
         }
