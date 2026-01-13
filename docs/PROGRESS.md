@@ -1,7 +1,7 @@
 # 📊 PICKY - Progress Tracker
 
-**Última Actualización:** 14 Enero 2026 - 01:30 hs  
-**Estado General:** 🚀 **53% Completado** (9/17 pantallas)  
+**Última Actualización:** 14 Enero 2026 - 02:30 hs  
+**Estado General:** 🚀 **70% Completado** (12/17 pantallas)  
 **Servidor:** 🟢 http://localhost:3000
 
 ---
@@ -12,10 +12,81 @@
 |------|----------|-----------|--------|
 | **Setup Inicial** | 100% | - | ✅ Completo |
 | **Cliente Mobile** | 90% | 9/10 | 🎉 Casi Completo |
-| **Picker Desktop** | 0% | 0/3 | ⏳ Pendiente |
+| **Picker Desktop** | 100% | 3/3 | ✅ Completo |
 | **Admin Dashboard** | 0% | 0/4 | ⏳ Pendiente |
 
-**Total General:** 9/17 pantallas = **53% completado**ess Tracker
+**Total General:** 12/17 pantallas = **70% completado**
+
+---
+
+## 🎉 NUEVO: PORTAL PICKER COMPLETO (14 Enero 2026 - 02:30 hs)
+
+### ✅ Fase 3: Picker Desktop (100% - 3/3 pantallas)
+
+#### Infraestructura
+- ✅ **Zustand Store** (`usePickerStore`) - Gestión de órdenes en tiempo real
+- ✅ **Layout Desktop** - Sidebar con navegación
+- ✅ **Page Transitions** - Animaciones estilo PedidosYa/Instagram
+
+#### Pantallas Implementadas
+
+**1. Kanban de Pedidos** (`/picker`)
+- ✅ 3 columnas: Nuevos / En Preparación / Listos
+- ✅ OrderCard component con progress visual
+- ✅ Auto-refresh cada 5 segundos
+- ✅ Stats header con contadores por estado
+- ✅ Scroll horizontal responsive
+
+**2. Modal Detalle de Pedido**
+- ✅ Información completa del cliente
+- ✅ Checklist interactivo de items
+- ✅ Imágenes de productos
+- ✅ Control de estados (Paid → Preparing → Ready → Completed)
+- ✅ Validación de items completos antes de marcar listo
+- ✅ Toasts de feedback
+
+**3. Escaneo QR Retiro** (`/picker/retiro`)
+- ✅ Scanner QR con html5-qrcode
+- ✅ Input manual con autocompletado
+- ✅ Validación de pedidos en estado READY_FOR_PICKUP
+- ✅ Card de confirmación con datos del cliente
+- ✅ Lista de pedidos listos para retirar
+- ✅ Actualización de estado a COMPLETED
+
+#### Features Técnicas
+- ✅ Drag & drop ready (arquitectura preparada)
+- ✅ Real-time sync con localStorage
+- ✅ Responsive desktop-first
+- ✅ Toast notifications (Sonner)
+- ✅ Vibration API para feedback háptico
+- ✅ Auto-load de órdenes
+
+---
+
+## 🎨 NUEVO: TRANSICIONES APP-STYLE
+
+### ✅ Implementado (14 Enero 2026)
+
+**PageTransition Component** (Framer Motion)
+- ✅ Slide + Fade animations
+- ✅ Cubic bezier easing (estilo PedidosYa)
+- ✅ 300ms entrada / 200ms salida
+- ✅ AnimatePresence mode="wait"
+
+**Template Files**
+- ✅ `/app/template.tsx` - Root transitions
+- ✅ `/app/tienda/[storeId]/template.tsx` - Cliente routes
+- ✅ `/app/picker/template.tsx` - Picker routes
+
+**AnimatedButton Component**
+- ✅ Scale animations on tap/hover
+- ✅ Spring physics (stiffness 400, damping 17)
+- ✅ 3 variantes (primary/secondary/outline)
+- ✅ 3 tamaños (sm/md/lg)
+
+**Optimizaciones Layout**
+- ✅ suppressHydrationWarning en html/body
+- ✅ Smooth transitions sin flickeress Tracker
 
 **Última Actualización:** 13 Enero 2026 - 23:00 hs  
 **Estado General:** � **53% Completado** (9/17 pantallas)  
