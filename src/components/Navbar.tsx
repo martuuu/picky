@@ -139,24 +139,29 @@ export function Navbar() {
             <span className="font-bold text-xl text-gray-900 hidden sm:block">Picky</span>
           </button>
 
-          {/* Breadcrumbs - Centro */}
-          <div className="hidden md:flex items-center gap-1 text-sm text-gray-600 flex-1 overflow-x-auto">
-            {breadcrumbs.map((crumb, index) => (
-              <div key={index} className="flex items-center gap-1 shrink-0">
-                {index > 0 && <ChevronRight className="w-4 h-4 text-gray-400" />}
-                {index === breadcrumbs.length - 1 ? (
-                  <span className="font-medium text-gray-900">{crumb.label}</span>
-                ) : (
-                  <button
-                    onClick={() => router.push(crumb.href)}
-                    className="hover:text-gray-900 transition-colors"
-                  >
-                    {crumb.label}
-                  </button>
-                )}
-              </div>
-            ))}
-          </div>
+          {/* Breadcrumbs - Centro (Solo visible en Cliente y Picker, NO en Admin) */}
+          {!isAdminPortal && (
+            <div className="hidden md:flex items-center gap-1 text-sm text-gray-600 flex-1 overflow-x-auto">
+              {breadcrumbs.map((crumb, index) => (
+                <div key={index} className="flex items-center gap-1 shrink-0">
+                  {index > 0 && <ChevronRight className="w-4 h-4 text-gray-400" />}
+                  {index === breadcrumbs.length - 1 ? (
+                    <span className="font-medium text-gray-900">{crumb.label}</span>
+                  ) : (
+                    <button
+                      onClick={() => router.push(crumb.href)}
+                      className="hover:text-gray-900 transition-colors"
+                    >
+                      {crumb.label}
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Spacer para centrar cuando no hay breadcrumbs (Admin) */}
+          {isAdminPortal && <div className="flex-1" />}
 
           {/* Búsqueda - Solo visible en portal cliente (desktop) */}
           {isClientPortal && (

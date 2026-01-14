@@ -9,7 +9,6 @@ import { Button } from '@/components/ui/button';
 import { RefreshCw, Package, Clock, CheckCircle2, BarChart3, Home } from 'lucide-react';
 import type { Order, OrderStatus } from '@/types/order';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 
 export default function PickerPage() {
   const { orders, loadOrders, selectOrder, selectedOrder } = usePickerStore();
@@ -79,11 +78,6 @@ export default function PickerPage() {
       <header className="bg-white border-b border-gray-200 p-6">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
-              <Link href="/" className="hover:text-blue-600">Inicio</Link>
-              <span>/</span>
-              <span className="text-gray-900 font-medium">Portal Picker</span>
-            </div>
             <h1 className="text-2xl font-bold text-gray-900">Pedidos Activos</h1>
             <p className="text-sm text-gray-500 mt-1">
               {orders.length} pedido{orders.length !== 1 ? 's' : ''} en total

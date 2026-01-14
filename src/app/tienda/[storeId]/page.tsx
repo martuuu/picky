@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Camera, ShoppingCart, Search, ArrowLeft, Store as StoreIcon, User } from 'lucide-react';
+import { Camera, ShoppingCart, Search, ArrowLeft, Store as StoreIcon } from 'lucide-react';
 import { useCartStore } from '@/stores/useCartStore';
 import { useUserStore } from '@/stores/useUserStore';
 import { Store } from '@/types/user';
@@ -88,28 +88,6 @@ export default function StoreLandingPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-linear-to-br from-green-50 to-blue-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm">
-        <div className="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => router.push('/')}
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => router.push(`/tienda/${storeId}/perfil`)}
-          >
-            <User className="w-5 h-5" />
-          </Button>
-          <h1 className="text-lg font-semibold">Picky</h1>
-          <div className="w-10" /> {/* Spacer */}
-        </div>
-      </div>
-
       {/* Main Content */}
       <div className="flex-1 flex items-center justify-center p-4">
         <div className="w-full max-w-md space-y-6">
