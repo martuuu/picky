@@ -8,32 +8,49 @@ MVP Prototipo - Frontend First con Mock Data + localStorage
 
 ## 📊 Estado del Proyecto
 
-**Progreso:** � **35% Completado** (6/17 pantallas)  
-**Última Actualización:** 13 Enero 2026 - 21:30 hs  
+**Progreso:** 🎉 **100% MVP COMPLETO** (24 pantallas totales)  
+**Última Actualización:** 14 Enero 2026 - 04:00 hs  
 **Servidor:** 🟢 Corriendo en http://localhost:3000
 
-### ✅ Completado (6 pantallas)
+### ✅ Completado (24 pantallas)
 - ✅ Setup inicial completo (Next.js 16.1.1 + TypeScript 5 + Shadcn/UI)
-- ✅ 16 componentes UI instalados
-- ✅ Zustand stores (Cart + User) con persist middleware
+- ✅ 18 componentes UI instalados (Label y Switch agregados)
+- ✅ Zustand stores (Cart + User + Picker) con persist middleware
 - ✅ TypeScript interfaces completas (5 archivos)
 - ✅ Mock data (20 productos bazar, 6 categorías, 2 tiendas)
-- ✅ **Landing Principal** - Home con selector de portales
-- ✅ **Store Landing** - Bienvenida + inicialización de sesión
-- ✅ **Catálogo** - Grid 2 col + búsqueda + filtros
-- ✅ **Scanner QR** - Con simulador + input manual
-- ✅ **Product Detail Page** - Completa con ofertas
-- ✅ **Carrito** - Gestión completa + ofertas dinámicas
+- ✅ **Portal Cliente Mobile (10/10 pantallas core + 3 adicionales):**
+  - Landing Principal - Home con selector de portales
+  - Store Landing - Bienvenida + inicialización de sesión
+  - Catálogo - Grid 2 col + búsqueda + filtros
+  - Scanner QR - Con simulador + input manual
+  - Product Detail Page - Completa con ofertas
+  - Carrito - Gestión completa + ofertas dinámicas
+  - Checkout & Pago - Simulación MercadoPago + validación
+  - Estado del Pedido - Real-time tracking + ofertas bar
+  - Confirmación - QR retiro + confetti
+  - Modal Ofertas Combinadas - Bottom sheet automático ✅
+  - **NUEVO:** Perfil Cliente - Stats + niveles + progress
+  - **NUEVO:** Ajustes - Mock form + roadmap
+  - **NUEVO:** Direcciones - Mock direcciones + roadmap
+- ✅ **Portal Picker Desktop (3/3 pantallas + 1 adicional):**
+  - Kanban de Pedidos - 3 columnas drag-ready
+  - Modal Detalle - Checklist interactivo
+  - Escaneo QR Retiro - Validación y entrega
+  - **NUEVO:** Historial - Stats + roadmap métricas
+- ✅ **Panel Admin (4/4 pantallas):**
+  - Dashboard Principal - Stats + Pedidos + Top Productos
+  - Analytics Avanzado - Charts (Line, Bar, Pie) + Embudo
+  - Productos & QR - 2 vistas + Generación QR
+  - Configuración - 5 tabs completas
+- ✅ **Páginas Adicionales (2 páginas):**
+  - **NUEVO:** Perfil de Sucursal - Info completa + roadmap
+  - **NUEVO:** 404 Personalizada - 6 accesos rápidos + friendly design
 
-### 🚧 En Desarrollo
-- **Checkout & Pago** (PRÓXIMO 🎯) - Simulación MercadoPago
-
-### ⏳ Próximo
-- Estado del Pedido (real-time tracking)
-- Confirmación de Retiro
-- Modal Ofertas Combinadas
-- Picker Portal (Kanban)
-- Admin Dashboard
+### 🎯 Estado Final
+**17 pantallas core funcionando al 100%**  
+**7 páginas adicionales con roadmaps de desarrollo**  
+**1 página 404 personalizada**  
+**Total: 24 pantallas = MVP 100% COMPLETO** 🎉
 
 ---
 
@@ -52,30 +69,28 @@ open http://localhost:3000
 
 ---
 
-## 📱 Pantallas del MVP (17 total)
+## 📱 Rutas Principales
 
-### 👤 Cliente Mobile (10 pantallas) - 60% Completado
-1. ✅ **Landing Principal** - `/` - Selector de portales
-2. ✅ **Landing Tienda** - `/tienda/[storeId]` - Bienvenida personalizada
-3. ✅ **Escáner QR** - `/tienda/[storeId]/escanear` - Con simulador + input manual
-4. ✅ **Catálogo** - `/tienda/[storeId]/catalogo` - Búsqueda + filtros + grid
-5. ✅ **Product Detail** - `/tienda/[storeId]/producto/[sku]` - Completa con ofertas
-6. ✅ **Carrito** - `/tienda/[storeId]/carrito` - Gestión completa + resumen
-7. ⏳ **Checkout** - `/tienda/[storeId]/checkout` - **PRÓXIMO**
-8. ⏳ **Estado Pedido** - `/tienda/[storeId]/pedido/[orderId]` - Real-time tracking
-9. ⏳ **Confirmación** - `/tienda/[storeId]/confirmacion` - QR retiro + feedback
-10. ⏳ **Modal Ofertas** - Popup automático bottom-sheet
+### 👤 Cliente Mobile
+- `/` - Landing Principal
+- `/tienda/store-001` - Store Landing (Bazar Casa Bella)
+- `/tienda/store-001/catalogo` - Catálogo de productos
+- `/tienda/store-001/escanear` - Scanner QR
+- `/tienda/store-001/producto/[sku]` - Detalle de producto
+- `/tienda/store-001/carrito` - Carrito de compras
+- `/tienda/store-001/checkout` - Checkout & Pago
+- `/tienda/store-001/pedido/[orderId]` - Estado del pedido
+- `/tienda/store-001/confirmacion` - Confirmación de retiro
 
-### 📦 Picker Desktop (3 pantallas) - 0% Completado
-11. ⏳ **Kanban de Pedidos** - `/picker`
-12. ⏳ **Modal Detalle Picking** - `/picker/pedido/[orderId]`
-13. ⏳ **Escaneo QR Retiro** - `/picker/retiro`
+### 📦 Picker Desktop
+- `/picker` - Kanban de pedidos (Nuevos/Preparando/Listos)
+- `/picker/retiro` - Escaneo QR para entrega
 
-### 📊 Admin Dashboard (4 pantallas) - 0% Completado
-14. ⏳ **Dashboard Principal** - `/admin`
-15. ⏳ **Analytics Avanzado** - `/admin/analytics`
-16. ⏳ **Gestión Productos + QR** - `/admin/productos`
-17. ⏳ **Configuración** - `/admin/configuracion`
+### 📊 Admin Dashboard
+- `/admin` - Dashboard principal con stats
+- `/admin/analytics` - Analytics avanzado (Charts + Embudo)
+- `/admin/productos` - Gestión de productos + Generación QR
+- `/admin/configuracion` - Configuración de tienda (5 tabs)
 
 ---
 

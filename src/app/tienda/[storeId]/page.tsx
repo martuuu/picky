@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Camera, ShoppingCart, Search, ArrowLeft, Store as StoreIcon } from 'lucide-react';
+import { Camera, ShoppingCart, Search, ArrowLeft, Store as StoreIcon, User } from 'lucide-react';
 import { useCartStore } from '@/stores/useCartStore';
 import { useUserStore } from '@/stores/useUserStore';
 import { Store } from '@/types/user';
@@ -97,6 +97,13 @@ export default function StoreLandingPage() {
             onClick={() => router.push('/')}
           >
             <ArrowLeft className="w-5 h-5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => router.push(`/tienda/${storeId}/perfil`)}
+          >
+            <User className="w-5 h-5" />
           </Button>
           <h1 className="text-lg font-semibold">Picky</h1>
           <div className="w-10" /> {/* Spacer */}

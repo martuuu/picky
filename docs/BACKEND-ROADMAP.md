@@ -1,522 +1,715 @@
-# 🔧 BACKEND ROADMAP - Picky
+# 🚀 Backend Roadmap - Picky MVP
 
-**Última Actualización:** 13 Enero 2026  
-**Estado:** 🟡 **POST-MVP** (Backend real después del prototipo frontend)  
-**Estrategia:** Frontend-First con Mock Data → Integración Real → Escalabilidad
+Este documento técnico detalla el desarrollo backend completo desde el prototipo funcional hasta producción con integraciones reales.
 
 ---
 
-## 📋 RESUMEN EJECUTIVO
+## ✅ Fase 0: MVP Prototipo (100% Completo)
 
-El MVP de **Picky** es **Frontend-First** utilizando:
-- Mock data (JSON estáticos)
-- LocalStorage para persistencia
-- Server Actions simulados con latencia artificial
+### Estado Actual
+- **24 páginas funcionales** con mock data
+- **3 Zustand stores** (Cart, User, Picker) con persistencia
+- **Mock products/stores** en JSON estático
+- **TypeScript 5 strict mode** + Next.js 16.1.1 App Router
+- **18 Shadcn/UI components** integrados
+- **QR Scanner** con html5-qrcode
+- **Framer Motion** para transiciones
+- **Recharts** para analytics admin
 
-El backend real se implementará en **fases posteriores** una vez validado el MVP con usuarios reales.
+### Arquitectura Actual
+```typescript
+// Mock Data Pattern
+export const mockProducts = [
+  {
+    id: "1",
+    name: "Adorno Decorativo",
+    sku: "DECO-001",
+    price: 1299,
+    category: "decoracion",
+    // ... más campos mock
+  }
+];
+
+// Zustand Store Pattern
+interface CartStore {
+  items: CartItem[];
+  addItem: (product: Product, quantity: number) => void;
+  removeItem: (productId: string) => void;
+  // ... más métodos
+}
+```
+
+**Listo para migrar a backend real.**
 
 ---
 
-## 🎯 FASE 0: MVP Prototipo (Frontend-Only)
+## 🔄 Fase 1: Integración MercadoPago (Prioridad Alta)
 
-### **Estado Actual:** ✅ Arquitectura definida en `docs/context.md`
+### 1.1 Setup Inicial
 
-**Stack Simulado:**
-- **Server Actions:** Next.js con `await setTimeout(500)` para simular latencia
-- **Persistencia:** `localStorage` (carrito, sesiones, órdenes)
-- **Sincronización:** `BroadcastChannel` API para sync entre tabs
-- **Mock Data:** Archivos JSON estáticos (`mock-products.json`, `mock-stores.json`)
-
-**Limitaciones del MVP:**
-- ⚠️ No hay autenticación real (todos son usuarios anónimos)
-- ⚠️ Stock NO se decrementa (solo visual)
-- ⚠️ Pagos simulados (no hay MercadoPago real)
-- ⚠️ Datos se pierden al limpiar localStorage
-- ⚠️ No hay analytics reales (solo simulados)
-
-**Ventajas del MVP:**
-- ✅ Deploy ultra rápido (solo frontend estático)
-- ✅ Costo $0 de infraestructura
-- ✅ Validación de UX/UI sin complejidad backend
-- ✅ Cambios rápidos sin migraciones de DB
-- ✅ Demo funcional para inversores/clientes
-
----
-
-## 🟢 FASE 1: Integración MercadoPago Sandbox (3-4 días)
-
-### **Objetivo:** Procesar pagos reales en modo desarrollo
-
-### **Tareas:**
-
-#### **1.1 Setup MercadoPago (1h)**
-
+#### Instalación
 ```bash
 npm install mercadopago
+npm install @types/mercadopago --save-dev
 ```
 
-**Crear cuenta:** [MercadoPago Developers](https://www.mercadopago.com.ar/developers/es/guides/overview)
-
-#### **1.2 Server Action para crear Preferencia (2h)**
-
-**Archivo:** `src/actions/payment-actions.ts`
-
+#### Configuración
 ```typescript
-'use server';
+// lib/mercadopago/config.ts
+import { MercadoPagoConfig, Payment, Preference } from 'mercadopago';
 
-import mercadopago from 'mercadopago';
-
-mercadopago.configure({
-  access_token: process.env.MP_ACCESS_TOKEN!,
+const client = new MercadoPagoConfig({
+  accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN!,
+  options: {
+    timeout: 5000,
+    idempotencyKey: 'your-unique-key'
+  }
 });
 
-export async function createPaymentPreference(order: {
-  items: Array<{
-    title: string;
-    quantity: number;
-    unit_price: number;
-  }>;
-  totalAmount: number;
-  orderId: string;
-  storeId: string;
-}) {
-  try {
-    const preference = await mercadopago.preferences.create({
-      items: order.items,
-      back_urls: {
-        success: `${process.env.NEXT_PUBLIC_BASE_URL}/tienda/${order.storeId}/pedido/${order.orderId}?status=success`,
-        failure: `${process.env.NEXT_PUBLIC_BASE_URL}/tienda/${order.storeId}/carrito?status=failure`,
-        pending: `${process.env.NEXT_PUBLIC_BASE_URL}/tienda/${order.storeId}/pedido/${order.orderId}?status=pending`,
-      },
-      auto_return: 'approved',
-      external_reference: order.orderId,
-      notification_url: `${process.env.NEXT_PUBLIC_BASE_URL}/api/webhooks/mercadopago`,
-    });
-
-    return {
-      success: true,
-      preferenceId: preference.body.id,
-      initPoint: preference.body.init_point,
-    };
-  } catch (error) {
-    console.error('Error creating MP preference:', error);
-    return {
-      success: false,
-      error: 'Error al crear preferencia de pago',
-    };
-  }
-}
+export const payment = new Payment(client);
+export const preference = new Preference(client);
 ```
 
-#### **1.3 Webhook para notificaciones (2h)**
+#### Variables de Entorno
+```env
+# .env.local
+MERCADOPAGO_ACCESS_TOKEN=TEST-XXXXXXXXXXXXXXX
+MERCADOPAGO_PUBLIC_KEY=TEST-XXXXXXXXXXXXXXX
+MERCADOPAGO_WEBHOOK_SECRET=your_webhook_secret
+NEXT_PUBLIC_MP_PUBLIC_KEY=TEST-XXXXXXXXXXXXXXX
+```
 
-**Archivo:** `src/app/api/webhooks/mercadopago/route.ts`
+### 1.2 Flujo de Pago Completo
 
+#### Crear Preferencia de Pago
 ```typescript
+// app/api/checkout/create-preference/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import mercadopago from 'mercadopago';
+import { preference } from '@/lib/mercadopago/config';
 
-mercadopago.configure({
-  access_token: process.env.MP_ACCESS_TOKEN!,
-});
-
-export async function POST(request: NextRequest) {
+export async function POST(req: NextRequest) {
   try {
-    const body = await request.json();
-    
-    // MercadoPago envía notificaciones de tipo "payment"
-    if (body.type === 'payment') {
-      const paymentId = body.data.id;
-      
-      // Obtener detalles del pago
-      const payment = await mercadopago.payment.get(paymentId);
-      
-      if (payment.body.status === 'approved') {
-        const orderId = payment.body.external_reference;
-        
-        // TODO: Actualizar estado de orden en DB
-        // Por ahora, actualizar en localStorage via BroadcastChannel
-        
-        console.log(`Pago aprobado para orden ${orderId}`);
-      }
-    }
-    
-    return NextResponse.json({ received: true });
-  } catch (error) {
-    console.error('Webhook error:', error);
-    return NextResponse.json({ error: 'Webhook processing failed' }, { status: 500 });
-  }
-}
-```
+    const { items, orderId, storeId } = await req.json();
 
-#### **1.4 Variables de entorno (10min)**
-
-**Archivo:** `.env.local`
-
-```bash
-# MercadoPago (Sandbox)
-MP_ACCESS_TOKEN=TEST-1234567890-123456-abcdef1234567890abcdef1234567890-123456789
-MP_PUBLIC_KEY=TEST-abcdef12-3456-7890-abcd-ef1234567890
-
-# Base URL (para webhooks)
-NEXT_PUBLIC_BASE_URL=http://localhost:3000
-```
-
-**Archivo:** `.env.example`
-
-```bash
-# MercadoPago
-MP_ACCESS_TOKEN=your_access_token_here
-MP_PUBLIC_KEY=your_public_key_here
-NEXT_PUBLIC_BASE_URL=https://picky.app
-```
-
-#### **1.5 Testing (1-2h)**
-
-- ✅ Crear orden de prueba
-- ✅ Generar preferencia de pago
-- ✅ Abrir Checkout de MercadoPago
-- ✅ Pagar con tarjeta de prueba
-- ✅ Verificar que webhook recibe notificación
-- ✅ Verificar que orden se marca como "PAID"
-
-**Tarjetas de prueba:** [Tarjetas de Prueba MP](https://www.mercadopago.com.ar/developers/es/docs/checkout-api/testing)
-
----
-
-## 🟡 FASE 2: Integración Tiendanube Dev API (4-5 días)
-
-### **Objetivo:** Sincronizar catálogo real desde Tiendanube
-
-### **Tareas:**
-
-#### **2.1 Setup Tiendanube (1h)**
-
-**Crear app:** [Tiendanube Partners](https://www.tiendanube.com/partners)
-
-```bash
-npm install axios
-```
-
-#### **2.2 Server Actions para Tiendanube (3h)**
-
-**Archivo:** `src/lib/adapters/tiendanube.ts`
-
-```typescript
-import axios from 'axios';
-
-const TIENDANUBE_API_URL = 'https://api.tiendanube.com/v1';
-
-export class TiendanubeAdapter {
-  private accessToken: string;
-  private storeId: string;
-
-  constructor(accessToken: string, storeId: string) {
-    this.accessToken = accessToken;
-    this.storeId = storeId;
-  }
-
-  private get headers() {
-    return {
-      'Authentication': `bearer ${this.accessToken}`,
-      'User-Agent': 'Picky (martin@picky.app)',
-      'Content-Type': 'application/json',
-    };
-  }
-
-  async getProducts(params?: {
-    page?: number;
-    per_page?: number;
-    published?: boolean;
-  }) {
-    const response = await axios.get(
-      `${TIENDANUBE_API_URL}/${this.storeId}/products`,
-      {
-        headers: this.headers,
-        params: {
-          per_page: 50,
-          published: true,
-          ...params,
-        },
-      }
-    );
-
-    return response.data.map(this.normalizeProduct);
-  }
-
-  async getProduct(productId: string) {
-    const response = await axios.get(
-      `${TIENDANUBE_API_URL}/${this.storeId}/products/${productId}`,
-      {
-        headers: this.headers,
-      }
-    );
-
-    return this.normalizeProduct(response.data);
-  }
-
-  async createOrder(order: {
-    customer: {
-      name: string;
-      email?: string;
-      phone?: string;
-    };
-    products: Array<{
-      variant_id: string;
-      quantity: number;
-    }>;
-    payment_status: string;
-    shipping_pickup: boolean;
-  }) {
-    const response = await axios.post(
-      `${TIENDANUBE_API_URL}/${this.storeId}/orders`,
-      order,
-      {
-        headers: this.headers,
-      }
-    );
-
-    return response.data;
-  }
-
-  // Normalizar producto de Tiendanube a formato Picky
-  private normalizeProduct(tnProduct: any) {
-    return {
-      id: tnProduct.id.toString(),
-      sku: tnProduct.sku || `TN-${tnProduct.id}`,
-      name: tnProduct.name.es || tnProduct.name,
-      description: tnProduct.description?.es || tnProduct.description || '',
-      price: Math.round(tnProduct.variants[0].price * 100), // Convertir a centavos
-      stock: tnProduct.variants[0].stock || 0,
-      category: tnProduct.categories?.[0]?.name?.es || 'General',
-      imageUrl: tnProduct.images?.[0]?.src || '/placeholder.jpg',
-      images: tnProduct.images?.map((img: any) => img.src) || [],
-      unit: 'unidad',
-      isActive: tnProduct.published,
-      createdAt: new Date(tnProduct.created_at),
-      updatedAt: new Date(tnProduct.updated_at),
-    };
-  }
-}
-```
-
-**Archivo:** `src/actions/tiendanube-actions.ts`
-
-```typescript
-'use server';
-
-import { TiendanubeAdapter } from '@/lib/adapters/tiendanube';
-
-export async function syncTiendanubeProducts(storeConfig: {
-  accessToken: string;
-  storeId: string;
-}) {
-  try {
-    const adapter = new TiendanubeAdapter(
-      storeConfig.accessToken,
-      storeConfig.storeId
-    );
-
-    const products = await adapter.getProducts();
-
-    // TODO: Guardar en DB real
-    // Por ahora, retornar productos para guardar en localStorage
-
-    return {
-      success: true,
-      products,
-      count: products.length,
-    };
-  } catch (error) {
-    console.error('Error syncing Tiendanube:', error);
-    return {
-      success: false,
-      error: 'Error al sincronizar con Tiendanube',
-    };
-  }
-}
-
-export async function createTiendanubeOrder(
-  storeConfig: {
-    accessToken: string;
-    storeId: string;
-  },
-  order: {
-    customerName: string;
-    customerEmail?: string;
-    customerPhone?: string;
-    items: Array<{
-      productId: string;
-      variantId: string;
-      quantity: number;
-    }>;
-  }
-) {
-  try {
-    const adapter = new TiendanubeAdapter(
-      storeConfig.accessToken,
-      storeConfig.storeId
-    );
-
-    const tnOrder = await adapter.createOrder({
-      customer: {
-        name: order.customerName,
-        email: order.customerEmail,
-        phone: order.customerPhone,
-      },
-      products: order.items.map((item) => ({
-        variant_id: item.variantId,
+    const preferenceData = {
+      items: items.map((item: any) => ({
+        id: item.sku,
+        title: item.name,
         quantity: item.quantity,
+        unit_price: item.price,
+        currency_id: 'ARS',
+        picture_url: item.image
       })),
-      payment_status: 'paid',
-      shipping_pickup: true,
+      back_urls: {
+        success: `${process.env.NEXT_PUBLIC_BASE_URL}/tienda/${storeId}/confirmacion?orderId=${orderId}`,
+        failure: `${process.env.NEXT_PUBLIC_BASE_URL}/tienda/${storeId}/checkout?error=payment_failed`,
+        pending: `${process.env.NEXT_PUBLIC_BASE_URL}/tienda/${storeId}/pedido/${orderId}?status=pending`
+      },
+      auto_return: 'approved' as const,
+      external_reference: orderId,
+      notification_url: `${process.env.NEXT_PUBLIC_BASE_URL}/api/webhooks/mercadopago`,
+      metadata: {
+        orderId,
+        storeId,
+        timestamp: new Date().toISOString()
+      },
+      payer: {
+        email: 'cliente@picky.com.ar',
+        name: 'Cliente',
+        surname: 'Demo'
+      },
+      statement_descriptor: 'PICKY',
+      expires: true,
+      expiration_date_from: new Date().toISOString(),
+      expiration_date_to: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+    };
+
+    const response = await preference.create({ body: preferenceData });
+
+    return NextResponse.json({
+      id: response.id,
+      init_point: response.init_point,
+      sandbox_init_point: response.sandbox_init_point
     });
 
-    return {
-      success: true,
-      orderId: tnOrder.id,
-    };
-  } catch (error) {
-    console.error('Error creating TN order:', error);
-    return {
-      success: false,
-      error: 'Error al crear orden en Tiendanube',
-    };
+  } catch (error: any) {
+    console.error('Error creando preferencia:', error);
+    return NextResponse.json(
+      { error: error.message || 'Error al crear preferencia de pago' },
+      { status: 500 }
+    );
   }
 }
 ```
 
-#### **2.3 UI de Configuración (2h)**
-
-**Archivo:** `src/app/admin/configuracion/page.tsx`
-
+#### Componente Checkout
 ```typescript
+// components/cliente/MercadoPagoCheckout.tsx
 'use client';
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card } from '@/components/ui/card';
-import { syncTiendanubeProducts } from '@/actions/tiendanube-actions';
-import { toast } from '@/components/ui/use-toast';
+import { Loader2 } from 'lucide-react';
 
-export default function ConfiguracionPage() {
-  const [config, setConfig] = useState({
-    accessToken: '',
-    storeId: '',
-  });
-  const [syncing, setSyncing] = useState(false);
+interface MercadoPagoCheckoutProps {
+  items: any[];
+  orderId: string;
+  storeId: string;
+}
 
-  const handleSync = async () => {
-    setSyncing(true);
+export function MercadoPagoCheckout({ items, orderId, storeId }: MercadoPagoCheckoutProps) {
+  const [loading, setLoading] = useState(false);
+
+  const handleCheckout = async () => {
+    setLoading(true);
     try {
-      const result = await syncTiendanubeProducts(config);
-      if (result.success) {
-        toast({
-          title: 'Sincronización exitosa',
-          description: `Se sincronizaron ${result.count} productos`,
-        });
-      } else {
-        throw new Error(result.error);
-      }
-    } catch (error) {
-      toast({
-        title: 'Error',
-        description: error.message,
-        variant: 'destructive',
+      const response = await fetch('/api/checkout/create-preference', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items, orderId, storeId })
       });
+
+      const data = await response.json();
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      // Redirigir a MercadoPago Checkout
+      window.location.href = data.sandbox_init_point || data.init_point;
+
+    } catch (error: any) {
+      console.error('Error:', error);
+      alert('Error al iniciar el pago. Por favor intenta de nuevo.');
     } finally {
-      setSyncing(false);
+      setLoading(false);
     }
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">Configuración</h1>
-
-      <Card className="p-6">
-        <h2 className="text-xl font-semibold mb-4">
-          Integración con Tiendanube
-        </h2>
-
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              Store ID
-            </label>
-            <Input
-              type="text"
-              value={config.storeId}
-              onChange={(e) =>
-                setConfig({ ...config, storeId: e.target.value })
-              }
-              placeholder="123456"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              Access Token
-            </label>
-            <Input
-              type="password"
-              value={config.accessToken}
-              onChange={(e) =>
-                setConfig({ ...config, accessToken: e.target.value })
-              }
-              placeholder="abcd1234..."
-            />
-          </div>
-
-          <Button
-            onClick={handleSync}
-            disabled={syncing || !config.storeId || !config.accessToken}
-            className="w-full"
-          >
-            {syncing ? 'Sincronizando...' : 'Sincronizar Catálogo Ahora'}
-          </Button>
-        </div>
-      </Card>
-    </div>
+    <Button 
+      onClick={handleCheckout} 
+      disabled={loading}
+      className="w-full"
+      size="lg"
+    >
+      {loading ? (
+        <>
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          Procesando...
+        </>
+      ) : (
+        'Pagar con MercadoPago'
+      )}
+    </Button>
   );
 }
 ```
 
-#### **2.4 Testing (1-2h)**
+### 1.3 Webhooks y Notificaciones
 
-- ✅ Conectar tienda de prueba Tiendanube
-- ✅ Sincronizar catálogo
-- ✅ Verificar que productos se mapean correctamente
-- ✅ Crear orden en Tiendanube al pagar en Picky
-- ✅ Verificar que orden aparece en panel Tiendanube
+#### Endpoint Webhook
+```typescript
+// app/api/webhooks/mercadopago/route.ts
+import { NextRequest, NextResponse } from 'next/server';
+import { payment } from '@/lib/mercadopago/config';
+import crypto from 'crypto';
+
+export async function POST(req: NextRequest) {
+  try {
+    const body = await req.text();
+    const signature = req.headers.get('x-signature');
+    const requestId = req.headers.get('x-request-id');
+
+    // Validar firma HMAC-SHA256
+    const expectedSignature = crypto
+      .createHmac('sha256', process.env.MERCADOPAGO_WEBHOOK_SECRET!)
+      .update(body)
+      .digest('hex');
+
+    if (signature !== expectedSignature) {
+      return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
+    }
+
+    const notification = JSON.parse(body);
+
+    // Procesar notificación según tipo
+    if (notification.type === 'payment') {
+      const paymentId = notification.data.id;
+      const paymentInfo = await payment.get({ id: paymentId });
+
+      const orderId = paymentInfo.external_reference;
+      const status = paymentInfo.status;
+
+      // Actualizar orden en la base de datos
+      switch (status) {
+        case 'approved':
+          await updateOrderStatus(orderId, 'paid');
+          await notifyCustomer(orderId, 'payment_approved');
+          await notifyPicker(orderId);
+          break;
+        case 'pending':
+          await updateOrderStatus(orderId, 'payment_pending');
+          break;
+        case 'rejected':
+          await updateOrderStatus(orderId, 'payment_failed');
+          await notifyCustomer(orderId, 'payment_rejected');
+          break;
+        default:
+          console.log(`Estado no manejado: ${status}`);
+      }
+    }
+
+    return NextResponse.json({ received: true });
+
+  } catch (error: any) {
+    console.error('Error procesando webhook:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+
+// Helper functions (implementar según tu DB)
+async function updateOrderStatus(orderId: string, status: string) {
+  // TODO: Actualizar en Prisma/DB
+  console.log(`Orden ${orderId} → ${status}`);
+}
+
+async function notifyCustomer(orderId: string, type: string) {
+  // TODO: Enviar email/push notification
+  console.log(`Notificar cliente: ${orderId} - ${type}`);
+}
+
+async function notifyPicker(orderId: string) {
+  // TODO: Notificar picker disponible
+  console.log(`Asignar picker para orden: ${orderId}`);
+}
+```
+
+### 1.4 Testing y Debugging
+
+#### Tarjetas de Prueba
+```typescript
+// lib/mercadopago/test-cards.ts
+export const TEST_CARDS = {
+  MASTERCARD_APPROVED: {
+    number: '5031 7557 3453 0604',
+    cvv: '123',
+    expiration: '11/25'
+  },
+  VISA_APPROVED: {
+    number: '4509 9535 6623 3704',
+    cvv: '123',
+    expiration: '11/25'
+  },
+  AMEX_APPROVED: {
+    number: '3711 803032 57522',
+    cvv: '1234',
+    expiration: '11/25'
+  },
+  REJECTED_INSUFFICIENT_FUNDS: {
+    number: '5031 4332 1540 6351',
+    cvv: '123',
+    expiration: '11/25'
+  }
+};
+```
+
+#### Logging y Monitoreo
+```typescript
+// lib/mercadopago/logger.ts
+export function logPaymentEvent(
+  event: 'preference_created' | 'payment_approved' | 'payment_failed' | 'webhook_received',
+  data: any
+) {
+  const logEntry = {
+    timestamp: new Date().toISOString(),
+    event,
+    data,
+    environment: process.env.NODE_ENV
+  };
+
+  console.log('[MercadoPago]', JSON.stringify(logEntry, null, 2));
+
+  // TODO: Enviar a servicio de logging (Sentry, LogRocket, etc.)
+}
+```
+
+### 1.5 Troubleshooting Común
+
+**Error: "Invalid access token"**
+- Verificar que `MERCADOPAGO_ACCESS_TOKEN` esté en `.env.local`
+- Confirmar que sea token de TEST (empieza con `TEST-`)
+- Regenerar token en el panel de MercadoPago si es necesario
+
+**Error: "Webhook signature mismatch"**
+- Verificar que `MERCADOPAGO_WEBHOOK_SECRET` coincida con el configurado en el dashboard
+- Asegurar que el body del webhook se lea como texto antes de parsear
+
+**Pagos no actualizan estado**
+- Verificar que el webhook esté público (no protegido por auth)
+- Confirmar URL en MercadoPago dashboard: `https://tu-dominio.com/api/webhooks/mercadopago`
+- Usar ngrok en desarrollo: `ngrok http 3000`
 
 ---
 
-## 🔴 FASE 3: Database Real con PostgreSQL (5-7 días)
+## 🏪 Fase 2: Integración Tiendanube (Prioridad Alta)
 
-### **Objetivo:** Reemplazar localStorage por DB persistente
+### 2.1 Setup OAuth2
 
-### **Stack:**
-- **Database:** PostgreSQL (Vercel Postgres o Supabase)
-- **ORM:** Prisma
-- **Auth:** NextAuth.js (opcional, para multi-tenant)
+#### Instalación
+```bash
+npm install axios
+```
 
-### **Tareas:**
+#### Configuración
+```typescript
+// lib/tiendanube/config.ts
+export const TIENDANUBE_CONFIG = {
+  clientId: process.env.TIENDANUBE_CLIENT_ID!,
+  clientSecret: process.env.TIENDANUBE_CLIENT_SECRET!,
+  redirectUri: `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/tiendanube/callback`,
+  authUrl: 'https://www.tiendanube.com/apps/authorize/token',
+  apiUrl: 'https://api.tiendanube.com/v1'
+};
 
-#### **3.1 Setup Prisma (2h)**
+export function getAuthorizationUrl(storeId: string) {
+  const params = new URLSearchParams({
+    client_id: TIENDANUBE_CONFIG.clientId,
+    redirect_uri: TIENDANUBE_CONFIG.redirectUri,
+    state: storeId // Para identificar la tienda después
+  });
 
+  return `https://www.tiendanube.com/apps/authorize/token?${params}`;
+}
+```
+
+#### Variables de Entorno
+```env
+TIENDANUBE_CLIENT_ID=your_client_id
+TIENDANUBE_CLIENT_SECRET=your_client_secret
+TIENDANUBE_WEBHOOK_SECRET=your_webhook_secret
+```
+
+### 2.2 Flujo de Autenticación
+
+#### Iniciar OAuth
+```typescript
+// app/api/auth/tiendanube/authorize/route.ts
+import { NextRequest, NextResponse } from 'next/server';
+import { getAuthorizationUrl } from '@/lib/tiendanube/config';
+
+export async function GET(req: NextRequest) {
+  const storeId = req.nextUrl.searchParams.get('storeId');
+
+  if (!storeId) {
+    return NextResponse.json({ error: 'storeId requerido' }, { status: 400 });
+  }
+
+  const authUrl = getAuthorizationUrl(storeId);
+  return NextResponse.redirect(authUrl);
+}
+```
+
+#### Callback OAuth
+```typescript
+// app/api/auth/tiendanube/callback/route.ts
+import { NextRequest, NextResponse } from 'next/server';
+import { TIENDANUBE_CONFIG } from '@/lib/tiendanube/config';
+import axios from 'axios';
+
+export async function GET(req: NextRequest) {
+  const code = req.nextUrl.searchParams.get('code');
+  const state = req.nextUrl.searchParams.get('state'); // storeId
+
+  if (!code || !state) {
+    return NextResponse.redirect('/admin/configuracion?error=auth_failed');
+  }
+
+  try {
+    // Intercambiar código por access token
+    const response = await axios.post(TIENDANUBE_CONFIG.authUrl, {
+      client_id: TIENDANUBE_CONFIG.clientId,
+      client_secret: TIENDANUBE_CONFIG.clientSecret,
+      grant_type: 'authorization_code',
+      code
+    });
+
+    const { access_token, user_id } = response.data;
+
+    // Guardar en base de datos
+    await saveStoreCredentials(state, {
+      tiendanubeUserId: user_id,
+      accessToken: access_token,
+      connectedAt: new Date()
+    });
+
+    return NextResponse.redirect('/admin/configuracion?success=tiendanube_connected');
+
+  } catch (error: any) {
+    console.error('Error en OAuth callback:', error);
+    return NextResponse.redirect('/admin/configuracion?error=auth_failed');
+  }
+}
+
+async function saveStoreCredentials(storeId: string, credentials: any) {
+  // TODO: Guardar en Prisma
+  console.log(`Credenciales guardadas para tienda ${storeId}`);
+}
+```
+
+### 2.3 Sincronización de Productos
+
+#### Cliente API Tiendanube
+```typescript
+// lib/tiendanube/client.ts
+import axios, { AxiosInstance } from 'axios';
+import { TIENDANUBE_CONFIG } from './config';
+
+export class TiendanubeClient {
+  private client: AxiosInstance;
+
+  constructor(private userId: string, private accessToken: string) {
+    this.client = axios.create({
+      baseURL: `${TIENDANUBE_CONFIG.apiUrl}/${userId}`,
+      headers: {
+        'Authentication': `bearer ${accessToken}`,
+        'User-Agent': 'Picky App (martin@picky.com.ar)'
+      }
+    });
+  }
+
+  // Obtener productos
+  async getProducts(page = 1, perPage = 50) {
+    try {
+      const response = await this.client.get('/products', {
+        params: { page, per_page: perPage }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error obteniendo productos:', error);
+      throw error;
+    }
+  }
+
+  // Obtener producto por ID
+  async getProduct(productId: string) {
+    const response = await this.client.get(`/products/${productId}`);
+    return response.data;
+  }
+
+  // Actualizar stock
+  async updateStock(variantId: string, stock: number) {
+    const response = await this.client.put(`/products/variants/${variantId}`, {
+      stock
+    });
+    return response.data;
+  }
+
+  // Crear orden
+  async createOrder(orderData: any) {
+    const response = await this.client.post('/orders', orderData);
+    return response.data;
+  }
+
+  // Actualizar estado de orden
+  async updateOrderStatus(orderId: string, status: string) {
+    const response = await this.client.put(`/orders/${orderId}`, {
+      status
+    });
+    return response.data;
+  }
+}
+```
+
+#### Sync Endpoint
+```typescript
+// app/api/sync/tiendanube/products/route.ts
+import { NextRequest, NextResponse } from 'next/server';
+import { TiendanubeClient } from '@/lib/tiendanube/client';
+
+export async function POST(req: NextRequest) {
+  try {
+    const { storeId } = await req.json();
+
+    // Obtener credenciales de la DB
+    const store = await getStoreById(storeId);
+    if (!store || !store.tiendanubeAccessToken) {
+      return NextResponse.json({ error: 'Tienda no conectada' }, { status: 400 });
+    }
+
+    const client = new TiendanubeClient(
+      store.tiendanubeUserId,
+      store.tiendanubeAccessToken
+    );
+
+    // Sincronizar productos
+    const products = await client.getProducts();
+
+    // Transformar y guardar en DB local
+    for (const product of products) {
+      await upsertProduct({
+        id: product.id.toString(),
+        name: product.name.es || product.name,
+        sku: product.sku || `TN-${product.id}`,
+        price: parseFloat(product.price),
+        description: product.description.es || product.description,
+        images: product.images.map((img: any) => img.src),
+        category: product.categories?.[0]?.name.es || 'Sin categoría',
+        stock: product.variants.reduce((sum: number, v: any) => sum + v.stock, 0),
+        storeId,
+        tiendanubeId: product.id
+      });
+    }
+
+    return NextResponse.json({
+      success: true,
+      synced: products.length,
+      timestamp: new Date().toISOString()
+    });
+
+  } catch (error: any) {
+    console.error('Error sincronizando productos:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+
+async function getStoreById(storeId: string) {
+  // TODO: Implementar con Prisma
+  return null;
+}
+
+async function upsertProduct(product: any) {
+  // TODO: Implementar con Prisma
+  console.log('Producto guardado:', product.name);
+}
+```
+
+### 2.4 Webhooks Tiendanube
+
+#### Registrar Webhooks
+```typescript
+// lib/tiendanube/webhooks.ts
+import { TiendanubeClient } from './client';
+
+export async function registerWebhooks(client: TiendanubeClient) {
+  const webhooks = [
+    { event: 'order/created', url: '/api/webhooks/tiendanube/order-created' },
+    { event: 'order/updated', url: '/api/webhooks/tiendanube/order-updated' },
+    { event: 'product/created', url: '/api/webhooks/tiendanube/product-created' },
+    { event: 'product/updated', url: '/api/webhooks/tiendanube/product-updated' }
+  ];
+
+  for (const webhook of webhooks) {
+    await client.client.post('/webhooks', {
+      url: `${process.env.NEXT_PUBLIC_BASE_URL}${webhook.url}`,
+      event: webhook.event
+    });
+  }
+}
+```
+
+#### Procesar Webhooks
+```typescript
+// app/api/webhooks/tiendanube/product-updated/route.ts
+import { NextRequest, NextResponse } from 'next/server';
+import crypto from 'crypto';
+
+export async function POST(req: NextRequest) {
+  try {
+    const body = await req.text();
+    const signature = req.headers.get('x-tiendanube-signature');
+
+    // Validar HMAC
+    const expectedSignature = crypto
+      .createHmac('sha256', process.env.TIENDANUBE_WEBHOOK_SECRET!)
+      .update(body)
+      .digest('hex');
+
+    if (signature !== expectedSignature) {
+      return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
+    }
+
+    const event = JSON.parse(body);
+
+    // Actualizar producto en DB local
+    await updateProductFromTiendanube(event.id, event);
+
+    return NextResponse.json({ received: true });
+
+  } catch (error: any) {
+    console.error('Error procesando webhook:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+
+async function updateProductFromTiendanube(productId: string, data: any) {
+  // TODO: Actualizar en Prisma
+  console.log(`Producto ${productId} actualizado desde Tiendanube`);
+}
+```
+
+### 2.5 Multi-Tenant Architecture
+
+```typescript
+// lib/tiendanube/multi-tenant.ts
+import { TiendanubeClient } from './client';
+
+export class MultiTenantManager {
+  private clients: Map<string, TiendanubeClient> = new Map();
+
+  async getClient(storeId: string): Promise<TiendanubeClient> {
+    if (this.clients.has(storeId)) {
+      return this.clients.get(storeId)!;
+    }
+
+    // Cargar credenciales de la DB
+    const store = await this.loadStoreCredentials(storeId);
+    if (!store) {
+      throw new Error(`Tienda ${storeId} no encontrada o no conectada`);
+    }
+
+    const client = new TiendanubeClient(
+      store.tiendanubeUserId,
+      store.tiendanubeAccessToken
+    );
+
+    this.clients.set(storeId, client);
+    return client;
+  }
+
+  private async loadStoreCredentials(storeId: string) {
+    // TODO: Cargar desde Prisma
+    return null;
+  }
+
+  clearCache(storeId?: string) {
+    if (storeId) {
+      this.clients.delete(storeId);
+    } else {
+      this.clients.clear();
+    }
+  }
+}
+
+export const multiTenantManager = new MultiTenantManager();
+```
+
+---
+
+## 🗄️ Fase 3: Base de Datos Real con Prisma
+
+### 3.1 Setup Prisma + PostgreSQL
+
+#### Instalación
 ```bash
 npm install @prisma/client
-npm install -D prisma
-
+npm install prisma --save-dev
 npx prisma init
 ```
 
-#### **3.2 Definir Schema (3h)**
-
-**Archivo:** `prisma/schema.prisma`
-
+#### Schema Completo
 ```prisma
+// prisma/schema.prisma
 generator client {
   provider = "prisma-client-js"
 }
@@ -527,236 +720,253 @@ datasource db {
 }
 
 model Store {
-  id        String   @id @default(cuid())
-  name      String
-  address   String?
-  phone     String?
-  logo      String?
-  hours     String?
-  isActive  Boolean  @default(true)
+  id                    String    @id @default(cuid())
+  name                  String
+  slug                  String    @unique
+  address               String
+  phone                 String?
+  email                 String?
+  rating                Float     @default(0)
   
-  // Integración
-  tnStoreId     String?   @map("tiendanube_store_id")
-  tnAccessToken String?   @map("tiendanube_access_token")
+  // Tiendanube Integration
+  tiendanubeUserId      String?   @unique
+  tiendanubeAccessToken String?
+  connectedAt           DateTime?
   
-  products  Product[]
-  orders    Order[]
-  users     User[]
+  products              Product[]
+  orders                Order[]
+  users                 User[]
   
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
   
-  @@map("stores")
+  @@index([slug])
 }
 
 model Product {
-  id          String   @id @default(cuid())
-  sku         String   @unique
-  name        String
-  description String
-  price       Int      // En centavos
-  stock       Int      @default(0)
-  minStock    Int?
-  category    String
-  imageUrl    String
-  images      String[] // Array de URLs
-  unit        String   @default("unidad")
-  location    String?  // Ubicación en depósito
-  isActive    Boolean  @default(true)
+  id              String      @id @default(cuid())
+  sku             String      @unique
+  name            String
+  description     String?
+  price           Float
+  compareAtPrice  Float?
+  images          String[]
+  category        String
+  stock           Int         @default(0)
+  featured        Boolean     @default(false)
   
-  storeId     String
-  store       Store    @relation(fields: [storeId], references: [id])
+  // Tiendanube
+  tiendanubeId    String?     @unique
   
-  // Smart features
-  bulkDiscounts Json?    // Array de {minQty, discountPercent}
-  relatedProducts String[] // Array de IDs
+  storeId         String
+  store           Store       @relation(fields: [storeId], references: [id], onDelete: Cascade)
   
-  orderItems  OrderItem[]
+  cartItems       CartItem[]
+  orderItems      OrderItem[]
   
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
   
-  @@index([storeId])
-  @@index([category])
-  @@map("products")
+  @@index([storeId, category])
+  @@index([sku])
 }
 
 model User {
-  id          String   @id @default(cuid())
-  sessionId   String   @unique
-  name        String?
-  email       String?
-  phone       String?
-  role        String   @default("CUSTOMER") // CUSTOMER | PICKER | ADMIN
-  isAnonymous Boolean  @default(true)
+  id              String      @id @default(cuid())
+  email           String      @unique
+  name            String
+  phone           String?
+  role            UserRole    @default(CUSTOMER)
   
-  storeId     String
-  store       Store    @relation(fields: [storeId], references: [id])
+  // Customer fields
+  level           String?     // Gold, Platinum, etc.
+  totalOrders     Int         @default(0)
+  totalSpent      Float       @default(0)
   
-  orders      Order[]
+  // Picker fields
+  pickerStats     Json?       // { ordersCompleted, avgTime, rating }
   
-  createdAt   DateTime @default(now())
-  lastLoginAt DateTime @default(now())
+  storeId         String?
+  store           Store?      @relation(fields: [storeId], references: [id])
   
-  @@index([storeId])
-  @@index([sessionId])
-  @@map("users")
+  orders          Order[]
+  pickedOrders    Order[]     @relation("PickerOrders")
+  cart            Cart?
+  
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  
+  @@index([email])
+  @@index([storeId, role])
 }
 
-enum OrderStatus {
-  PENDING_PAYMENT
-  PAYMENT_FAILED
-  PAID
-  PREPARING
-  READY_TO_PICKUP
-  DELIVERED
-  CANCELLED
+enum UserRole {
+  CUSTOMER
+  PICKER
+  ADMIN
+}
+
+model Cart {
+  id        String     @id @default(cuid())
+  userId    String     @unique
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items     CartItem[]
+  
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model CartItem {
+  id        String   @id @default(cuid())
+  quantity  Int
+  
+  cartId    String
+  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  
+  @@unique([cartId, productId])
 }
 
 model Order {
-  id          String      @id @default(cuid())
-  orderNumber String      @unique // ORD-1234
-  status      OrderStatus @default(PENDING_PAYMENT)
+  id              String       @id @default(cuid())
+  orderNumber     String       @unique
+  status          OrderStatus  @default(PENDING)
+  total           Float
   
-  // Cliente
-  customerId   String?
-  customer     User?       @relation(fields: [customerId], references: [id])
-  customerName String?
-  
-  // Pricing
-  subtotal    Int
-  discounts   Int         @default(0)
-  total       Int
-  
-  // Items
-  items       OrderItem[]
+  // Payment
+  paymentStatus   PaymentStatus @default(PENDING)
+  paymentMethod   String?
+  mercadopagoId   String?       @unique
   
   // Picking
-  pickerId         String?
-  pickingStartedAt DateTime?
-  pickingCompletedAt DateTime?
+  pickerId        String?
+  picker          User?         @relation("PickerOrders", fields: [pickerId], references: [id])
+  pickedAt        DateTime?
   
-  // Retiro
-  pickupQRCode String   @unique
-  deliveredAt  DateTime?
-  deliveredBy  String?
+  // Customer
+  customerId      String
+  customer        User          @relation(fields: [customerId], references: [id])
   
-  // Pago
-  mpPreferenceId String?
-  mpPaymentId    String?
-  paidAt         DateTime?
+  // Store
+  storeId         String
+  store           Store         @relation(fields: [storeId], references: [id])
   
-  storeId     String
-  store       Store    @relation(fields: [storeId], references: [id])
+  items           OrderItem[]
   
-  statusHistory Json[]  // Array de {from, to, timestamp, userId}
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
   
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  @@index([storeId])
-  @@index([status])
+  @@index([customerId])
+  @@index([pickerId])
+  @@index([storeId, status])
   @@index([orderNumber])
-  @@map("orders")
+}
+
+enum OrderStatus {
+  PENDING
+  PAYMENT_PENDING
+  PAID
+  PICKING
+  READY
+  COMPLETED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  REFUNDED
 }
 
 model OrderItem {
-  id          String  @id @default(cuid())
+  id        String  @id @default(cuid())
+  quantity  Int
+  price     Float   // Precio al momento de la compra
   
-  productId   String
-  product     Product @relation(fields: [productId], references: [id])
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
   
-  orderId     String
-  order       Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
   
-  sku         String
-  name        String
-  price       Int     // Precio al momento de la compra
-  quantity    Int
-  imageUrl    String
-  notes       String?
-  
-  // Picking
-  isPicked    Boolean  @default(false)
-  pickedAt    DateTime?
-  location    String?
-  
-  @@index([orderId])
-  @@index([productId])
-  @@map("order_items")
-}
-
-model Analytics {
-  id          String   @id @default(cuid())
-  
-  eventType   String   // SCAN | ADD_TO_CART | REMOVE_FROM_CART | PURCHASE | COMPARE
-  productId   String?
-  productSku  String?
-  sessionId   String
-  storeId     String
-  
-  metadata    Json?    // Datos adicionales del evento
-  
-  createdAt   DateTime @default(now())
-  
-  @@index([eventType])
-  @@index([productId])
-  @@index([storeId])
-  @@index([createdAt])
-  @@map("analytics")
+  @@unique([orderId, productId])
 }
 ```
 
-#### **3.3 Migraciones (1h)**
+### 3.2 Migraciones y Seed
 
+#### Crear migración
 ```bash
 npx prisma migrate dev --name init
-npx prisma generate
 ```
 
-#### **3.4 Server Actions para DB (4-6h)**
-
-**Archivo:** `src/actions/product-actions.ts`
-
+#### Seed inicial
 ```typescript
-'use server';
+// prisma/seed.ts
+import { PrismaClient } from '@prisma/client';
 
-import { prisma } from '@/lib/prisma';
+const prisma = new PrismaClient();
 
-export async function getProducts(storeId: string, filters?: {
-  category?: string;
-  search?: string;
-}) {
-  return await prisma.product.findMany({
-    where: {
-      storeId,
-      isActive: true,
-      ...(filters?.category && { category: filters.category }),
-      ...(filters?.search && {
-        OR: [
-          { name: { contains: filters.search, mode: 'insensitive' } },
-          { description: { contains: filters.search, mode: 'insensitive' } },
-        ],
-      }),
-    },
-    orderBy: {
-      name: 'asc',
-    },
+async function main() {
+  // Crear tienda demo
+  const store = await prisma.store.create({
+    data: {
+      name: 'Deco Home Demo',
+      slug: 'demo',
+      address: 'Av. Corrientes 1234, CABA',
+      phone: '+54 11 4567-8900',
+      email: 'contacto@decohome.com.ar',
+      rating: 4.8
+    }
   });
+
+  // Crear productos demo
+  await prisma.product.createMany({
+    data: [
+      {
+        sku: 'DECO-001',
+        name: 'Adorno Decorativo',
+        description: 'Hermoso adorno para decorar tu hogar',
+        price: 1299,
+        images: ['/images/productos/adorno-deco.jpg'],
+        category: 'decoracion',
+        stock: 15,
+        featured: true,
+        storeId: store.id
+      },
+      // ... más productos
+    ]
+  });
+
+  console.log('✅ Seed completado');
 }
 
-export async function getProductBySku(sku: string) {
-  return await prisma.product.findUnique({
-    where: { sku },
+main()
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
   });
-}
-
-// ... más acciones
 ```
 
-**Archivo:** `src/lib/prisma.ts`
+```json
+// package.json
+{
+  "prisma": {
+    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
+  }
+}
+```
+
+### 3.3 Cliente Prisma Singleton
 
 ```typescript
+// lib/prisma.ts
 import { PrismaClient } from '@prisma/client';
 
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
@@ -770,213 +980,343 @@ export const prisma =
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
 ```
 
-#### **3.5 Migrar de localStorage a DB (2-3h)**
+### 3.4 Migrar Stores de Mock a Prisma
 
-- Reemplazar hooks que leen de localStorage
-- Usar React Query para caché
-- Mantener Zustand solo para UI state
-
----
-
-## 🟣 FASE 4: Analytics Real (3-4 días)
-
-### **Objetivo:** Track de eventos para insights
-
-### **Eventos a trackear:**
-
-1. **SCAN** - Producto escaneado
-2. **ADD_TO_CART** - Producto agregado al carrito
-3. **REMOVE_FROM_CART** - Producto eliminado
-4. **PURCHASE** - Compra completada
-5. **COMPARE** - Productos comparados
-6. **CART_ABANDONED** - Carrito abandonado (>30min sin pagar)
-
-### **Implementación:**
-
-**Archivo:** `src/actions/analytics-actions.ts`
-
+#### Antes (Mock)
 ```typescript
-'use server';
+// stores/useCartStore.ts con mock
+const useCartStore = create<CartStore>()(
+  persist(
+    (set, get) => ({
+      items: [],
+      addItem: (product, quantity) => set((state) => ({
+        items: [...state.items, { ...product, quantity }]
+      }))
+    }),
+    { name: 'cart-storage' }
+  )
+);
+```
 
+#### Después (Con DB)
+```typescript
+// stores/useCartStore.ts con Prisma
 import { prisma } from '@/lib/prisma';
 
-export async function trackEvent(event: {
-  eventType: string;
-  productId?: string;
-  productSku?: string;
-  sessionId: string;
-  storeId: string;
-  metadata?: Record<string, any>;
-}) {
-  await prisma.analytics.create({
-    data: event,
-  });
-}
-
-export async function getProductAnalytics(storeId: string, dateRange: {
-  start: Date;
-  end: Date;
-}) {
-  const events = await prisma.analytics.groupBy({
-    by: ['productId', 'eventType'],
-    where: {
-      storeId,
-      createdAt: {
-        gte: dateRange.start,
-        lte: dateRange.end,
-      },
-      productId: { not: null },
+export async function addToCart(userId: string, productId: string, quantity: number) {
+  const cart = await prisma.cart.upsert({
+    where: { userId },
+    create: {
+      userId,
+      items: {
+        create: { productId, quantity }
+      }
     },
-    _count: true,
+    update: {
+      items: {
+        upsert: {
+          where: {
+            cartId_productId: {
+              cartId: (await prisma.cart.findUnique({ where: { userId } }))!.id,
+              productId
+            }
+          },
+          create: { productId, quantity },
+          update: { quantity: { increment: quantity } }
+        }
+      }
+    },
+    include: {
+      items: {
+        include: { product: true }
+      }
+    }
   });
 
-  // Procesar y retornar métricas
-  return events;
+  return cart;
 }
 ```
 
 ---
 
-## 🔵 FASE 5: Integraciones SAP/VTEX (Futuro)
+## 🔐 Fase 4: Autenticación con NextAuth.js
 
-### **Objetivo:** Escalabilidad para clientes enterprise
+### 4.1 Setup
 
-**Arquitectura:**
+```bash
+npm install next-auth@beta
+npm install @auth/prisma-adapter
+```
+
+### 4.2 Configuración
 
 ```typescript
-// src/lib/adapters/index.ts
-export interface IProductAdapter {
-  getProducts(): Promise<Product[]>;
-  getProduct(id: string): Promise<Product>;
-  createOrder(order: OrderInput): Promise<string>;
-}
+// auth.ts
+import NextAuth from 'next-auth';
+import { PrismaAdapter } from '@auth/prisma-adapter';
+import Credentials from 'next-auth/providers/credentials';
+import { prisma } from '@/lib/prisma';
 
-// Implementaciones:
-// - TiendanubeAdapter (✅ FASE 2)
-// - SAPAdapter (⏳ Futuro)
-// - VTEXAdapter (⏳ Futuro)
+export const { handlers, auth, signIn, signOut } = NextAuth({
+  adapter: PrismaAdapter(prisma),
+  providers: [
+    Credentials({
+      credentials: {
+        email: { label: 'Email', type: 'email' },
+        password: { label: 'Password', type: 'password' }
+      },
+      authorize: async (credentials) => {
+        const user = await prisma.user.findUnique({
+          where: { email: credentials.email as string }
+        });
 
-// src/lib/adapters/factory.ts
-export function getAdapter(storeConfig: StoreConfig): IProductAdapter {
-  switch (storeConfig.provider) {
-    case 'TIENDANUBE':
-      return new TiendanubeAdapter(storeConfig);
-    case 'SAP':
-      return new SAPAdapter(storeConfig);
-    case 'VTEX':
-      return new VTEXAdapter(storeConfig);
-    default:
-      throw new Error('Provider not supported');
+        if (!user) return null;
+
+        // TODO: Verificar password con bcrypt
+        return user;
+      }
+    })
+  ],
+  callbacks: {
+    session: ({ session, user }) => ({
+      ...session,
+      user: {
+        ...session.user,
+        id: user.id,
+        role: user.role
+      }
+    })
+  }
+});
+```
+
+### 4.3 Proteger Rutas
+
+```typescript
+// middleware.ts
+import { auth } from '@/auth';
+
+export default auth((req) => {
+  const isLoggedIn = !!req.auth;
+  const isAdmin = req.auth?.user?.role === 'ADMIN';
+
+  if (req.nextUrl.pathname.startsWith('/admin') && !isAdmin) {
+    return Response.redirect(new URL('/login', req.url));
+  }
+
+  if (req.nextUrl.pathname.startsWith('/picker') && !isLoggedIn) {
+    return Response.redirect(new URL('/login', req.url));
+  }
+});
+
+export const config = {
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)']
+};
+```
+
+---
+
+## 🚀 Fase 5: Requerimientos de Cliente
+
+### 5.1 Notificaciones Push (PWA)
+
+```typescript
+// lib/push-notifications.ts
+export async function subscribeUserToPush() {
+  if ('serviceWorker' in navigator && 'PushManager' in window) {
+    const registration = await navigator.serviceWorker.ready;
+    const subscription = await registration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
+    });
+
+    // Guardar subscription en DB
+    await fetch('/api/push/subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(subscription)
+    });
   }
 }
 ```
 
-**Ver:** `docs/middleware-tiendanube-sap.md` para detalles
+### 5.2 Sistema de Reseñas
+
+```prisma
+model Review {
+  id          String   @id @default(cuid())
+  rating      Int      // 1-5
+  comment     String?
+  
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id])
+  
+  createdAt   DateTime @default(now())
+  
+  @@unique([userId, productId])
+}
+```
+
+### 5.3 Programa de Fidelidad
+
+```prisma
+model LoyaltyPoints {
+  id          String   @id @default(cuid())
+  points      Int      @default(0)
+  level       String   @default("Bronze") // Bronze, Silver, Gold, Platinum
+  
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id])
+  
+  transactions LoyaltyTransaction[]
+}
+
+model LoyaltyTransaction {
+  id          String   @id @default(cuid())
+  points      Int
+  type        String   // earned, redeemed
+  description String
+  
+  loyaltyId   String
+  loyalty     LoyaltyPoints @relation(fields: [loyaltyId], references: [id])
+  
+  createdAt   DateTime @default(now())
+}
+```
+
+### 5.4 Geolocalización de Tiendas
+
+```typescript
+// lib/geolocation.ts
+export async function findNearestStores(lat: number, lng: number, radius = 5000) {
+  const stores = await prisma.store.findMany();
+
+  return stores
+    .map(store => ({
+      ...store,
+      distance: calculateDistance(lat, lng, store.latitude, store.longitude)
+    }))
+    .filter(store => store.distance <= radius)
+    .sort((a, b) => a.distance - b.distance);
+}
+
+function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
+  const R = 6371e3; // Radio de la Tierra en metros
+  const φ1 = lat1 * Math.PI / 180;
+  const φ2 = lat2 * Math.PI / 180;
+  const Δφ = (lat2 - lat1) * Math.PI / 180;
+  const Δλ = (lon2 - lon1) * Math.PI / 180;
+
+  const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+            Math.cos(φ1) * Math.cos(φ2) *
+            Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  return R * c;
+}
+```
+
+### 5.5 Analytics Avanzado
+
+```prisma
+model AnalyticsEvent {
+  id          String   @id @default(cuid())
+  event       String   // product_view, add_to_cart, purchase, etc.
+  properties  Json
+  
+  userId      String?
+  storeId     String
+  
+  createdAt   DateTime @default(now())
+  
+  @@index([storeId, event, createdAt])
+}
+```
+
+```typescript
+// lib/analytics.ts
+export async function trackEvent(
+  event: string,
+  properties: Record<string, any>,
+  userId?: string,
+  storeId?: string
+) {
+  await prisma.analyticsEvent.create({
+    data: {
+      event,
+      properties,
+      userId,
+      storeId
+    }
+  });
+}
+```
 
 ---
 
-## 📊 RESUMEN DE FASES
+## 📋 Checklist de Implementación
 
-| Fase | Objetivo | Duración | Prioridad |
-|------|----------|----------|-----------|
-| FASE 0 | MVP Frontend-Only | ✅ Completo | 🔴 CRÍTICO |
-| FASE 1 | MercadoPago Sandbox | 3-4 días | 🔴 ALTA |
-| FASE 2 | Tiendanube Dev API | 4-5 días | 🟡 MEDIA |
-| FASE 3 | PostgreSQL + Prisma | 5-7 días | 🟡 MEDIA |
-| FASE 4 | Analytics Real | 3-4 días | 🟢 BAJA |
-| FASE 5 | SAP/VTEX | TBD | 🟢 FUTURO |
+### Fase 1: MercadoPago
+- [ ] Configurar credenciales TEST
+- [ ] Implementar API crear preferencia
+- [ ] Integrar componente checkout
+- [ ] Configurar webhook
+- [ ] Validar firmas HMAC
+- [ ] Implementar manejo de estados (approved/pending/rejected)
+- [ ] Testing con tarjetas de prueba
+- [ ] Migrar a producción con credenciales reales
 
-**Total Backend:** ~15-20 días (post-MVP frontend)
+### Fase 2: Tiendanube
+- [ ] Crear app en Tiendanube Partners
+- [ ] Implementar flujo OAuth2
+- [ ] Desarrollar cliente API
+- [ ] Sincronizar productos (inicial)
+- [ ] Configurar webhooks (product/order)
+- [ ] Implementar actualización de stock bidireccional
+- [ ] Testing multi-tenant
+- [ ] Documentar para clientes
 
----
+### Fase 3: Base de Datos
+- [ ] Setup PostgreSQL (Supabase/Railway/Vercel Postgres)
+- [ ] Definir schema Prisma completo
+- [ ] Crear migraciones
+- [ ] Implementar seed con datos demo
+- [ ] Migrar stores de Zustand a DB
+- [ ] Implementar caching (Redis/Upstash)
+- [ ] Setup backups automáticos
 
-## 🚀 Estrategia de Deploy
+### Fase 4: Autenticación
+- [ ] Configurar NextAuth.js
+- [ ] Implementar login/registro
+- [ ] Proteger rutas admin/picker
+- [ ] Roles y permisos
+- [ ] Session management
+- [ ] Password reset flow
 
-### **MVP (FASE 0):**
-```
-Vercel (Frontend) → localStorage → Mock Data
-Costo: $0/mes
-```
-
-### **POST-MVP (FASE 1-2):**
-```
-Vercel (Frontend + Server Actions)
-  ↓
-MercadoPago Sandbox
-  ↓
-Tiendanube Dev API
-Costo: $0/mes (sandbox)
-```
-
-### **PRODUCCIÓN (FASE 3-4):**
-```
-Vercel (Frontend + Server Actions)
-  ↓
-Vercel Postgres ($20/mes)
-  ↓
-MercadoPago Production
-  ↓
-Tiendanube/SAP/VTEX
-Costo: ~$40-60/mes
-```
-
----
-
-## 📝 Variables de Entorno
-
-**Archivo:** `.env.local`
-
-```bash
-# Database
-DATABASE_URL="postgresql://user:pass@host:5432/picky"
-
-# MercadoPago
-MP_ACCESS_TOKEN="TEST-xxx"
-MP_PUBLIC_KEY="TEST-xxx"
-
-# Tiendanube
-TN_CLIENT_ID="xxx"
-TN_CLIENT_SECRET="xxx"
-
-# App
-NEXT_PUBLIC_BASE_URL="http://localhost:3000"
-NODE_ENV="development"
-
-# Analytics (opcional)
-NEXT_PUBLIC_GA_ID="G-XXXXXXXXXX"
-```
+### Fase 5: Features Adicionales
+- [ ] Sistema de reseñas
+- [ ] Programa de fidelidad
+- [ ] Notificaciones push
+- [ ] Geolocalización
+- [ ] Analytics avanzado
+- [ ] Búsqueda con filtros
+- [ ] Wishlist/Favoritos
 
 ---
 
-## ✅ Checklist Pre-Producción
+## 🎯 Métricas de Éxito
 
-### **Seguridad:**
-- [ ] Variables sensibles en `.env` (nunca en código)
-- [ ] CORS configurado correctamente
-- [ ] Rate limiting en API routes
-- [ ] Validación de inputs (Zod)
-- [ ] Sanitización de datos de usuario
-
-### **Performance:**
-- [ ] Índices DB en columnas frecuentes
-- [ ] Caché con React Query (staleTime)
-- [ ] Imágenes optimizadas (Next/Image)
-- [ ] Bundle size < 200KB (first load)
-
-### **Monitoring:**
-- [ ] Logs centralizados (Vercel Logs)
-- [ ] Error tracking (Sentry)
-- [ ] Uptime monitoring (UptimeRobot)
-- [ ] Analytics dashboard funcionando
-
-### **Testing:**
-- [ ] Tests E2E flujo completo (Playwright)
-- [ ] Load testing (k6)
-- [ ] Testing webhooks MP
-- [ ] Testing sincronización TN
+- **Pagos**: 95%+ tasa de aprobación MercadoPago
+- **Sync**: <5min latencia Tiendanube webhooks
+- **Performance**: <200ms query time promedio DB
+- **Uptime**: 99.9% availability
+- **UX**: <3seg tiempo carga páginas
 
 ---
 
-**Última Actualización:** 13 Enero 2026  
-**Autor:** Tech Lead Backend Senior  
-**Status:** 📝 Roadmap definido, listo para post-MVP
+**Última actualización:** Enero 2025  
+**Mantenedor:** Martín Navarro  
+**Email:** martin@picky.com.ar

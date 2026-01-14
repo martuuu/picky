@@ -9,9 +9,9 @@ import {
   CheckCircle2, 
   Download,
   Share2,
-  ArrowLeft,
   Sparkles,
-  Home
+  Home,
+  User
 } from 'lucide-react';
 import QRCode from 'qrcode';
 import { formatPrice } from '@/lib/utils';
@@ -33,36 +33,43 @@ export default function ConfirmacionPage() {
       return;
     }
 
-    // Load order
-    const orders = JSON.parse(localStorage.getItem('picky_orders') || '[]');
-    const foundOrder = orders.find((o: Order) => o.id === orderId);
-    
-    if (foundOrder) {
-      setOrder(foundOrder);
+    // Load order asynchronously
+    const loadOrder = async () => {
+      const orders = JSON.parse(localStorage.getItem('picky_orders') || '[]');
+      const foundOrder = orders.find((o: Order) => o.id === orderId);
       
-      // Generate QR Code
-      const qrData = JSON.stringify({
-        orderId: foundOrder.id,
-        orderNumber: foundOrder.orderNumber,
-        customerId: foundOrder.customerId,
-        total: foundOrder.total,
-      });
+      if (foundOrder) {
+        setOrder(foundOrder);
+        
+        // Generate QR Code
+        const qrData = JSON.stringify({
+          orderId: foundOrder.id,
+          orderNumber: foundOrder.orderNumber,
+          customerId: foundOrder.customerId,
+          total: foundOrder.total,
+        });
 
-      QRCode.toDataURL(qrData, {
-        width: 300,
-        margin: 2,
-        color: {
-          dark: '#000000',
-          light: '#FFFFFF',
-        },
-      })
-        .then((url) => setQrDataUrl(url))
-        .catch((err) => console.error('QR generation error:', err));
+        try {
+          const url = await QRCode.toDataURL(qrData, {
+            width: 300,
+            margin: 2,
+            color: {
+              dark: '#000000',
+              light: '#FFFFFF',
+            },
+          });
+          setQrDataUrl(url);
+        } catch (err) {
+          console.error('QR generation error:', err);
+        }
 
-      // Show confetti animation
-      setShowConfetti(true);
-      setTimeout(() => setShowConfetti(false), 3000);
-    }
+        // Show confetti animation
+        setShowConfetti(true);
+        setTimeout(() => setShowConfetti(false), 3000);
+      }
+    };
+
+    loadOrder();
   }, [orderId, router]);
 
   const handleDownloadQR = () => {
@@ -149,25 +156,8 @@ export default function ConfirmacionPage() {
         </div>
       )}
 
-      {/* Header */}
-      <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-sm border-b">
-        <div className="flex items-center gap-3 p-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => router.back()}
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <div>
-            <h1 className="text-lg font-semibold">Confirmación de pedido</h1>
-            <p className="text-sm text-gray-500">Pedido {order.orderNumber}</p>
-          </div>
-        </div>
-      </header>
-
       {/* Content */}
-      <main className="flex-1 p-4 space-y-4 pb-24">
+      <main className="flex-1 p-4 space-y-4 pb-24 pt-4">
         {/* Success Header */}
         <Card className="border-2 border-green-500 bg-white">
           <CardContent className="p-6 text-center space-y-3">
@@ -302,18 +292,30 @@ export default function ConfirmacionPage() {
 
       {/* Bottom Action */}
       <footer className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg p-4 space-y-2">
-        <Button
-          size="lg"
-          className="w-full bg-green-600 hover:bg-green-700"
-          onClick={() => {
-            // Get storeId from order
-            const storeId = order.storeId;
-            router.push(`/tienda/${storeId}/catalogo`);
-          }}
-        >
-          <Home className="w-5 h-5 mr-2" />
-          Volver al inicio
-        </Button>
+        <div className="grid grid-cols-2 gap-3">
+          <Button
+            size="lg"
+            variant="outline"
+            onClick={() => {
+              const storeId = order.storeId;
+              router.push(`/tienda/${storeId}/perfil`);
+            }}
+          >
+            <User className="w-5 h-5 mr-2" />
+            Ver Mi Perfil
+          </Button>
+          <Button
+            size="lg"
+            className="bg-green-600 hover:bg-green-700"
+            onClick={() => {
+              const storeId = order.storeId;
+              router.push(`/tienda/${storeId}/catalogo`);
+            }}
+          >
+            <Home className="w-5 h-5 mr-2" />
+            Seguir Comprando
+          </Button>
+        </div>
         <p className="text-xs text-center text-gray-500">
           Guardá este QR para retirar tu pedido
         </p>

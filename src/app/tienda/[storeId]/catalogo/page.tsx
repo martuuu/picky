@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, Search, ShoppingCart, X, Package } from 'lucide-react';
+import { ArrowLeft, Search, ShoppingCart, X, Package, User } from 'lucide-react';
 import { ProductCard } from '@/components/cliente/ProductCard';
 import { useCartStore } from '@/stores/useCartStore';
 import { Category } from '@/types/product';
@@ -86,19 +86,28 @@ export default function CatalogoPage() {
             
             <h1 className="text-lg font-semibold">Catálogo</h1>
             
-            <Button
-              variant="ghost"
-              size="sm"
-              className="relative"
-              onClick={() => router.push(`/tienda/${storeId}/carrito`)}
-            >
-              <ShoppingCart className="w-5 h-5" />
-              {cartItemsCount > 0 && (
-                <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs">
-                  {cartItemsCount}
-                </Badge>
-              )}
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => router.push(`/tienda/${storeId}/perfil`)}
+              >
+                <User className="w-5 h-5" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="relative"
+                onClick={() => router.push(`/tienda/${storeId}/carrito`)}
+              >
+                <ShoppingCart className="w-5 h-5" />
+                {cartItemsCount > 0 && (
+                  <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs">
+                    {cartItemsCount}
+                  </Badge>
+                )}
+              </Button>
+            </div>
           </div>
 
           {/* Search Bar */}

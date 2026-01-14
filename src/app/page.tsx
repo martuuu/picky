@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Store, UserCog, Package } from 'lucide-react';
+import { Store, UserCog, Package, Building2 } from 'lucide-react';
 
 export default function Home() {
   const router = useRouter();
@@ -73,7 +73,19 @@ export default function Home() {
           </Card>
         </div>
 
-        <div className="mt-8 text-center text-sm text-gray-500">
+        {/* Link to Store Profile */}
+        <div className="mt-8 text-center">
+          <Button 
+            variant="link" 
+            onClick={() => router.push('/perfil-sucursal')}
+            className="gap-2"
+          >
+            <Building2 className="w-4 h-4" />
+            Ver Perfil de Sucursal Demo
+          </Button>
+        </div>
+
+        <div className="mt-4 text-center text-sm text-gray-500">
           <p>MVP Prototipo - Frontend First con Mock Data</p>
           <p className="mt-2">Total: 17 pantallas (10 Cliente + 3 Picker + 4 Admin)</p>
         </div>

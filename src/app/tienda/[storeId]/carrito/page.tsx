@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { ArrowLeft, Trash2, ShoppingCart, Minus, Plus, Package, TrendingUp, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Trash2, ShoppingCart, Minus, Plus, Package, TrendingUp, ChevronRight, User } from 'lucide-react';
 import { useCartStore } from '@/stores/useCartStore';
 import { formatPrice } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -66,16 +66,25 @@ export default function CarritoPage() {
       <div className="flex min-h-screen flex-col bg-gray-50">
         {/* Header */}
         <div className="sticky top-0 z-10 bg-white shadow-sm">
-          <div className="max-w-4xl mx-auto px-4 py-3 flex items-center">
+          <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div className="flex items-center">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => router.push(`/tienda/${storeId}/catalogo`)}
+              >
+                <ArrowLeft className="w-5 h-5 mr-2" />
+                Volver
+              </Button>
+              <h1 className="text-lg font-semibold ml-4">Carrito</h1>
+            </div>
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => router.push(`/tienda/${storeId}/catalogo`)}
+              onClick={() => router.push(`/tienda/${storeId}/perfil`)}
             >
-              <ArrowLeft className="w-5 h-5 mr-2" />
-              Volver
+              <User className="w-5 h-5" />
             </Button>
-            <h1 className="text-lg font-semibold ml-4">Carrito</h1>
           </div>
         </div>
 
@@ -111,19 +120,30 @@ export default function CarritoPage() {
     <div className="flex min-h-screen flex-col bg-gray-50">
       {/* Fixed Header */}
       <div className="sticky top-0 z-10 bg-white shadow-sm">
-        <div className="max-w-4xl mx-auto px-4 py-3 flex items-center">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => router.back()}
-          >
-            <ArrowLeft className="w-5 h-5 mr-2" />
-            Volver
-          </Button>
-          <h1 className="text-lg font-semibold ml-4">Carrito</h1>
-          <Badge className="ml-auto" variant="outline">
-            {validItems.length} {validItems.length === 1 ? 'producto' : 'productos'}
-          </Badge>
+        <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => router.back()}
+            >
+              <ArrowLeft className="w-5 h-5 mr-2" />
+              Volver
+            </Button>
+            <h1 className="text-lg font-semibold ml-4">Carrito</h1>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => router.push(`/tienda/${storeId}/perfil`)}
+            >
+              <User className="w-5 h-5" />
+            </Button>
+            <Badge variant="outline">
+              {validItems.length} {validItems.length === 1 ? 'producto' : 'productos'}
+            </Badge>
+          </div>
         </div>
       </div>
 

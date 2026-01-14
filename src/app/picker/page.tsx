@@ -6,12 +6,15 @@ import { OrderCard } from '@/components/picker/OrderCard';
 import { OrderDetailModal } from '@/components/picker/OrderDetailModal';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { RefreshCw, Package, Clock, CheckCircle2, LucideIcon } from 'lucide-react';
+import { RefreshCw, Package, Clock, CheckCircle2, BarChart3, Home } from 'lucide-react';
 import type { Order, OrderStatus } from '@/types/order';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function PickerPage() {
   const { orders, loadOrders, selectOrder, selectedOrder } = usePickerStore();
   const [modalOpen, setModalOpen] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     // Load orders on mount
@@ -74,21 +77,44 @@ export default function PickerPage() {
     <div className="h-full flex flex-col">
       {/* Header */}
       <header className="bg-white border-b border-gray-200 p-6">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mb-4">
           <div>
+            <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
+              <Link href="/" className="hover:text-blue-600">Inicio</Link>
+              <span>/</span>
+              <span className="text-gray-900 font-medium">Portal Picker</span>
+            </div>
             <h1 className="text-2xl font-bold text-gray-900">Pedidos Activos</h1>
             <p className="text-sm text-gray-500 mt-1">
               {orders.length} pedido{orders.length !== 1 ? 's' : ''} en total
             </p>
           </div>
-          <Button 
-            variant="outline" 
-            onClick={() => loadOrders()}
-            className="gap-2"
-          >
-            <RefreshCw className="h-4 w-4" />
-            Actualizar
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              onClick={() => router.push('/')}
+              className="gap-2"
+            >
+              <Home className="h-4 w-4" />
+              Inicio
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={() => router.push('/picker/historial')}
+              className="gap-2"
+            >
+              <BarChart3 className="h-4 w-4" />
+              Historial
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={() => loadOrders()}
+              className="gap-2"
+            >
+              <RefreshCw className="h-4 w-4" />
+              Actualizar
+            </Button>
+          </div>
         </div>
 
         {/* Stats */}
