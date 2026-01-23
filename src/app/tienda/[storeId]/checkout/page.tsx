@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { 
   ArrowLeft, 
@@ -21,10 +22,9 @@ import { useCartStore } from '@/stores/useCartStore';
 import { useUserStore } from '@/stores/useUserStore';
 import { formatPrice } from '@/lib/utils';
 import { toast } from 'sonner';
-import Image from 'next/image';
 import type { Order } from '@/types/order';
 
-type PaymentMethod = 'MERCADOPAGO' | 'CASH' | 'CARD';
+type PaymentMethod = 'MERCADOPAGO' | 'CASH_AT_COUNTER' | 'CARD_AT_COUNTER';
 
 export default function CheckoutPage() {
   const params = useParams();
@@ -39,14 +39,18 @@ export default function CheckoutPage() {
   const [customerPhone, setCustomerPhone] = useState(user?.phone || '');
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod>('MERCADOPAGO');
   const [errors, setErrors] = useState<{ name?: string; phone?: string }>({});
+  const hasCheckedCart = useRef(false);
 
-  // Redirect if cart is empty
+  // Redirect if cart is empty (only on initial load)
   useEffect(() => {
-    if (!cart || cart.items.length === 0) {
-      toast.error('Tu carrito está vacío', {
-        description: 'Agregá productos antes de proceder al pago',
-      });
-      router.push(`/tienda/${storeId}/catalogo`);
+    if (!hasCheckedCart.current) {
+      if (!cart || cart.items.length === 0) {
+        toast.error('Tu carrito está vacío', {
+          description: 'Agregá productos antes de proceder al pago',
+        });
+        router.push(`/tienda/${storeId}/escanear`);
+      }
+      hasCheckedCart.current = true;
     }
   }, [cart, router, storeId]);
 
@@ -92,6 +96,10 @@ export default function CheckoutPage() {
       const orderId = `ORD-${Date.now()}`;
       const orderNumber = `PK-${String(Math.floor(Math.random() * 999999)).padStart(6, '0')}`;
 
+      // Determinar status según método de pago
+      const orderStatus = 
+        selectedPaymentMethod === 'MERCADOPAGO' ? 'PAID' : 'PENDING_PAYMENT';
+
       const order: Order = {
         id: orderId,
         orderNumber,
@@ -100,7 +108,7 @@ export default function CheckoutPage() {
         customerId: user?.id || 'anonymous',
         customerName,
         customerPhone,
-        status: 'PAID',
+        status: orderStatus,
         items: cart!.items.map(item => ({
           id: `item-${item.productId}-${Date.now()}`,
           productId: item.product!.id,
@@ -122,9 +130,11 @@ export default function CheckoutPage() {
         statusHistory: [
           {
             from: 'PENDING_PAYMENT' as const,
-            to: 'PAID' as const,
+            to: orderStatus,
             timestamp: new Date(),
-            notes: 'Pago procesado exitosamente',
+            notes: selectedPaymentMethod === 'MERCADOPAGO' 
+              ? 'Pago procesado exitosamente'
+              : 'Pedido creado - Pago pendiente en caja',
           },
         ],
         createdAt: new Date(),
@@ -140,8 +150,16 @@ export default function CheckoutPage() {
       clearCart();
 
       // Success feedback
-      toast.success('¡Pago exitoso!', {
-        description: `Pedido ${orderNumber} confirmado`,
+      const successMessage = selectedPaymentMethod === 'MERCADOPAGO'
+        ? '¡Pago exitoso!'
+        : 'Pedido confirmado';
+      
+      const successDescription = selectedPaymentMethod === 'MERCADOPAGO'
+        ? `Pedido ${orderNumber} confirmado`
+        : `Pedido ${orderNumber} - Pagá al retirar`;
+
+      toast.success(successMessage, {
+        description: successDescription,
         icon: <CheckCircle2 className="w-5 h-5 text-green-600" />,
       });
 
@@ -150,9 +168,9 @@ export default function CheckoutPage() {
         navigator.vibrate([100, 50, 100]);
       }
 
-      // Redirect to order status
+      // Redirect to order tracking page
       setTimeout(() => {
-        router.push(`/tienda/${storeId}/pedido/${orderId}`);
+        router.push(`/tienda/${storeId}/pedido?orderId=${orderId}`);
       }, 1500);
 
     } catch (error) {
@@ -286,12 +304,12 @@ export default function CheckoutPage() {
               )}
             </button>
 
-            {/* Card Option (Simulated) */}
+            {/* Card at Counter Option */}
             <button
-              onClick={() => setSelectedPaymentMethod('CARD')}
+              onClick={() => setSelectedPaymentMethod('CARD_AT_COUNTER')}
               disabled={isProcessing}
               className={`w-full p-4 rounded-lg border-2 transition-all flex items-center justify-between ${
-                selectedPaymentMethod === 'CARD'
+                selectedPaymentMethod === 'CARD_AT_COUNTER'
                   ? 'border-green-500 bg-green-50'
                   : 'border-gray-200 hover:border-gray-300'
               }`}
@@ -301,12 +319,36 @@ export default function CheckoutPage() {
                   <CreditCard className="w-5 h-5 text-green-600" />
                 </div>
                 <div className="text-left">
-                  <p className="font-semibold text-gray-900">Tarjeta de crédito/débito</p>
-                  <p className="text-xs text-gray-500">Pagá en el momento del retiro</p>
+                  <p className="font-semibold text-gray-900">Tarjeta en Caja</p>
+                  <p className="text-xs text-gray-500">Pagá con tarjeta en el mostrador</p>
                 </div>
               </div>
-              {selectedPaymentMethod === 'CARD' && (
+              {selectedPaymentMethod === 'CARD_AT_COUNTER' && (
                 <CheckCircle2 className="w-5 h-5 text-green-600" />
+              )}
+            </button>
+
+            {/* Cash at Counter Option */}
+            <button
+              onClick={() => setSelectedPaymentMethod('CASH_AT_COUNTER')}
+              disabled={isProcessing}
+              className={`w-full p-4 rounded-lg border-2 transition-all flex items-center justify-between ${
+                selectedPaymentMethod === 'CASH_AT_COUNTER'
+                  ? 'border-orange-500 bg-orange-50'
+                  : 'border-gray-200 hover:border-gray-300'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center">
+                  <Wallet className="w-5 h-5 text-orange-600" />
+                </div>
+                <div className="text-left">
+                  <p className="font-semibold text-gray-900">Efectivo en Caja</p>
+                  <p className="text-xs text-gray-500">Pagá en efectivo al retirar</p>
+                </div>
+              </div>
+              {selectedPaymentMethod === 'CASH_AT_COUNTER' && (
+                <CheckCircle2 className="w-5 h-5 text-orange-600" />
               )}
             </button>
 
@@ -315,6 +357,15 @@ export default function CheckoutPage() {
                 <AlertCircle className="w-4 h-4 text-blue-600 mt-0.5 shrink-0" />
                 <p className="text-xs text-blue-800">
                   <strong>Demo:</strong> El pago será simulado. En producción, serás redirigido al checkout de MercadoPago.
+                </p>
+              </div>
+            )}
+
+            {(selectedPaymentMethod === 'CASH_AT_COUNTER' || selectedPaymentMethod === 'CARD_AT_COUNTER') && (
+              <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 flex items-start gap-2">
+                <AlertCircle className="w-4 h-4 text-orange-600 mt-0.5 shrink-0" />
+                <p className="text-xs text-orange-800">
+                  <strong>Importante:</strong> Tu pedido será preparado. Realizá el pago al momento de retirarlo en caja.
                 </p>
               </div>
             )}
@@ -355,32 +406,48 @@ export default function CheckoutPage() {
                 {cart.items.map((item) => {
                   const itemTotal = item.quantity * item.product!.price;
                   return (
-                  <div key={item.productId} className="flex gap-3">
-                    <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-gray-100 shrink-0">
-                      <Image
-                        src={item.product!.imageUrl}
-                        alt={item.product!.name}
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
+                  <div key={item.productId} className="border-b last:border-0 pb-3 last:pb-0">
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm text-gray-900 truncate">
+                      <p className="font-medium text-sm text-gray-900">
                         {item.product!.name}
                       </p>
-                      <p className="text-xs text-gray-500">
-                        {item.quantity} × {formatPrice(item.product!.price)}
+                      <p className="text-xs text-gray-500 mt-1">
+                        SKU: {item.product!.sku}
                       </p>
+                      
+                      {/* Product Details */}
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {item.product!.packaging && (
+                          <Badge variant="outline" className="text-xs">
+                            📦 {item.product!.packaging}
+                          </Badge>
+                        )}
+                        {item.product!.weight && (
+                          <Badge variant="outline" className="text-xs">
+                            ⚖️ {item.product!.weight * item.quantity} kg
+                          </Badge>
+                        )}
+                        {item.product!.dimensions && (
+                          <Badge variant="outline" className="text-xs">
+                            📏 {item.product!.dimensions.length}x{item.product!.dimensions.width}x{item.product!.dimensions.height}cm
+                          </Badge>
+                        )}
+                      </div>
+                      
+                      <div className="flex items-center justify-between mt-2">
+                        <p className="text-sm text-gray-600">
+                          x{item.quantity} × {formatPrice(item.product!.price)}
+                        </p>
+                        <p className="font-semibold text-sm text-gray-900">
+                          {formatPrice(itemTotal)}
+                        </p>
+                      </div>
+                      
                       {item.observations && (
-                        <p className="text-xs text-gray-500 italic mt-1">
+                        <p className="text-xs text-gray-500 italic mt-2">
                           Obs: {item.observations}
                         </p>
                       )}
-                    </div>
-                    <div className="text-right">
-                      <p className="font-semibold text-sm text-gray-900">
-                        {formatPrice(itemTotal)}
-                      </p>
                     </div>
                   </div>
                   );

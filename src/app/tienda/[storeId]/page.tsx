@@ -5,11 +5,12 @@ import { useParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Camera, ShoppingCart, Search, ArrowLeft, Store as StoreIcon } from 'lucide-react';
+import { Camera, ShoppingCart, ArrowLeft, Store as StoreIcon } from 'lucide-react';
 import { useCartStore } from '@/stores/useCartStore';
 import { useUserStore } from '@/stores/useUserStore';
 import { Store } from '@/types/user';
 import mockStores from '@/data/mock-stores.json';
+import { FloatingHelpButton } from '@/components/cliente/FloatingHelpButton';
 
 export default function StoreLandingPage() {
   const params = useParams();
@@ -21,6 +22,34 @@ export default function StoreLandingPage() {
   
   const [store, setStore] = useState<Store | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // Verificar entrada al local (QR de entrada obligatorio)
+  useEffect(() => {
+    const checkEntry = () => {
+      const entryKey = `picky_entry_validated_${storeId}`;
+      const entryData = localStorage.getItem(entryKey);
+      
+      if (!entryData) {
+        // No tiene entrada válida, redirigir a scanner de entrada
+        router.push(`/tienda/${storeId}/entrada`);
+        return;
+      }
+
+      // Verificar si la entrada no expiró (24 horas)
+      const parsed = JSON.parse(entryData);
+      const validUntil = new Date(parsed.validUntil);
+      
+      if (validUntil <= new Date()) {
+        // Entrada expirada
+        localStorage.removeItem(entryKey);
+        router.push(`/tienda/${storeId}/entrada`);
+      }
+    };
+
+    if (storeId) {
+      checkEntry();
+    }
+  }, [storeId, router]);
 
   useEffect(() => {
     // Inicializar sesión solo una vez
@@ -129,7 +158,7 @@ export default function StoreLandingPage() {
             </Button>
 
             {/* Secondary Actions */}
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3">
               <Button
                 variant="outline"
                 className="h-12"
@@ -143,15 +172,6 @@ export default function StoreLandingPage() {
                   </Badge>
                 )}
               </Button>
-
-              <Button
-                variant="outline"
-                className="h-12"
-                onClick={() => router.push(`/tienda/${storeId}/catalogo`)}
-              >
-                <Search className="w-5 h-5 mr-2" />
-                Ver Catálogo
-              </Button>
             </div>
           </div>
 
@@ -164,6 +184,9 @@ export default function StoreLandingPage() {
           </Card>
         </div>
       </div>
+
+      {/* Floating Help Button */}
+      <FloatingHelpButton storeId={storeId} />
     </div>
   );
 }

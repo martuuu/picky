@@ -1,0 +1,458 @@
+{
+  "newProducts": [
+    {
+      "id": "prod-mayor-001",
+      "sku": "CEMENTO-LOMA-50KG",
+      "name": "Cemento Portland Loma Negra 50kg",
+      "description": "Cemento Portland tipo CPC40 para construcción en general. Ideal para hormigón estructural y mampostería.",
+      "price": 9850,
+      "stock": 180,
+      "imageUrl": "/images/productos/mueble-deco.jpg",
+      "category": "Construcción",
+      "categoryId": "cat-mayor-001",
+      "packaging": "Bolsa de 50 kg",
+      "weight": 50,
+      "bulkType": "extra-large",
+      "dimensions": { "length": 80, "width": 50, "height": 15 },
+      "volumeDiscounts": [
+        { "minQuantity": 10, "pricePerUnit": 9350, "label": "10+ bolsas → $9,350 c/u" },
+        { "minQuantity": 30, "pricePerUnit": 8900, "label": "30+ bolsas → $8,900 c/u" }
+      ],
+      "specifications": [
+        { "label": "Tipo", "value": "CPC40" },
+        { "label": "Marca", "value": "Loma Negra" },
+        { "label": "Rendimiento", "value": "~0.02 m³ por kg" }
+      ],
+      "observations": ["Almacenar en lugar seco", "Consumir dentro de 3 meses"],
+      "isActive": true,
+      "createdAt": "2026-01-15T10:00:00Z",
+      "updatedAt": "2026-01-15T10:00:00Z"
+    },
+    {
+      "id": "prod-mayor-002",
+      "sku": "LADRILLO-COMUN-1000",
+      "name": "Ladrillo Común (Pallet x 1000 unid.)",
+      "description": "Ladrillo cerámico común para obra. Medidas estándar 25x12x7cm. Venta por pallet completo.",
+      "price": 485000,
+      "stock": 12,
+      "imageUrl": "/images/productos/mueble-deco.jpg",
+      "category": "Construcción",
+      "categoryId": "cat-mayor-001",
+      "packaging": "Pallet x 1000 unidades",
+      "weight": 2500,
+      "bulkType": "extra-large",
+      "unitType": "box",
+      "unitsPerPackage": 1000,
+      "dimensions": { "length": 120, "width": 100, "height": 180 },
+      "volumeDiscounts": [
+        { "minQuantity": 3, "pricePerUnit": 465000, "label": "3+ pallets → $465,000 c/u" }
+      ],
+      "specifications": [
+        { "label": "Dimensiones", "value": "25 x 12 x 7 cm" },
+        { "label": "Unidades", "value": "1000 por pallet" },
+        { "label": "Peso total", "value": "2500 kg" }
+      ],
+      "isActive": true,
+      "createdAt": "2026-01-15T10:00:00Z",
+      "updatedAt": "2026-01-15T10:00:00Z"
+    },
+    {
+      "id": "prod-mayor-003",
+      "sku": "HIERRO-8MM-12M",
+      "name": "Hierro de Construcción ADN 420 8mm x 12m",
+      "description": "Barra de acero para hormigón armado. Diámetro 8mm, longitud 12 metros.",
+      "price": 7200,
+      "stock": 250,
+      "imageUrl": "/images/productos/mueble-deco.jpg",
+      "category": "Construcción",
+      "categoryId": "cat-mayor-001",
+      "packaging": "Barra de 12 metros",
+      "weight": 4.74,
+      "bulkType": "extra-large",
+      "unitType": "unit",
+      "dimensions": { "length": 1200, "width": 1, "height": 1 },
+      "volumeDiscounts": [
+        { "minQuantity": 20, "pricePerUnit": 6800, "label": "20+ barras → $6,800 c/u" },
+        { "minQuantity": 50, "pricePerUnit": 6400, "label": "50+ barras → $6,400 c/u" }
+      ],
+      "specifications": [
+        { "label": "Diámetro", "value": "8 mm" },
+        { "label": "Longitud", "value": "12 metros" },
+        { "label": "Norma", "value": "ADN 420" },
+        { "label": "Peso", "value": "4.74 kg" }
+      ],
+      "isActive": true,
+      "createdAt": "2026-01-15T10:00:00Z",
+      "updatedAt": "2026-01-15T10:00:00Z"
+    },
+    {
+      "id": "prod-mayor-004",
+      "sku": "CABLE-UNIPOLAR-2.5MM-100M",
+      "name": "Cable Unipolar 2.5mm x 100m (Rojo/Azul/Verde-Amarillo)",
+      "description": "Cable unipolar para instalación eléctrica domiciliaria. Cobre electrolítico. Rollo de 100 metros.",
+      "price": 28500,
+      "stock": 45,
+      "imageUrl": "/images/productos/mueble-deco.jpg",
+      "category": "Electricidad",
+      "categoryId": "cat-mayor-002",
+      "packaging": "Rollo x 100 metros",
+      "weight": 2.4,
+      "bulkType": "medium",
+      "unitType": "meter",
+      "dimensions": { "length": 30, "width": 30, "height": 15 },
+      "volumeDiscounts": [
+        { "minQuantity": 5, "pricePerUnit": 27000, "label": "5+ rollos → $27,000 c/u" },
+        { "minQuantity": 10, "pricePerUnit": 25500, "label": "10+ rollos → $25,500 c/u" }
+      ],
+      "specifications": [
+        { "label": "Sección", "value": "2.5 mm²" },
+        { "label": "Longitud", "value": "100 metros" },
+        { "label": "Material", "value": "Cobre electrolítico" },
+        { "label": "Tensión", "value": "1000V" }
+      ],
+      "observations": ["Disponible en rojo, azul y verde-amarillo", "Consultar colores en stock"],
+      "isActive": true,
+      "createdAt": "2026-01-15T10:00:00Z",
+      "updatedAt": "2026-01-15T10:00:00Z"
+    },
+    {
+      "id": "prod-mayor-005",
+      "sku": "DISYUNTOR-25A-BIPOLAR",
+      "name": "Disyuntor Termomagnético Bipolar 25A",
+      "description": "Llave termomagnética bipolar 25 amperes. Norma IEC 60898. Para tablero DIN.",
+      "price": 4850,
+      "stock": 120,
+      "imageUrl": "/images/productos/mueble-deco.jpg",
+      "category": "Electricidad",
+      "categoryId": "cat-mayor-002",
+      "packaging": "Unidad",
+      "weight": 0.15,
+      "bulkType": "small",
+      "unitType": "unit",
+      "volumeDiscounts": [
+        { "minQuantity": 10, "pricePerUnit": 4500, "label": "10+ unidades → $4,500 c/u" },
+        { "minQuantity": 50, "pricePerUnit": 4200, "label": "50+ unidades → $4,200 c/u" }
+      ],
+      "specifications": [
+        { "label": "Corriente", "value": "25 Amperes" },
+        { "label": "Polos", "value": "2 (Bipolar)" },
+        { "label": "Norma", "value": "IEC 60898" },
+        { "label": "Montaje", "value": "Riel DIN" }
+      ],
+      "isActive": true,
+      "createdAt": "2026-01-15T10:00:00Z",
+      "updatedAt": "2026-01-15T10:00:00Z"
+    },
+    {
+      "id": "prod-mayor-006",
+      "sku": "CAÑO-PVC-110MM-6M",
+      "name": "Caño Cloacal PVC 110mm x 6m",
+      "description": "Caño para desagües cloacales. PVC rígido clase 6. Longitud 6 metros.",
+      "price": 12400,
+      "stock": 85,
+      "imageUrl": "/images/productos/mueble-deco.jpg",
+      "category": "Plomería",
+      "categoryId": "cat-mayor-003",
+      "packaging": "Caño de 6 metros",
+      "weight": 6.5,
+      "bulkType": "large",
+      "unitType": "unit",
+      "dimensions": { "length": 600, "width": 11, "height": 11 },
+      "volumeDiscounts": [
+        { "minQuantity": 10, "pricePerUnit": 11800, "label": "10+ caños → $11,800 c/u" },
+        { "minQuantity": 30, "pricePerUnit": 11200, "label": "30+ caños → $11,200 c/u" }
+      ],
+      "specifications": [
+        { "label": "Diámetro", "value": "110 mm" },
+        { "label": "Longitud", "value": "6 metros" },
+        { "label": "Material", "value": "PVC Clase 6" },
+        { "label": "Uso", "value": "Desagües cloacales" }
+      ],
+      "isActive": true,
+      "createdAt": "2026-01-15T10:00:00Z",
+      "updatedAt": "2026-01-15T10:00:00Z"
+    },
+    {
+      "id": "prod-mayor-007",
+      "sku": "CODO-PVC-110-90",
+      "name": "Codo PVC 110mm 90° (Pack x 10 unid.)",
+      "description": "Codo de 90 grados para caño cloacal 110mm. Venta por pack de 10 unidades.",
+      "price": 8500,
+      "stock": 60,
+      "imageUrl": "/images/productos/mueble-deco.jpg",
+      "category": "Plomería",
+      "categoryId": "cat-mayor-003",
+      "packaging": "Pack x 10 unidades",
+      "weight": 3.2,
+      "bulkType": "medium",
+      "unitType": "box",
+      "unitsPerPackage": 10,
+      "volumeDiscounts": [
+        { "minQuantity": 5, "pricePerUnit": 8000, "label": "5+ packs → $8,000 c/u" }
+      ],
+      "specifications": [
+        { "label": "Diámetro", "value": "110 mm" },
+        { "label": "Ángulo", "value": "90 grados" },
+        { "label": "Unidades", "value": "10 por pack" },
+        { "label": "Material", "value": "PVC" }
+      ],
+      "isActive": true,
+      "createdAt": "2026-01-15T10:00:00Z",
+      "updatedAt": "2026-01-15T10:00:00Z"
+    },
+    {
+      "id": "prod-mayor-008",
+      "sku": "PINTURA-LATEX-INT-20L",
+      "name": "Pintura Látex Interior Premium 20 Litros (Blanco)",
+      "description": "Látex acrílico para interiores. Alto rendimiento y lavabilidad. Secado rápido.",
+      "price": 42000,
+      "stock": 38,
+      "imageUrl": "/images/productos/mueble-deco.jpg",
+      "category": "Pinturería",
+      "categoryId": "cat-mayor-004",
+      "packaging": "Balde x 20 litros",
+      "weight": 24,
+      "bulkType": "large",
+      "unitType": "liter",
+      "volumeDiscounts": [
+        { "minQuantity": 5, "pricePerUnit": 39500, "label": "5+ baldes → $39,500 c/u" },
+        { "minQuantity": 10, "pricePerUnit": 37000, "label": "10+ baldes → $37,000 c/u" }
+      ],
+      "specifications": [
+        { "label": "Capacidad", "value": "20 litros" },
+        { "label": "Rendimiento", "value": "10-12 m²/litro" },
+        { "label": "Color", "value": "Blanco" },
+        { "label": "Tipo", "value": "Látex acrílico" }
+      ],
+      "observations": ["Agitar bien antes de usar", "No freezar"],
+      "isActive": true,
+      "createdAt": "2026-01-15T10:00:00Z",
+      "updatedAt": "2026-01-15T10:00:00Z"
+    },
+    {
+      "id": "prod-mayor-009",
+      "sku": "ENDUIDO-PLASTICO-30KG",
+      "name": "Enduido Plástico Interior 30kg",
+      "description": "Enduido plástico para terminación de paredes interiores. Listo para usar.",
+      "price": 18500,
+      "stock": 72,
+      "imageUrl": "/images/productos/mueble-deco.jpg",
+      "category": "Pinturería",
+      "categoryId": "cat-mayor-004",
+      "packaging": "Balde x 30 kg",
+      "weight": 30,
+      "bulkType": "large",
+      "volumeDiscounts": [
+        { "minQuantity": 6, "pricePerUnit": 17500, "label": "6+ baldes → $17,500 c/u" },
+        { "minQuantity": 15, "pricePerUnit": 16500, "label": "15+ baldes → $16,500 c/u" }
+      ],
+      "specifications": [
+        { "label": "Peso", "value": "30 kg" },
+        { "label": "Rendimiento", "value": "~1 kg/m²" },
+        { "label": "Uso", "value": "Interior" }
+      ],
+      "isActive": true,
+      "createdAt": "2026-01-15T10:00:00Z",
+      "updatedAt": "2026-01-15T10:00:00Z"
+    },
+    {
+      "id": "prod-mayor-010",
+      "sku": "TIERRA-NEGRA-30L",
+      "name": "Tierra Negra Fertilizada 30 Litros",
+      "description": "Sustrato orgánico enriquecido para plantas. Ideal para macetas y jardines.",
+      "price": 3200,
+      "stock": 150,
+      "imageUrl": "/images/productos/adorno-maceta.jpg",
+      "category": "Jardín",
+      "categoryId": "cat-mayor-005",
+      "packaging": "Bolsa x 30 litros",
+      "weight": 18,
+      "bulkType": "medium",
+      "unitType": "liter",
+      "volumeDiscounts": [
+        { "minQuantity": 10, "pricePerUnit": 2900, "label": "10+ bolsas → $2,900 c/u" },
+        { "minQuantity": 30, "pricePerUnit": 2600, "label": "30+ bolsas → $2,600 c/u" }
+      ],
+      "specifications": [
+        { "label": "Capacidad", "value": "30 litros" },
+        { "label": "Peso", "value": "18 kg aprox." },
+        { "label": "Tipo", "value": "Sustrato fertilizado" }
+      ],
+      "isActive": true,
+      "createdAt": "2026-01-15T10:00:00Z",
+      "updatedAt": "2026-01-15T10:00:00Z"
+    },
+    {
+      "id": "prod-mayor-011",
+      "sku": "MANGUERA-1-2-50M",
+      "name": "Manguera de Jardín 1/2\" x 50m",
+      "description": "Manguera reforzada para riego. Resistente a alta presión. Rollo de 50 metros.",
+      "price": 14800,
+      "stock": 42,
+      "imageUrl": "/images/productos/adorno-maceta.jpg",
+      "category": "Jardín",
+      "categoryId": "cat-mayor-005",
+      "packaging": "Rollo x 50 metros",
+      "weight": 8.5,
+      "bulkType": "medium",
+      "unitType": "meter",
+      "dimensions": { "length": 40, "width": 40, "height": 25 },
+      "volumeDiscounts": [
+        { "minQuantity": 5, "pricePerUnit": 14000, "label": "5+ rollos → $14,000 c/u" }
+      ],
+      "specifications": [
+        { "label": "Diámetro", "value": "1/2 pulgada" },
+        { "label": "Longitud", "value": "50 metros" },
+        { "label": "Material", "value": "PVC reforzado" }
+      ],
+      "isActive": true,
+      "createdAt": "2026-01-15T10:00:00Z",
+      "updatedAt": "2026-01-15T10:00:00Z"
+    },
+    {
+      "id": "prod-mayor-012",
+      "sku": "LAVANDINA-20L-INDUSTRIA",
+      "name": "Lavandina Concentrada Industrial 20 Litros",
+      "description": "Hipoclorito de sodio al 6%. Uso industrial y comercial. Bidon de 20 litros.",
+      "price": 8500,
+      "stock": 95,
+      "imageUrl": "/images/productos/recipiente-especias.jpg",
+      "category": "Limpieza",
+      "categoryId": "cat-mayor-006",
+      "packaging": "Bidón x 20 litros",
+      "weight": 21,
+      "bulkType": "large",
+      "unitType": "liter",
+      "volumeDiscounts": [
+        { "minQuantity": 6, "pricePerUnit": 8000, "label": "6+ bidones → $8,000 c/u" },
+        { "minQuantity": 15, "pricePerUnit": 7500, "label": "15+ bidones → $7,500 c/u" }
+      ],
+      "specifications": [
+        { "label": "Capacidad", "value": "20 litros" },
+        { "label": "Concentración", "value": "6% cloro activo" },
+        { "label": "Uso", "value": "Industrial/Comercial" }
+      ],
+      "observations": ["Mantener fuera del alcance de niños", "No mezclar con otros productos"],
+      "isActive": true,
+      "createdAt": "2026-01-15T10:00:00Z",
+      "updatedAt": "2026-01-15T10:00:00Z"
+    },
+    {
+      "id": "prod-mayor-013",
+      "sku": "DETERGENTE-5L-COMERCIAL",
+      "name": "Detergente Líquido Industrial 5 Litros",
+      "description": "Detergente concentrado para limpieza de pisos y superficies. Uso profesional.",
+      "price": 4200,
+      "stock": 110,
+      "imageUrl": "/images/productos/recipiente-especias.jpg",
+      "category": "Limpieza",
+      "categoryId": "cat-mayor-006",
+      "packaging": "Bidón x 5 litros",
+      "weight": 5.3,
+      "bulkType": "medium",
+      "unitType": "liter",
+      "volumeDiscounts": [
+        { "minQuantity": 12, "pricePerUnit": 3900, "label": "12+ bidones → $3,900 c/u" },
+        { "minQuantity": 24, "pricePerUnit": 3600, "label": "24+ bidones → $3,600 c/u" }
+      ],
+      "specifications": [
+        { "label": "Capacidad", "value": "5 litros" },
+        { "label": "Dilución", "value": "1:40" },
+        { "label": "Uso", "value": "Pisos y superficies" }
+      ],
+      "isActive": true,
+      "createdAt": "2026-01-15T10:00:00Z",
+      "updatedAt": "2026-01-15T10:00:00Z"
+    },
+    {
+      "id": "prod-mayor-014",
+      "sku": "ARENA-GRUESA-BOLSON",
+      "name": "Arena Gruesa Construcción (Bolsón 1m³)",
+      "description": "Arena gruesa lavada para mezclas de hormigón y contrapisos. Bolsón de 1 metro cúbico.",
+      "price": 32000,
+      "stock": 25,
+      "imageUrl": "/images/productos/mueble-deco.jpg",
+      "category": "Construcción",
+      "categoryId": "cat-mayor-001",
+      "packaging": "Bolsón de 1 m³",
+      "weight": 1600,
+      "bulkType": "extra-large",
+      "volumeDiscounts": [
+        { "minQuantity": 3, "pricePerUnit": 30000, "label": "3+ bolsones → $30,000 c/u" }
+      ],
+      "specifications": [
+        { "label": "Volumen", "value": "1 metro cúbico" },
+        { "label": "Tipo", "value": "Arena gruesa lavada" },
+        { "label": "Peso", "value": "~1600 kg" }
+      ],
+      "observations": ["Entrega con camión grúa", "Consultar disponibilidad de entrega"],
+      "isActive": true,
+      "createdAt": "2026-01-15T10:00:00Z",
+      "updatedAt": "2026-01-15T10:00:00Z"
+    },
+    {
+      "id": "prod-mayor-015",
+      "sku": "CAL-HIDRATADA-25KG",
+      "name": "Cal Hidratada 25kg",
+      "description": "Cal hidratada para mezclas, revoques y blanqueos. Bolsa de 25 kg.",
+      "price": 3800,
+      "stock": 200,
+      "imageUrl": "/images/productos/mueble-deco.jpg",
+      "category": "Construcción",
+      "categoryId": "cat-mayor-001",
+      "packaging": "Bolsa x 25 kg",
+      "weight": 25,
+      "bulkType": "large",
+      "volumeDiscounts": [
+        { "minQuantity": 10, "pricePerUnit": 3500, "label": "10+ bolsas → $3,500 c/u" },
+        { "minQuantity": 30, "pricePerUnit": 3200, "label": "30+ bolsas → $3,200 c/u" }
+      ],
+      "specifications": [
+        { "label": "Peso", "value": "25 kg" },
+        { "label": "Tipo", "value": "Cal hidratada" },
+        { "label": "Uso", "value": "Mezclas y blanqueos" }
+      ],
+      "isActive": true,
+      "createdAt": "2026-01-15T10:00:00Z",
+      "updatedAt": "2026-01-15T10:00:00Z"
+    }
+  ],
+  "newCategories": [
+    {
+      "id": "cat-mayor-001",
+      "name": "Construcción",
+      "description": "Materiales para obra: cemento, ladrillos, hierros, arena, cal",
+      "icon": "🏗️"
+    },
+    {
+      "id": "cat-mayor-002",
+      "name": "Electricidad",
+      "description": "Cables, disyuntores, cajas, fichas y materiales eléctricos",
+      "icon": "⚡"
+    },
+    {
+      "id": "cat-mayor-003",
+      "name": "Plomería",
+      "description": "Caños, conexiones, grifería y accesorios sanitarios",
+      "icon": "🚰"
+    },
+    {
+      "id": "cat-mayor-004",
+      "name": "Pinturería",
+      "description": "Pinturas, enduidos, selladores y herramientas de pintura",
+      "icon": "🎨"
+    },
+    {
+      "id": "cat-mayor-005",
+      "name": "Jardín",
+      "description": "Tierra, fertilizantes, herramientas y accesorios de jardinería",
+      "icon": "🌿"
+    },
+    {
+      "id": "cat-mayor-006",
+      "name": "Limpieza",
+      "description": "Productos de limpieza industrial y comercial",
+      "icon": "🧹"
+    }
+  ]
+}

@@ -19,7 +19,7 @@ export interface Order {
   subtotal: number;
   totalDiscount: number;
   total: number;
-  paymentMethod: 'MERCADOPAGO' | 'CASH' | 'CARD';
+  paymentMethod: 'MERCADOPAGO' | 'CASH_AT_COUNTER' | 'CARD_AT_COUNTER';
   paymentId?: string;
   estimatedPrepTime: number; // minutos
   actualPrepTime?: number;

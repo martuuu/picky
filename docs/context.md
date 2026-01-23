@@ -48,7 +48,7 @@
 **Navegación & UX:**
 - **Breadcrumbs:** Implementados en admin y picker
 - **Profile Access:** Icon en todas las páginas cliente
-- **Page Transitions:** Framer Motion en todos los portales
+- **Page Transitions:** Framer Motion en todos los portales y tailwind-animation
 - **Quick Actions:** 6 cards en 404 page
 
 **Build Stats:**

@@ -1,0 +1,479 @@
+{
+  "products": [
+    {
+      "id": "prod-001",
+      "sku": "OLLA-ACERO-24CM",
+      "name": "Olla de Acero Inoxidable 24cm",
+      "description": "Olla de acero inoxidable con tapa de vidrio templado. Apta para todo tipo de cocinas incluyendo inducción.",
+      "price": 18900,
+      "originalPrice": 23500,
+      "stock": 45,
+      "imageUrl": "/images/productos/recipiente-especias.jpg",
+      "images": [
+        "/images/productos/recipiente-especias.jpg",
+        "/images/productos/easter-eggs-recipiento-mesa.jpg"
+      ],
+      "category": "Cocina y Mesa",
+      "categoryId": "cat-001",
+      "specifications": [
+        { "label": "Material", "value": "Acero Inoxidable 304" },
+        { "label": "Diámetro", "value": "24cm" },
+        { "label": "Capacidad", "value": "5 litros" },
+        { "label": "Apto", "value": "Todas las cocinas" }
+      ],
+      "bulkDiscounts": [
+        { "minQty": 3, "discountPercent": 15, "label": "Comprá 3 ollas y ahorrá 15%" }
+      ],
+      "relatedProducts": ["prod-002", "prod-003"],
+      "isActive": true,
+      "createdAt": "2025-12-01T10:00:00Z",
+      "updatedAt": "2026-01-10T15:30:00Z"
+    },
+    {
+      "id": "prod-002",
+      "sku": "JUEGO-PLATOS-18PZ",
+      "name": "Juego de Platos de Porcelana 18 Piezas",
+      "description": "Set completo de vajilla para 6 personas. Incluye platos planos, hondos y postres. Diseño minimalista blanco.",
+      "price": 24500,
+      "stock": 28,
+      "imageUrl": "/images/productos/easter-eggs-recipiento-mesa.jpg",
+      "images": ["/images/productos/easter-eggs-recipiento-mesa.jpg"],
+      "category": "Cocina y Mesa",
+      "categoryId": "cat-001",
+      "specifications": [
+        { "label": "Material", "value": "Porcelana" },
+        { "label": "Piezas", "value": "18 (6 c/u)" },
+        { "label": "Apto", "value": "Microondas y Lavavajillas" },
+        { "label": "Color", "value": "Blanco" }
+      ],
+      "bulkDiscounts": [],
+      "relatedProducts": ["prod-001", "prod-004"],
+      "isActive": true,
+      "createdAt": "2025-12-05T10:00:00Z",
+      "updatedAt": "2026-01-08T12:00:00Z"
+    },
+    {
+      "id": "prod-003",
+      "sku": "SARTEN-TEFLON-28CM",
+      "name": "Sartén Antiadherente Teflón 28cm",
+      "description": "Sartén con recubrimiento antiadherente de alta calidad. Mango ergonómico con toque frío.",
+      "price": 12800,
+      "originalPrice": 15900,
+      "stock": 62,
+      "imageUrl": "/images/productos/recipiente-especias.jpg",
+      "images": ["/images/productos/recipiente-especias.jpg"],
+      "category": "Cocina y Mesa",
+      "categoryId": "cat-001",
+      "specifications": [
+        { "label": "Diámetro", "value": "28cm" },
+        { "label": "Material", "value": "Aluminio + Teflón" },
+        { "label": "Mango", "value": "Baquelita" }
+      ],
+      "bulkDiscounts": [
+        { "minQty": 2, "discountPercent": 10, "label": "Llevá 2 y ahorrá 10%" }
+      ],
+      "relatedProducts": ["prod-001"],
+      "isActive": true,
+      "createdAt": "2025-11-20T10:00:00Z",
+      "updatedAt": "2026-01-12T09:15:00Z"
+    },
+    {
+      "id": "prod-004",
+      "sku": "CUBIERTOS-SET-24PZ",
+      "name": "Cubiertos de Acero Inoxidable x24 Piezas",
+      "description": "Juego de cubiertos para 6 personas. Incluye cuchillos, tenedores, cucharas y cucharitas. Terminación espejo.",
+      "price": 16900,
+      "stock": 35,
+      "imageUrl": "/images/productos/home-keys-1.jpg",
+      "images": ["/images/productos/home-keys-1.jpg"],
+      "category": "Cocina y Mesa",
+      "categoryId": "cat-001",
+      "specifications": [
+        { "label": "Material", "value": "Acero Inoxidable" },
+        { "label": "Piezas", "value": "24" },
+        { "label": "Personas", "value": "6" }
+      ],
+      "bulkDiscounts": [],
+      "relatedProducts": ["prod-002"],
+      "isActive": true,
+      "createdAt": "2025-12-10T10:00:00Z",
+      "updatedAt": "2026-01-09T14:20:00Z"
+    },
+    {
+      "id": "prod-005",
+      "sku": "ASPIRADORA-1600W",
+      "name": "Aspiradora Multiuso 1600W",
+      "description": "Aspiradora de arrastre con filtro HEPA. Potencia regulable y cable de 5 metros. Incluye 3 accesorios.",
+      "price": 45900,
+      "originalPrice": 52000,
+      "stock": 18,
+      "imageUrl": "/images/productos/estantes-deco.jpg",
+      "images": ["/images/productos/estantes-deco.jpg"],
+      "category": "Limpieza",
+      "categoryId": "cat-002",
+      "specifications": [
+        { "label": "Potencia", "value": "1600W" },
+        { "label": "Filtro", "value": "HEPA" },
+        { "label": "Cable", "value": "5 metros" },
+        { "label": "Capacidad", "value": "2.5 litros" }
+      ],
+      "bulkDiscounts": [],
+      "relatedProducts": ["prod-006", "prod-007"],
+      "isActive": true,
+      "createdAt": "2025-11-15T10:00:00Z",
+      "updatedAt": "2026-01-11T11:45:00Z"
+    },
+    {
+      "id": "prod-006",
+      "sku": "BALDE-ESCURRIDOR-12L",
+      "name": "Balde con Escurridor Giratorio 12L",
+      "description": "Balde de limpieza con sistema de escurrido centrífugo. Incluye mopa de microfibra lavable.",
+      "price": 8900,
+      "stock": 72,
+      "imageUrl": "/images/productos/wrapping-papper.jpg",
+      "images": ["/images/productos/wrapping-papper.jpg"],
+      "category": "Limpieza",
+      "categoryId": "cat-002",
+      "specifications": [
+        { "label": "Capacidad", "value": "12 litros" },
+        { "label": "Material", "value": "Plástico reforzado" },
+        { "label": "Incluye", "value": "Mopa microfibra" }
+      ],
+      "bulkDiscounts": [
+        { "minQty": 5, "discountPercent": 12, "label": "Comprá 5 y ahorrá 12%" }
+      ],
+      "relatedProducts": ["prod-005"],
+      "isActive": true,
+      "createdAt": "2025-12-02T10:00:00Z",
+      "updatedAt": "2026-01-10T16:00:00Z"
+    },
+    {
+      "id": "prod-007",
+      "sku": "SET-LIMPIEZA-7PZ",
+      "name": "Set de Limpieza Profesional 7 Piezas",
+      "description": "Kit completo de limpieza: escoba, secador, cepillo, pala, balde, trapo y guantes.",
+      "price": 13500,
+      "stock": 48,
+      "imageUrl": "/images/productos/wrapping-papper.jpg",
+      "images": ["/images/productos/wrapping-papper.jpg"],
+      "category": "Limpieza",
+      "categoryId": "cat-002",
+      "specifications": [
+        { "label": "Piezas", "value": "7" },
+        { "label": "Material", "value": "Plástico y fibras" }
+      ],
+      "bulkDiscounts": [],
+      "relatedProducts": ["prod-006"],
+      "isActive": true,
+      "createdAt": "2025-12-08T10:00:00Z",
+      "updatedAt": "2026-01-07T10:30:00Z"
+    },
+    {
+      "id": "prod-008",
+      "sku": "CUADRO-DECORATIVO-40X60",
+      "name": "Cuadro Decorativo Canvas 40x60cm",
+      "description": "Cuadro impreso en canvas de alta calidad. Diseño abstracto moderno. Marco de madera incluido.",
+      "price": 8900,
+      "originalPrice": 11500,
+      "stock": 56,
+      "imageUrl": "/images/productos/cuadro-mapamundi.jpg",
+      "images": ["/images/productos/cuadro-mapamundi.jpg"],
+      "category": "Decoración",
+      "categoryId": "cat-003",
+      "specifications": [
+        { "label": "Tamaño", "value": "40x60cm" },
+        { "label": "Material", "value": "Canvas" },
+        { "label": "Marco", "value": "Madera incluido" }
+      ],
+      "bulkDiscounts": [
+        { "minQty": 3, "discountPercent": 20, "label": "Llevá 3 cuadros y ahorrá 20%" }
+      ],
+      "relatedProducts": ["prod-009", "prod-010"],
+      "isActive": true,
+      "createdAt": "2025-11-25T10:00:00Z",
+      "updatedAt": "2026-01-13T08:00:00Z"
+    },
+    {
+      "id": "prod-009",
+      "sku": "ALMOHADON-VELVET-45X45",
+      "name": "Almohadón Velvet 45x45cm",
+      "description": "Almohadón decorativo de terciopelo con relleno de vellón siliconado. Cierre invisible.",
+      "price": 4200,
+      "stock": 95,
+      "imageUrl": "/images/productos/adorno-deco.jpg",
+      "images": ["/images/productos/adorno-deco.jpg"],
+      "category": "Decoración",
+      "categoryId": "cat-003",
+      "specifications": [
+        { "label": "Tamaño", "value": "45x45cm" },
+        { "label": "Material", "value": "Terciopelo" },
+        { "label": "Relleno", "value": "Vellón siliconado" }
+      ],
+      "bulkDiscounts": [
+        { "minQty": 4, "discountPercent": 15, "label": "Pack x4 con 15% OFF" }
+      ],
+      "relatedProducts": ["prod-008"],
+      "isActive": true,
+      "createdAt": "2025-12-03T10:00:00Z",
+      "updatedAt": "2026-01-11T13:15:00Z"
+    },
+    {
+      "id": "prod-010",
+      "sku": "ESPEJO-REDONDO-60CM",
+      "name": "Espejo Redondo con Marco Dorado 60cm",
+      "description": "Espejo circular con marco metálico dorado. Perfecto para living o recibidor.",
+      "price": 12400,
+      "stock": 32,
+      "imageUrl": "/images/productos/adorno-maceta.jpg",
+      "images": ["/images/productos/adorno-maceta.jpg"],
+      "category": "Decoración",
+      "categoryId": "cat-003",
+      "specifications": [
+        { "label": "Diámetro", "value": "60cm" },
+        { "label": "Marco", "value": "Metal dorado" },
+        { "label": "Peso", "value": "2.5kg" }
+      ],
+      "bulkDiscounts": [],
+      "relatedProducts": ["prod-008", "prod-009"],
+      "isActive": true,
+      "createdAt": "2025-12-12T10:00:00Z",
+      "updatedAt": "2026-01-09T09:00:00Z"
+    },
+    {
+      "id": "prod-011",
+      "sku": "ORGANIZADOR-PLASTICO-3CAJONES",
+      "name": "Organizador de Plástico 3 Cajones",
+      "description": "Torre organizadora con 3 cajones deslizables. Ideal para escritorio, baño o cocina.",
+      "price": 7800,
+      "stock": 64,
+      "imageUrl": "/images/productos/estantes-deco.jpg",
+      "images": ["/images/productos/estantes-deco.jpg"],
+      "category": "Organización",
+      "categoryId": "cat-004",
+      "specifications": [
+        { "label": "Cajones", "value": "3" },
+        { "label": "Material", "value": "Plástico PP" },
+        { "label": "Medidas", "value": "25x35x28cm" }
+      ],
+      "bulkDiscounts": [
+        { "minQty": 3, "discountPercent": 10, "label": "Comprá 3 y ahorrá 10%" }
+      ],
+      "relatedProducts": ["prod-012", "prod-013"],
+      "isActive": true,
+      "createdAt": "2025-11-28T10:00:00Z",
+      "updatedAt": "2026-01-08T14:00:00Z"
+    },
+    {
+      "id": "prod-012",
+      "sku": "CAJAS-ORGANIZADORAS-SET6",
+      "name": "Set 6 Cajas Organizadoras Plegables",
+      "description": "Cajas de tela con estructura plegable. Incluye 6 unidades en diferentes tamaños.",
+      "price": 9600,
+      "stock": 41,
+      "imageUrl": "/images/productos/mueble-deco.jpg",
+      "images": ["/images/productos/mueble-deco.jpg"],
+      "category": "Organización",
+      "categoryId": "cat-004",
+      "specifications": [
+        { "label": "Unidades", "value": "6" },
+        { "label": "Material", "value": "Tela no tejida" },
+        { "label": "Plegable", "value": "Sí" }
+      ],
+      "bulkDiscounts": [],
+      "relatedProducts": ["prod-011"],
+      "isActive": true,
+      "createdAt": "2025-12-01T10:00:00Z",
+      "updatedAt": "2026-01-10T11:20:00Z"
+    },
+    {
+      "id": "prod-013",
+      "sku": "PERCHERO-PIE-8GANCHOS",
+      "name": "Perchero de Pie 8 Ganchos",
+      "description": "Perchero metálico con 8 ganchos distribuidos en 2 niveles. Base con contrapeso.",
+      "price": 15900,
+      "stock": 27,
+      "imageUrl": "/images/productos/home-keys-1.jpg",
+      "images": ["/images/productos/home-keys-1.jpg"],
+      "category": "Organización",
+      "categoryId": "cat-004",
+      "specifications": [
+        { "label": "Altura", "value": "175cm" },
+        { "label": "Ganchos", "value": "8" },
+        { "label": "Material", "value": "Metal" }
+      ],
+      "bulkDiscounts": [],
+      "relatedProducts": ["prod-011", "prod-012"],
+      "isActive": true,
+      "createdAt": "2025-12-06T10:00:00Z",
+      "updatedAt": "2026-01-09T15:30:00Z"
+    },
+    {
+      "id": "prod-014",
+      "sku": "JUEGO-TOALLAS-4PZ",
+      "name": "Juego de Toallas Premium 4 Piezas",
+      "description": "Set de toallas 100% algodón. Incluye 2 de baño y 2 de mano. Alta absorción.",
+      "price": 13800,
+      "originalPrice": 16500,
+      "stock": 53,
+      "imageUrl": "/images/productos/rosas-papel-deco.jpg",
+      "images": ["/images/productos/rosas-papel-deco.jpg"],
+      "category": "Textil y Baño",
+      "categoryId": "cat-005",
+      "specifications": [
+        { "label": "Material", "value": "100% Algodón" },
+        { "label": "Piezas", "value": "4 (2+2)" },
+        { "label": "Gramaje", "value": "500 g/m²" }
+      ],
+      "bulkDiscounts": [
+        { "minQty": 2, "discountPercent": 15, "label": "Llevá 2 juegos y ahorrá 15%" }
+      ],
+      "relatedProducts": ["prod-015", "prod-016"],
+      "isActive": true,
+      "createdAt": "2025-11-22T10:00:00Z",
+      "updatedAt": "2026-01-12T10:15:00Z"
+    },
+    {
+      "id": "prod-015",
+      "sku": "CORTINA-BANO-180X180",
+      "name": "Cortina de Baño Impermeable 180x180cm",
+      "description": "Cortina de baño de poliéster con tratamiento anti-moho. Incluye 12 aros plásticos.",
+      "price": 4900,
+      "stock": 78,
+      "imageUrl": "/images/productos/wrapping-papper.jpg",
+      "images": ["/images/productos/wrapping-papper.jpg"],
+      "category": "Textil y Baño",
+      "categoryId": "cat-005",
+      "specifications": [
+        { "label": "Medidas", "value": "180x180cm" },
+        { "label": "Material", "value": "Poliéster" },
+        { "label": "Incluye", "value": "12 aros" }
+      ],
+      "bulkDiscounts": [],
+      "relatedProducts": ["prod-014", "prod-017"],
+      "isActive": true,
+      "createdAt": "2025-12-04T10:00:00Z",
+      "updatedAt": "2026-01-11T09:45:00Z"
+    },
+    {
+      "id": "prod-016",
+      "sku": "ALFOMBRA-BANO-50X70",
+      "name": "Alfombra de Baño Antideslizante 50x70cm",
+      "description": "Alfombra con base de goma antideslizante. Superficie de microfibra ultra absorbente.",
+      "price": 3400,
+      "stock": 88,
+      "imageUrl": "/images/productos/adorno-mesa-sapo.jpg",
+      "images": ["/images/productos/adorno-mesa-sapo.jpg"],
+      "category": "Textil y Baño",
+      "categoryId": "cat-005",
+      "specifications": [
+        { "label": "Medidas", "value": "50x70cm" },
+        { "label": "Material", "value": "Microfibra" },
+        { "label": "Base", "value": "Goma antideslizante" }
+      ],
+      "bulkDiscounts": [
+        { "minQty": 3, "discountPercent": 10, "label": "Pack x3 con 10% OFF" }
+      ],
+      "relatedProducts": ["prod-014", "prod-015"],
+      "isActive": true,
+      "createdAt": "2025-12-07T10:00:00Z",
+      "updatedAt": "2026-01-10T12:30:00Z"
+    },
+    {
+      "id": "prod-017",
+      "sku": "LAMPARA-MESA-LED",
+      "name": "Lámpara de Mesa LED Táctil",
+      "description": "Lámpara con 3 niveles de intensidad regulable por touch. Base de madera y pantalla de tela.",
+      "price": 11900,
+      "stock": 39,
+      "imageUrl": "/images/productos/mesa-ratona.jpg",
+      "images": ["/images/productos/mesa-ratona.jpg"],
+      "category": "Iluminación",
+      "categoryId": "cat-006",
+      "specifications": [
+        { "label": "Tipo", "value": "LED" },
+        { "label": "Control", "value": "Táctil 3 niveles" },
+        { "label": "Base", "value": "Madera" },
+        { "label": "Altura", "value": "35cm" }
+      ],
+      "bulkDiscounts": [],
+      "relatedProducts": ["prod-018", "prod-019"],
+      "isActive": true,
+      "createdAt": "2025-11-30T10:00:00Z",
+      "updatedAt": "2026-01-09T16:45:00Z"
+    },
+    {
+      "id": "prod-018",
+      "sku": "TIRA-LED-RGB-5M",
+      "name": "Tira LED RGB 5 metros con Control Remoto",
+      "description": "Tira LED multicolor con control remoto. 16 millones de colores y modos de animación.",
+      "price": 11900,
+      "originalPrice": 14500,
+      "stock": 67,
+      "imageUrl": "/images/productos/estantes-deco.jpg",
+      "images": ["/images/productos/estantes-deco.jpg"],
+      "category": "Iluminación",
+      "categoryId": "cat-006",
+      "specifications": [
+        { "label": "Longitud", "value": "5 metros" },
+        { "label": "Tipo", "value": "RGB" },
+        { "label": "Control", "value": "Remoto IR" },
+        { "label": "LEDs", "value": "300 SMD 5050" }
+      ],
+      "bulkDiscounts": [
+        { "minQty": 2, "discountPercent": 15, "label": "Llevá 2 tiras y ahorrá 15%" }
+      ],
+      "relatedProducts": ["prod-017"],
+      "isActive": true,
+      "createdAt": "2025-12-09T10:00:00Z",
+      "updatedAt": "2026-01-13T10:00:00Z"
+    },
+    {
+      "id": "prod-019",
+      "sku": "LAMPARA-COLGANTE-MINIMALISTA",
+      "name": "Lámpara Colgante Minimalista",
+      "description": "Lámpara colgante de diseño moderno. Pantalla de metal con acabado mate. Cable regulable.",
+      "price": 16800,
+      "stock": 24,
+      "imageUrl": "/images/productos/mueble-deco.jpg",
+      "images": ["/images/productos/mueble-deco.jpg"],
+      "category": "Iluminación",
+      "categoryId": "cat-006",
+      "specifications": [
+        { "label": "Material", "value": "Metal" },
+        { "label": "Cable", "value": "120cm regulable" },
+        { "label": "Diámetro", "value": "25cm" },
+        { "label": "Socket", "value": "E27" }
+      ],
+      "bulkDiscounts": [],
+      "relatedProducts": ["prod-017", "prod-018"],
+      "isActive": true,
+      "createdAt": "2025-12-11T10:00:00Z",
+      "updatedAt": "2026-01-08T17:00:00Z"
+    },
+    {
+      "id": "prod-020",
+      "sku": "TERMO-ACERO-1L",
+      "name": "Termo de Acero Inoxidable 1L",
+      "description": "Termo de acero con doble pared. Mantiene bebidas frías 24hs y calientes 12hs.",
+      "price": 9800,
+      "originalPrice": 12000,
+      "stock": 51,
+      "imageUrl": "/images/productos/recipiente-especias.jpg",
+      "images": ["/images/productos/recipiente-especias.jpg"],
+      "category": "Cocina y Mesa",
+      "categoryId": "cat-001",
+      "specifications": [
+        { "label": "Capacidad", "value": "1 litro" },
+        { "label": "Material", "value": "Acero inoxidable" },
+        { "label": "Aislamiento", "value": "Doble pared" }
+      ],
+      "bulkDiscounts": [
+        { "minQty": 3, "discountPercent": 18, "label": "Pack x3 con 18% OFF" }
+      ],
+      "relatedProducts": ["prod-001", "prod-002"],
+      "isActive": true,
+      "createdAt": "2025-12-13T10:00:00Z",
+      "updatedAt": "2026-01-12T13:30:00Z"
+    }
+  ]
+}

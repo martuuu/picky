@@ -1,0 +1,587 @@
+{
+  "moreProducts": [
+    {
+      "id": "prod-mayor-016",
+      "sku": "YESO-PARIS-25KG",
+      "name": "Yeso París 25kg",
+      "description": "Yeso para construcción y molduras. Secado rápido. Bolsa de 25 kg.",
+      "price": 5200,
+      "stock": 140,
+      "imageUrl": "/images/productos/mueble-deco.jpg",
+      "category": "Construcción",
+      "categoryId": "cat-mayor-001",
+      "packaging": "Bolsa x 25 kg",
+      "weight": 25,
+      "bulkType": "large",
+      "volumeDiscounts": [
+        { "minQuantity": 10, "pricePerUnit": 4900, "label": "10+ bolsas → $4,900 c/u" }
+      ],
+      "specifications": [
+        { "label": "Peso", "value": "25 kg" },
+        { "label": "Tipo", "value": "Yeso París" }
+      ],
+      "isActive": true,
+      "createdAt": "2026-01-15T10:00:00Z",
+      "updatedAt": "2026-01-15T10:00:00Z"
+    },
+    {
+      "id": "prod-mayor-017",
+      "sku": "MEMBRANA-ALUMINIO-35KG",
+      "name": "Membrana Asfáltica Aluminio 35kg",
+      "description": "Rollo de membrana asfáltica con terminación aluminio. 10 metros cuadrados.",
+      "price": 48000,
+      "stock": 32,
+      "imageUrl": "/images/productos/mueble-deco.jpg",
+      "category": "Construcción",
+      "categoryId": "cat-mayor-001",
+      "packaging": "Rollo 10 m²",
+      "weight": 35,
+      "bulkType": "extra-large",
+      "volumeDiscounts": [
+        { "minQuantity": 5, "pricePerUnit": 45000, "label": "5+ rollos → $45,000 c/u" }
+      ],
+      "specifications": [
+        { "label": "Área", "value": "10 m²" },
+        { "label": "Terminación", "value": "Aluminio" },
+        { "label": "Peso", "value": "35 kg" }
+      ],
+      "isActive": true,
+      "createdAt": "2026-01-15T10:00:00Z",
+      "updatedAt": "2026-01-15T10:00:00Z"
+    },
+    {
+      "id": "prod-mayor-018",
+      "sku": "PORCELANATO-60X60-CAJA",
+      "name": "Porcelanato Rectificado 60x60cm (Caja x 1.44m²)",
+      "description": "Porcelanato rectificado para pisos y paredes. Simil mármol blanco. Caja de 4 piezas.",
+      "price": 18500,
+      "stock": 68,
+      "imageUrl": "/images/productos/mueble-deco.jpg",
+      "category": "Construcción",
+      "categoryId": "cat-mayor-001",
+      "packaging": "Caja x 4 piezas (1.44 m²)",
+      "weight": 32,
+      "bulkType": "large",
+      "unitType": "box",
+      "unitsPerPackage": 4,
+      "volumeDiscounts": [
+        { "minQuantity": 10, "pricePerUnit": 17500, "label": "10+ cajas → $17,500 c/u" },
+        { "minQuantity": 30, "pricePerUnit": 16500, "label": "30+ cajas → $16,500 c/u" }
+      ],
+      "specifications": [
+        { "label": "Medida", "value": "60 x 60 cm" },
+        { "label": "Piezas", "value": "4 por caja" },
+        { "label": "Área", "value": "1.44 m²" },
+        { "label": "Tipo", "value": "Rectificado" }
+      ],
+      "isActive": true,
+      "createdAt": "2026-01-15T10:00:00Z",
+      "updatedAt": "2026-01-15T10:00:00Z"
+    },
+    {
+      "id": "prod-mayor-019",
+      "sku": "TOMA-CORRIENTE-10A-PACK20",
+      "name": "Toma Corriente 10A (Pack x 20 unid.)",
+      "description": "Toma de corriente 10 amperes con toma tierra. Pack mayorista de 20 unidades.",
+      "price": 24000,
+      "stock": 55,
+      "imageUrl": "/images/productos/mueble-deco.jpg",
+      "category": "Electricidad",
+      "categoryId": "cat-mayor-002",
+      "packaging": "Pack x 20 unidades",
+      "weight": 2.8,
+      "bulkType": "medium",
+      "unitType": "box",
+      "unitsPerPackage": 20,
+      "volumeDiscounts": [
+        { "minQuantity": 5, "pricePerUnit": 22500, "label": "5+ packs → $22,500 c/u" }
+      ],
+      "specifications": [
+        { "label": "Corriente", "value": "10 Amperes" },
+        { "label": "Unidades", "value": "20 por pack" },
+        { "label": "Toma tierra", "value": "Sí" }
+      ],
+      "isActive": true,
+      "createdAt": "2026-01-15T10:00:00Z",
+      "updatedAt": "2026-01-15T10:00:00Z"
+    },
+    {
+      "id": "prod-mayor-020",
+      "sku": "LAMPARA-LED-9W-PACK10",
+      "name": "Lámpara LED 9W Luz Fría (Pack x 10 unid.)",
+      "description": "Lámpara LED E27 9W luz fría. Pack mayorista de 10 unidades.",
+      "price": 15000,
+      "stock": 90,
+      "imageUrl": "/images/productos/mueble-deco.jpg",
+      "category": "Electricidad",
+      "categoryId": "cat-mayor-002",
+      "packaging": "Pack x 10 unidades",
+      "weight": 1.2,
+      "bulkType": "small",
+      "unitType": "box",
+      "unitsPerPackage": 10,
+      "volumeDiscounts": [
+        { "minQuantity": 10, "pricePerUnit": 14000, "label": "10+ packs → $14,000 c/u" }
+      ],
+      "specifications": [
+        { "label": "Potencia", "value": "9W" },
+        { "label": "Casquillo", "value": "E27" },
+        { "label": "Luz", "value": "Fría (6500K)" },
+        { "label": "Unidades", "value": "10 por pack" }
+      ],
+      "isActive": true,
+      "createdAt": "2026-01-15T10:00:00Z",
+      "updatedAt": "2026-01-15T10:00:00Z"
+    },
+    {
+      "id": "prod-mayor-021",
+      "sku": "CINTA-AISLADORA-PACK50",
+      "name": "Cinta Aisladora 3M 19mm x 20m (Pack x 50 unid.)",
+      "description": "Cinta aisladora profesional 3M. Pack mayorista de 50 rollos.",
+      "price": 42000,
+      "stock": 28,
+      "imageUrl": "/images/productos/mueble-deco.jpg",
+      "category": "Electricidad",
+      "categoryId": "cat-mayor-002",
+      "packaging": "Pack x 50 rollos",
+      "weight": 8.5,
+      "bulkType": "medium",
+      "unitType": "box",
+      "unitsPerPackage": 50,
+      "volumeDiscounts": [
+        { "minQuantity": 3, "pricePerUnit": 39000, "label": "3+ packs → $39,000 c/u" }
+      ],
+      "specifications": [
+        { "label": "Marca", "value": "3M" },
+        { "label": "Ancho", "value": "19 mm" },
+        { "label": "Largo", "value": "20 metros" },
+        { "label": "Unidades", "value": "50 rollos" }
+      ],
+      "isActive": true,
+      "createdAt": "2026-01-15T10:00:00Z",
+      "updatedAt": "2026-01-15T10:00:00Z"
+    },
+    {
+      "id": "prod-mayor-022",
+      "sku": "INODORO-LOZA-BLANCO",
+      "name": "Inodoro a Piso Loza Blanco con Mochila",
+      "description": "Inodoro completo a piso con mochila externa. Incluye asiento y mecanismo.",
+      "price": 58000,
+      "stock": 18,
+      "imageUrl": "/images/productos/mueble-deco.jpg",
+      "category": "Plomería",
+      "categoryId": "cat-mayor-003",
+      "packaging": "Unidad (completo)",
+      "weight": 42,
+      "bulkType": "extra-large",
+      "unitType": "unit",
+      "volumeDiscounts": [
+        { "minQuantity": 3, "pricePerUnit": 55000, "label": "3+ unidades → $55,000 c/u" },
+        { "minQuantity": 6, "pricePerUnit": 52000, "label": "6+ unidades → $52,000 c/u" }
+      ],
+      "specifications": [
+        { "label": "Material", "value": "Loza vitrificada" },
+        { "label": "Color", "value": "Blanco" },
+        { "label": "Incluye", "value": "Mochila, asiento y mecanismo" }
+      ],
+      "isActive": true,
+      "createdAt": "2026-01-15T10:00:00Z",
+      "updatedAt": "2026-01-15T10:00:00Z"
+    },
+    {
+      "id": "prod-mayor-023",
+      "sku": "GRIFERIA-MONOCOMANDO-LAVA",
+      "name": "Grifería Monocomando para Lavatorio Cromada",
+      "description": "Grifería monocomando de bronce cromado. Con caño flexible de conexión.",
+      "price": 22500,
+      "stock": 45,
+      "imageUrl": "/images/productos/mueble-deco.jpg",
+      "category": "Plomería",
+      "categoryId": "cat-mayor-003",
+      "packaging": "Unidad",
+      "weight": 1.8,
+      "bulkType": "small",
+      "unitType": "unit",
+      "volumeDiscounts": [
+        { "minQuantity": 5, "pricePerUnit": 21000, "label": "5+ unidades → $21,000 c/u" },
+        { "minQuantity": 10, "pricePerUnit": 19500, "label": "10+ unidades → $19,500 c/u" }
+      ],
+      "specifications": [
+        { "label": "Material", "value": "Bronce cromado" },
+        { "label": "Tipo", "value": "Monocomando" },
+        { "label": "Uso", "value": "Lavatorio" }
+      ],
+      "isActive": true,
+      "createdAt": "2026-01-15T10:00:00Z",
+      "updatedAt": "2026-01-15T10:00:00Z"
+    },
+    {
+      "id": "prod-mayor-024",
+      "sku": "PILETA-BACHA-COCINA-DOBLE",
+      "name": "Pileta de Cocina Doble con Grifería (Acero Inox)",
+      "description": "Pileta doble de acero inoxidable para mesada. Incluye grifería monocomando.",
+      "price": 68000,
+      "stock": 22,
+      "imageUrl": "/images/productos/recipiente-especias.jpg",
+      "category": "Plomería",
+      "categoryId": "cat-mayor-003",
+      "packaging": "Kit completo",
+      "weight": 12,
+      "bulkType": "large",
+      "unitType": "unit",
+      "volumeDiscounts": [
+        { "minQuantity": 3, "pricePerUnit": 65000, "label": "3+ kits → $65,000 c/u" }
+      ],
+      "specifications": [
+        { "label": "Material", "value": "Acero inoxidable" },
+        { "label": "Bachas", "value": "Doble" },
+        { "label": "Incluye", "value": "Grifería monocomando" }
+      ],
+      "isActive": true,
+      "createdAt": "2026-01-15T10:00:00Z",
+      "updatedAt": "2026-01-15T10:00:00Z"
+    },
+    {
+      "id": "prod-mayor-025",
+      "sku": "LLAVE-ESFERICA-3-4",
+      "name": "Llave Esférica 3/4\" (Pack x 10 unid.)",
+      "description": "Llave esférica de bronce 3/4 pulgada. Pack mayorista de 10 unidades.",
+      "price": 18000,
+      "stock": 60,
+      "imageUrl": "/images/productos/mueble-deco.jpg",
+      "category": "Plomería",
+      "categoryId": "cat-mayor-003",
+      "packaging": "Pack x 10 unidades",
+      "weight": 5.2,
+      "bulkType": "medium",
+      "unitType": "box",
+      "unitsPerPackage": 10,
+      "volumeDiscounts": [
+        { "minQuantity": 5, "pricePerUnit": 17000, "label": "5+ packs → $17,000 c/u" }
+      ],
+      "specifications": [
+        { "label": "Diámetro", "value": "3/4 pulgada" },
+        { "label": "Material", "value": "Bronce" },
+        { "label": "Unidades", "value": "10 por pack" }
+      ],
+      "isActive": true,
+      "createdAt": "2026-01-15T10:00:00Z",
+      "updatedAt": "2026-01-15T10:00:00Z"
+    },
+    {
+      "id": "prod-mayor-026",
+      "sku": "ESMALTE-SINTETICO-4L",
+      "name": "Esmalte Sintético Brillante 4 Litros (Blanco)",
+      "description": "Esmalte sintético al aceite. Alto brillo y durabilidad. Para metal y madera.",
+      "price": 16800,
+      "stock": 52,
+      "imageUrl": "/images/productos/mueble-deco.jpg",
+      "category": "Pinturería",
+      "categoryId": "cat-mayor-004",
+      "packaging": "Lata x 4 litros",
+      "weight": 5,
+      "bulkType": "medium",
+      "unitType": "liter",
+      "volumeDiscounts": [
+        { "minQuantity": 6, "pricePerUnit": 15800, "label": "6+ latas → $15,800 c/u" }
+      ],
+      "specifications": [
+        { "label": "Capacidad", "value": "4 litros" },
+        { "label": "Terminación", "value": "Brillante" },
+        { "label": "Base", "value": "Sintético al aceite" }
+      ],
+      "isActive": true,
+      "createdAt": "2026-01-15T10:00:00Z",
+      "updatedAt": "2026-01-15T10:00:00Z"
+    },
+    {
+      "id": "prod-mayor-027",
+      "sku": "RODILLO-LANA-22CM-PACK10",
+      "name": "Rodillo de Lana 22cm (Pack x 10 unid.)",
+      "description": "Rodillo para pintar con felpilla de lana. Pack mayorista de 10 unidades.",
+      "price": 12000,
+      "stock": 75,
+      "imageUrl": "/images/productos/mueble-deco.jpg",
+      "category": "Pinturería",
+      "categoryId": "cat-mayor-004",
+      "packaging": "Pack x 10 unidades",
+      "weight": 2.5,
+      "bulkType": "small",
+      "unitType": "box",
+      "unitsPerPackage": 10,
+      "volumeDiscounts": [
+        { "minQuantity": 5, "pricePerUnit": 11000, "label": "5+ packs → $11,000 c/u" }
+      ],
+      "specifications": [
+        { "label": "Ancho", "value": "22 cm" },
+        { "label": "Material", "value": "Lana" },
+        { "label": "Unidades", "value": "10 por pack" }
+      ],
+      "isActive": true,
+      "createdAt": "2026-01-15T10:00:00Z",
+      "updatedAt": "2026-01-15T10:00:00Z"
+    },
+    {
+      "id": "prod-mayor-028",
+      "sku": "PINCEL-2-PULGADAS-PACK12",
+      "name": "Pincel 2\" Cerda Sintética (Pack x 12 unid.)",
+      "description": "Pincel profesional de 2 pulgadas con cerda sintética. Pack de 12 unidades.",
+      "price": 14400,
+      "stock": 48,
+      "imageUrl": "/images/productos/mueble-deco.jpg",
+      "category": "Pinturería",
+      "categoryId": "cat-mayor-004",
+      "packaging": "Pack x 12 unidades",
+      "weight": 1.8,
+      "bulkType": "small",
+      "unitType": "box",
+      "unitsPerPackage": 12,
+      "volumeDiscounts": [
+        { "minQuantity": 5, "pricePerUnit": 13500, "label": "5+ packs → $13,500 c/u" }
+      ],
+      "specifications": [
+        { "label": "Ancho", "value": "2 pulgadas" },
+        { "label": "Cerda", "value": "Sintética" },
+        { "label": "Unidades", "value": "12 por pack" }
+      ],
+      "isActive": true,
+      "createdAt": "2026-01-15T10:00:00Z",
+      "updatedAt": "2026-01-15T10:00:00Z"
+    },
+    {
+      "id": "prod-mayor-029",
+      "sku": "AGUARRAS-20L-INDUSTRIAL",
+      "name": "Aguarrás Mineral Industrial 20 Litros",
+      "description": "Aguarrás para dilución de pinturas y limpieza. Bidón de 20 litros.",
+      "price": 24000,
+      "stock": 35,
+      "imageUrl": "/images/productos/mueble-deco.jpg",
+      "category": "Pinturería",
+      "categoryId": "cat-mayor-004",
+      "packaging": "Bidón x 20 litros",
+      "weight": 16,
+      "bulkType": "large",
+      "unitType": "liter",
+      "volumeDiscounts": [
+        { "minQuantity": 4, "pricePerUnit": 22500, "label": "4+ bidones → $22,500 c/u" }
+      ],
+      "specifications": [
+        { "label": "Capacidad", "value": "20 litros" },
+        { "label": "Uso", "value": "Dilución y limpieza" }
+      ],
+      "observations": ["Inflamable", "Mantener alejado del fuego"],
+      "isActive": true,
+      "createdAt": "2026-01-15T10:00:00Z",
+      "updatedAt": "2026-01-15T10:00:00Z"
+    },
+    {
+      "id": "prod-mayor-030",
+      "sku": "FERTILIZANTE-NPK-25KG",
+      "name": "Fertilizante NPK 15-15-15 (25kg)",
+      "description": "Fertilizante completo NPK para todo tipo de plantas. Bolsa de 25 kg.",
+      "price": 18500,
+      "stock": 65,
+      "imageUrl": "/images/productos/adorno-maceta.jpg",
+      "category": "Jardín",
+      "categoryId": "cat-mayor-005",
+      "packaging": "Bolsa x 25 kg",
+      "weight": 25,
+      "bulkType": "large",
+      "volumeDiscounts": [
+        { "minQuantity": 5, "pricePerUnit": 17500, "label": "5+ bolsas → $17,500 c/u" },
+        { "minQuantity": 10, "pricePerUnit": 16500, "label": "10+ bolsas → $16,500 c/u" }
+      ],
+      "specifications": [
+        { "label": "Fórmula", "value": "NPK 15-15-15" },
+        { "label": "Peso", "value": "25 kg" }
+      ],
+      "isActive": true,
+      "createdAt": "2026-01-15T10:00:00Z",
+      "updatedAt": "2026-01-15T10:00:00Z"
+    },
+    {
+      "id": "prod-mayor-031",
+      "sku": "PASTO-BERMUDA-1KG",
+      "name": "Semilla de Pasto Bermuda 1kg",
+      "description": "Semilla de césped Bermuda para jardines y canchas. Bolsa de 1 kg.",
+      "price": 8500,
+      "stock": 80,
+      "imageUrl": "/images/productos/adorno-maceta.jpg",
+      "category": "Jardín",
+      "categoryId": "cat-mayor-005",
+      "packaging": "Bolsa x 1 kg",
+      "weight": 1,
+      "bulkType": "small",
+      "unitType": "kg",
+      "volumeDiscounts": [
+        { "minQuantity": 10, "pricePerUnit": 8000, "label": "10+ kg → $8,000 c/u" }
+      ],
+      "specifications": [
+        { "label": "Tipo", "value": "Bermuda" },
+        { "label": "Peso", "value": "1 kg" },
+        { "label": "Rendimiento", "value": "~50 m²" }
+      ],
+      "isActive": true,
+      "createdAt": "2026-01-15T10:00:00Z",
+      "updatedAt": "2026-01-15T10:00:00Z"
+    },
+    {
+      "id": "prod-mayor-032",
+      "sku": "CORTACESPED-MANUAL-40CM",
+      "name": "Cortacésped Manual 40cm",
+      "description": "Cortadora de césped manual con cilindro de corte. Ancho de corte 40cm.",
+      "price": 42000,
+      "stock": 15,
+      "imageUrl": "/images/productos/adorno-maceta.jpg",
+      "category": "Jardín",
+      "categoryId": "cat-mayor-005",
+      "packaging": "Unidad",
+      "weight": 12,
+      "bulkType": "extra-large",
+      "unitType": "unit",
+      "volumeDiscounts": [
+        { "minQuantity": 3, "pricePerUnit": 39000, "label": "3+ unidades → $39,000 c/u" }
+      ],
+      "specifications": [
+        { "label": "Ancho", "value": "40 cm" },
+        { "label": "Tipo", "value": "Manual" }
+      ],
+      "isActive": true,
+      "createdAt": "2026-01-15T10:00:00Z",
+      "updatedAt": "2026-01-15T10:00:00Z"
+    },
+    {
+      "id": "prod-mayor-033",
+      "sku": "PALA-RECTA-MANGO-FIBRA",
+      "name": "Pala Recta con Mango de Fibra de Vidrio",
+      "description": "Pala de acero reforzada con mango de fibra de vidrio. Extra resistente.",
+      "price": 9800,
+      "stock": 95,
+      "imageUrl": "/images/productos/adorno-maceta.jpg",
+      "category": "Jardín",
+      "categoryId": "cat-mayor-005",
+      "packaging": "Unidad",
+      "weight": 2.8,
+      "bulkType": "large",
+      "unitType": "unit",
+      "volumeDiscounts": [
+        { "minQuantity": 10, "pricePerUnit": 9200, "label": "10+ unidades → $9,200 c/u" }
+      ],
+      "specifications": [
+        { "label": "Material hoja", "value": "Acero reforzado" },
+        { "label": "Mango", "value": "Fibra de vidrio" }
+      ],
+      "isActive": true,
+      "createdAt": "2026-01-15T10:00:00Z",
+      "updatedAt": "2026-01-15T10:00:00Z"
+    },
+    {
+      "id": "prod-mayor-034",
+      "sku": "DESINFECTANTE-PINO-5L",
+      "name": "Desinfectante Concentrado Pino 5 Litros",
+      "description": "Desinfectante líquido aroma pino. Concentrado 1:20. Bidón de 5 litros.",
+      "price": 5200,
+      "stock": 125,
+      "imageUrl": "/images/productos/recipiente-especias.jpg",
+      "category": "Limpieza",
+      "categoryId": "cat-mayor-006",
+      "packaging": "Bidón x 5 litros",
+      "weight": 5.3,
+      "bulkType": "medium",
+      "unitType": "liter",
+      "volumeDiscounts": [
+        { "minQuantity": 12, "pricePerUnit": 4800, "label": "12+ bidones → $4,800 c/u" },
+        { "minQuantity": 24, "pricePerUnit": 4500, "label": "24+ bidones → $4,500 c/u" }
+      ],
+      "specifications": [
+        { "label": "Capacidad", "value": "5 litros" },
+        { "label": "Aroma", "value": "Pino" },
+        { "label": "Dilución", "value": "1:20" }
+      ],
+      "isActive": true,
+      "createdAt": "2026-01-15T10:00:00Z",
+      "updatedAt": "2026-01-15T10:00:00Z"
+    },
+    {
+      "id": "prod-mayor-035",
+      "sku": "TRAPO-PISO-PACK100",
+      "name": "Trapo de Piso 60x80cm (Pack x 100 unid.)",
+      "description": "Trapo rejilla para limpieza de pisos. Pack mayorista de 100 unidades.",
+      "price": 38000,
+      "stock": 42,
+      "imageUrl": "/images/productos/recipiente-especias.jpg",
+      "category": "Limpieza",
+      "categoryId": "cat-mayor-006",
+      "packaging": "Pack x 100 unidades",
+      "weight": 12,
+      "bulkType": "large",
+      "unitType": "box",
+      "unitsPerPackage": 100,
+      "volumeDiscounts": [
+        { "minQuantity": 3, "pricePerUnit": 36000, "label": "3+ packs → $36,000 c/u" }
+      ],
+      "specifications": [
+        { "label": "Medida", "value": "60 x 80 cm" },
+        { "label": "Tipo", "value": "Rejilla" },
+        { "label": "Unidades", "value": "100 por pack" }
+      ],
+      "isActive": true,
+      "createdAt": "2026-01-15T10:00:00Z",
+      "updatedAt": "2026-01-15T10:00:00Z"
+    },
+    {
+      "id": "prod-mayor-036",
+      "sku": "ESCOBA-INDUSTRIAL-PACK12",
+      "name": "Escoba Industrial Reforzada (Pack x 12 unid.)",
+      "description": "Escoba con cerdas duras y mango reforzado. Pack de 12 unidades.",
+      "price": 28000,
+      "stock": 35,
+      "imageUrl": "/images/productos/recipiente-especias.jpg",
+      "category": "Limpieza",
+      "categoryId": "cat-mayor-006",
+      "packaging": "Pack x 12 unidades",
+      "weight": 8,
+      "bulkType": "large",
+      "unitType": "box",
+      "unitsPerPackage": 12,
+      "volumeDiscounts": [
+        { "minQuantity": 3, "pricePerUnit": 26500, "label": "3+ packs → $26,500 c/u" }
+      ],
+      "specifications": [
+        { "label": "Tipo", "value": "Industrial" },
+        { "label": "Unidades", "value": "12 por pack" }
+      ],
+      "isActive": true,
+      "createdAt": "2026-01-15T10:00:00Z",
+      "updatedAt": "2026-01-15T10:00:00Z"
+    },
+    {
+      "id": "prod-mayor-037",
+      "sku": "BOLSAS-RESIDUO-100L-PACK100",
+      "name": "Bolsas de Residuo 100L Negras (Pack x 100 unid.)",
+      "description": "Bolsas de residuo reforzadas 100 litros. Pack de 100 unidades.",
+      "price": 22000,
+      "stock": 88,
+      "imageUrl": "/images/productos/recipiente-especias.jpg",
+      "category": "Limpieza",
+      "categoryId": "cat-mayor-006",
+      "packaging": "Pack x 100 unidades",
+      "weight": 6,
+      "bulkType": "medium",
+      "unitType": "box",
+      "unitsPerPackage": 100,
+      "volumeDiscounts": [
+        { "minQuantity": 5, "pricePerUnit": 20500, "label": "5+ packs → $20,500 c/u" },
+        { "minQuantity": 10, "pricePerUnit": 19000, "label": "10+ packs → $19,000 c/u" }
+      ],
+      "specifications": [
+        { "label": "Capacidad", "value": "100 litros" },
+        { "label": "Color", "value": "Negro" },
+        { "label": "Unidades", "value": "100 por pack" }
+      ],
+      "isActive": true,
+      "createdAt": "2026-01-15T10:00:00Z",
+      "updatedAt": "2026-01-15T10:00:00Z"
+    }
+  ]
+}

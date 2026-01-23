@@ -35,6 +35,42 @@
       "name": "Iluminación",
       "icon": "�",
       "productsCount": 18
+    },
+    {
+      "id": "cat-mayor-001",
+      "name": "Construcción",
+      "icon": "🏗️",
+      "productsCount": 12
+    },
+    {
+      "id": "cat-mayor-002",
+      "name": "Electricidad",
+      "icon": "⚡",
+      "productsCount": 6
+    },
+    {
+      "id": "cat-mayor-003",
+      "name": "Plomería",
+      "icon": "🚰",
+      "productsCount": 7
+    },
+    {
+      "id": "cat-mayor-004",
+      "name": "Pinturería",
+      "icon": "🎨",
+      "productsCount": 8
+    },
+    {
+      "id": "cat-mayor-005",
+      "name": "Jardín",
+      "icon": "🌿",
+      "productsCount": 7
+    },
+    {
+      "id": "cat-mayor-006",
+      "name": "Limpieza Industrial",
+      "icon": "🧹",
+      "productsCount": 8
     }
   ]
 }
