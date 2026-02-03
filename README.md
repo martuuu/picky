@@ -1,36 +1,116 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## 🚀 Picky Corralón - Setup Instructions
 
-## Getting Started
+### Prerequisites
+- Node.js 18+
+- Supabase Account
 
-First, run the development server:
+### 1. Database Setup (Supabase SQL Editor)
+
+1. Go to your Supabase project Dashboard
+2. Navigate to **SQL Editor**
+3. Create a new query
+4. Copy and paste the contents of `docs/supabase-schema.sql`
+5. Click **Run** to execute
+
+This will:
+- Create all tables (Category, Product, Order, OrderItem)
+- Set up Row Level Security (RLS) policies
+- Seed 7 products across 6 categories
+- Create indexes for performance
+
+### 2. Environment Variables
+
+Update your `.env` file with your Supabase credentials:
+
+```bash
+# Supabase Configuration
+NEXT_PUBLIC_SUPABASE_URL="https://your-project.supabase.co"
+NEXT_PUBLIC_SUPABASE_ANON_KEY="your-anon-key"
+
+# Prisma Database Connections
+DATABASE_URL="postgresql://postgres.your-project:YOUR_PASSWORD@aws-1-sa-east-1.pooler.supabase.com:6543/postgres"
+DIRECT_URL="postgresql://postgres:YOUR_PASSWORD@db.your-project.supabase.co:5432/postgres"
+```
+
+### 3. Install Dependencies
+
+```bash
+npm install
+```
+
+### 4. Run Development Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 5. Optional: Create Test Users
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+In Supabase Dashboard > Authentication > Users, create test accounts:
 
-## Learn More
+**Test Customer:**
+- Email: `test@picky.com.ar`
+- Password: `Picky2025!`
 
-To learn more about Next.js, take a look at the following resources:
+**Admin:**
+- Email: `admin@picky.com.ar`
+- Password: `Admin2025!`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+**Picker:**
+- Email: `picker@picky.com.ar`
+- Password: `Picker2025!`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 6. Guest Checkout
 
-## Deploy on Vercel
+Users can also complete purchases without creating an account by selecting "Continuar como Invitado" during checkout.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 📂 Key Files
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `/docs/supabase-schema.sql` - Complete database schema
+- `/src/lib/supabase.ts` - Supabase client & auth helpers
+- `/src/lib/mockData.json` - Mock data for analytics, orders, etc.
+- `/src/lib/data.ts` - Product catalog (can be replaced with Supabase queries)
+
+## 🔐 Authentication Flow
+
+1. **Registered Users:** Full account with order history
+2. **Guest Checkout:** Orders tied to email, no account required
+3. **Staff Access:** Admin and Picker roles for internal operations
+
+## 📊 Features
+
+- **Scan & Go:** QR/Barcode scanning for instant catalog access
+- **Smart Cart:** Real-time cart with custom alerts
+- **Checkout:** Multi-step with guest option
+- **Order Tracking:** Live status updates
+- **Picker Dashboard:** Order management and picking interface
+- **Admin Analytics:** Sales metrics and performance tracking
+
+## 🛠️ Tech Stack
+
+- **Framework:** Next.js 14 (App Router)
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS v4
+- **Database:** Supabase (PostgreSQL)
+- **ORM:** Prisma
+- **Auth:** Supabase Auth
+- **State:** Zustand
+- **Animations:** Framer Motion
+- **Icons:** Lucide React
+
+## 🚨 Troubleshooting
+
+**Prisma Push Hangs:**
+- Always use the SQL Editor for schema changes in Supabase
+- The pooler connection can cause timeouts with `db push`
+
+**RLS Errors:**
+- Make sure you're signed in when testing authenticated features
+- Guest checkout uses the `anon` key which has limited permissions
+
+**Connection Issues:**
+- Double-check your `.env` variables
+- Ensure your Supabase project is active
+- Verify your IP isn't blocked in Supabase settings

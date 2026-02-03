@@ -1,0 +1,166 @@
+{
+  "storeInfo": {
+    "name": "Corralón Picky",
+    "branches": [
+      {
+        "id": "branch-1",
+        "name": "Picky - Buenos Aires Centro",
+        "address": "Av. Corrientes 1234, CABA",
+        "phone": "+54 11 4567-8900",
+        "hours": "Lun-Vie 8:00-19:00, Sáb 9:00-14:00",
+        "zones": ["Pinturas", "Herramientas", "Construcción", "Grifería", "Electricidad", "Pisos"]
+      },
+      {
+        "id": "branch-2",
+        "name": "Picky - Rosario Sur",
+        "address": "Pellegrini 890, Rosario",
+        "phone": "+54 341 456-7890",
+        "hours": "Lun-Vie 8:00-19:00, Sáb 9:00-14:00",
+        "zones": ["Pinturas", "Herramientas", "Construcción"]
+      },
+      {
+        "id": "branch-3",
+        "name": "Picky - Córdoba Norte",
+        "address": "Colón 567, Córdoba",
+        "phone": "+54 351 567-8901",
+        "hours": "Lun-Vie 8:00-19:00, Sáb 9:00-13:00",
+        "zones": ["Pinturas", "Herramientas", "Electricidad", "Pisos"]
+      }
+    ]
+  },
+  "analytics": {
+    "today": {
+      "sales": {
+        "total": 420500,
+        "growth": "+12%",
+        "currency": "ARS"
+      },
+      "averageTicket": {
+        "value": 32400,
+        "growth": "+2.4%",
+        "currency": "ARS"
+      },
+      "activeScans": {
+        "count": 128,
+        "growth": "+5%"
+      },
+      "ordersPending": 45,
+      "ordersCompleted": 312,
+      "scanSuccessRate": 92,
+      "firstScanSuccess": 88,
+      "rescanRate": 8
+    },
+    "trends": {
+      "hourly": [
+        { "hour": "08:00", "sales": 15000 },
+        { "hour": "10:00", "sales": 35000 },
+        { "hour": "12:00", "sales": 55000 },
+        { "hour": "14:00", "sales": 45000 },
+        { "hour": "16:00", "sales": 60000 },
+        { "hour": "18:00", "sales": 40000 }
+      ],
+      "categories": [
+        { "name": "Construcción", "percentage": 35 },
+        { "name": "Herramientas", "percentage": 28 },
+        { "name": "Pinturas", "percentage": 18 },
+        { "name": "Electricidad", "percentage": 12 },
+        { "name": "Grifería", "percentage": 7 }
+      ]
+    }
+  },
+  "pickerOrders": [
+    {
+      "id": "ORD-4092",
+      "customer": "Juan Pérez",
+      "items": 24,
+      "zone": "Pasillo 4",
+      "timeRemaining": "04:12 min",
+      "status": "late-risk",
+      "priority": "high",
+      "products": [
+        { "sku": "PIN-LAT-01", "name": "Látex Interior 20L", "quantity": 2, "location": "P4-E2" },
+        { "sku": "HER-TAL-18V", "name": "Taladro DeWalt 20V", "quantity": 1, "location": "P4-E1" }
+      ]
+    },
+    {
+      "id": "ORD-4105",
+      "customer": "María García",
+      "items": 8,
+      "zone": "Ferretería",
+      "timeRemaining": "14:02 min",
+      "status": "urgent",
+      "priority": "medium",
+      "products": [
+        { "sku": "ELE-CAB-25", "name": "Cable 2.5mm 100m", "quantity": 3, "location": "F1-E5" }
+      ]
+    },
+    {
+      "id": "ORD-4088",
+      "customer": "Tiago Rex",
+      "items": 15,
+      "pickedItems": 12,
+      "zone": "Construcción",
+      "status": "active",
+      "priority": "medium",
+      "products": [
+        { "sku": "CON-CEM-50KG", "name": "Cemento 50kg", "quantity": 10, "location": "C2-E1", "picked": true },
+        { "sku": "LAD-HUE-12", "name": "Ladrillo Hueco", "quantity": 5, "location": "C2-E3", "picked": false }
+      ]
+    },
+    {
+      "id": "ORD-4201",
+      "customer": "Ana Smith",
+      "items": 5,
+      "zone": "Pinturas",
+      "timeRemaining": "45:00 min",
+      "status": "standard",
+      "priority": "low",
+      "products": [
+        { "sku": "PIN-LAT-01", "name": "Látex Interior 20L", "quantity": 5, "location": "P3-E2" }
+      ]
+    }
+  ],
+  "mockUsers": {
+    "testUser": {
+      "email": "test@picky.com.ar",
+      "password": "Picky2025!",
+      "name": "Usuario de Prueba",
+      "role": "customer"
+    },
+    "adminUser": {
+      "email": "admin@picky.com.ar",
+      "password": "Admin2025!",
+      "name": "Administrador Picky",
+      "role": "admin"
+    },
+    "pickerUser": {
+      "email": "picker@picky.com.ar",
+      "password": "Picker2025!",
+      "name": "Armador Zona A",
+      "role": "picker"
+    }
+  },
+  "promotions": [
+    {
+      "id": "promo-1",
+      "title": "20% OFF en Pinturas",
+      "description": "Llevá 3 o más productos de pintura y obtené 20% de descuento adicional",
+      "validUntil": "2025-02-15",
+      "category": "Pinturas",
+      "minQuantity": 3
+    },
+    {
+      "id": "promo-2",
+      "title": "Combo Herramientas",
+      "description": "Taladro + Set de Mechas por $199.000",
+      "validUntil": "2025-02-28",
+      "category": "Herramientas"
+    }
+  ],
+  "popularProducts": [
+    "PIN-LAT-01",
+    "HER-TAL-18V",
+    "CON-CEM-50KG",
+    "ELE-CAB-25"
+  ]
+}
