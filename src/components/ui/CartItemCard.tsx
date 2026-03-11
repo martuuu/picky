@@ -10,7 +10,8 @@ interface CartItem {
   quantity: number;
   category: string;
   sku: string;
-  specs?: Array<{ label: string; value: string }>;
+  wholesalePrice?: number;
+  wholesaleMinQuantity?: number;
 }
 
 interface CartItemCardProps {
@@ -19,93 +20,82 @@ interface CartItemCardProps {
   onRemove: (id: string) => void;
 }
 
+function getActivePromo(qty: number, item: CartItem) {
+  if (item.wholesalePrice && qty >= (item.wholesaleMinQuantity ?? 10)) {
+    return { label: `Por mayor`, saving: item.price - item.wholesalePrice };
+  }
+  if (qty >= 10) return { label: "15% OFF", saving: Math.round(item.price * 0.15) };
+  if (qty >= 5) return { label: "10% OFF", saving: Math.round(item.price * 0.10) };
+  return null;
+}
+
 export function CartItemCard({ item, onUpdateQuantity, onRemove }: CartItemCardProps) {
+  const promo = getActivePromo(item.quantity, item);
+  const effectivePrice = promo ? item.price - Math.round(promo.saving / item.quantity) : item.price;
+  const subtotal = effectivePrice * item.quantity;
+  const originalSubtotal = item.price * item.quantity;
+
   return (
     <motion.div
       layout
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.9 }}
-      className="bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-100 dark:border-slate-700 shadow-sm space-y-3"
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: 20 }}
+      className="bg-white dark:bg-slate-800/50 rounded-2xl p-3 border border-slate-100 dark:border-slate-800 shadow-sm mb-3 overflow-hidden"
     >
-      {/* Header - More compact */}
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex-1 space-y-1">
-          {/* Category Badge - Smaller */}
-          <span className="inline-block px-2 py-0.5 rounded-lg text-[8px] font-black uppercase tracking-wider bg-primary/10 dark:bg-primary/20 gradient-text-primary">
-            {item.category}
-          </span>
-          
-          {/* Product Name - Smaller */}
-          <h3 className="text-sm font-black uppercase italic leading-tight text-slate-900 dark:text-white">
+      <div className="flex justify-between relative">
+        {/* Info del producto: Nombre y Categoría */}
+        <div className="flex-1 min-w-0 pr-4">
+          <h3 className="text-sm font-black uppercase italic leading-tight text-slate-900 dark:text-white line-clamp-2">
             {item.name}
           </h3>
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mt-1.5 truncate">
+            {item.category} · {item.sku}
+          </p>
           
-          {/* SKU - Smaller */}
-          <p className="text-[8px] font-black uppercase tracking-widest text-slate-400">
-            SKU: {item.sku}
-          </p>
-        </div>
-
-        {/* Delete Button - Smaller */}
-        <button
-          onClick={() => onRemove(item.id)}
-          className="size-8 rounded-full bg-red-50 dark:bg-red-900/20 text-red-500 dark:text-red-400 flex items-center justify-center hover:bg-red-100 dark:hover:bg-red-900/30 transition-all active:scale-90"
-        >
-          <Trash2 size={14} strokeWidth={2.5} />
-        </button>
-      </div>
-
-      {/* Specifications - Simplified, only show first 2 */}
-      {item.specs && item.specs.length > 0 && (
-        <div className="flex gap-2 flex-wrap">
-          {item.specs.slice(0, 2).map((spec, index) => (
-            <div
-              key={index}
-              className="bg-slate-50 dark:bg-slate-900/50 rounded-lg px-2 py-1 border border-slate-100 dark:border-slate-800"
-            >
-              <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest">
-                {spec.label}
-              </p>
-              <p className="text-[10px] font-black text-slate-900 dark:text-white">
-                {spec.value}
-              </p>
+          {/* Optional: Promos */}
+          {promo && (
+            <div className="flex gap-2 items-center mt-2">
+              <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">{promo.label}</span>
+              <span className="text-[10px] text-slate-400 font-bold line-through">${originalSubtotal.toLocaleString("es-AR")}</span>
             </div>
-          ))}
-        </div>
-      )}
-
-      {/* Quantity & Price - More compact */}
-      <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800">
-        {/* Quantity Controls - Smaller */}
-        <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-900/50 rounded-xl p-0.5">
-          <button
-            onClick={() => onUpdateQuantity(item.id, Math.max(1, item.quantity - 1))}
-            className="size-7 rounded-lg flex items-center justify-center text-slate-400 hover:text-primary transition-all active:scale-90"
-          >
-            <Minus size={12} strokeWidth={3} />
-          </button>
-          <span className="text-sm font-black min-w-[1.5rem] text-center italic text-slate-900 dark:text-white">
-            {item.quantity}
-          </span>
-          <button
-            onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
-            className="size-7 rounded-lg bg-gradient-purple-pink text-white shadow-md glow-primary flex items-center justify-center active:scale-90 transition-all"
-          >
-            <Plus size={12} strokeWidth={3} />
-          </button>
+          )}
         </div>
 
-        {/* Price - Smaller */}
-        <div className="text-right">
-          <p className="text-[7px] font-black uppercase tracking-wider text-slate-400">
-            Subtotal
-          </p>
-          <p className="text-lg font-black italic tracking-tighter gradient-text-primary">
-            ${(item.price * item.quantity).toLocaleString("es-AR")}
-          </p>
+        {/* Lado derecho: Basurero, Precio y Stepper */}
+        <div className="flex flex-col items-end shrink-0 gap-3 relative">
+          <button
+            onClick={() => onRemove(item.id)}
+            className="text-slate-400 hover:text-red-500 transition-colors absolute top-0 right-0 -mr-1 -mt-1 p-1"
+          >
+            <Trash2 size={16} />
+          </button>
+
+          <div className="flex flex-col items-end gap-1.5 mt-6">
+            <p className="text-xl font-black italic tracking-tighter gradient-text-primary leading-none">
+              ${subtotal.toLocaleString("es-AR")}
+            </p>
+            <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800/80 rounded-xl p-1.5 border border-slate-200 dark:border-slate-700 mt-0.5 shadow-inner">
+              <button
+                onClick={() => onUpdateQuantity(item.id, Math.max(1, item.quantity - 1))}
+                className="size-6 rounded-md flex items-center justify-center text-slate-500 hover:text-primary transition-all active:scale-90 bg-transparent"
+              >
+                <Minus size={14} strokeWidth={3} />
+              </button>
+              <span className="text-xs font-black w-4 text-center italic text-slate-900 dark:text-white">
+                {item.quantity}
+              </span>
+              <button
+                onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
+                className="size-6 rounded-md bg-slate-300 dark:bg-slate-600/80 text-slate-700 dark:text-slate-200 flex items-center justify-center active:scale-90 transition-all shadow-sm"
+              >
+                <Plus size={14} strokeWidth={3} />
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </motion.div>
   );
 }
+

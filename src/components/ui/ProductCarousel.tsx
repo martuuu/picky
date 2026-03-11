@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { Product } from "@/lib/data";
 import { Button } from "./Button";
@@ -62,12 +63,12 @@ export function ProductCarousel({ products, title, subtitle }: ProductCarouselPr
               >
                 <div className="flex gap-4 items-center">
                   {/* Product Image */}
-                  <div className="relative w-24 h-24 rounded-2xl overflow-hidden bg-white flex-shrink-0">
+                  <Link href={`/product/${product.sku}`} className="block relative w-24 h-24 rounded-2xl overflow-hidden bg-white flex-shrink-0">
                     <Image
                       src={product.image}
                       alt={product.name}
                       fill
-                      className="object-contain p-2"
+                      className="object-contain p-2 hover:scale-110 transition-transform"
                       unoptimized
                     />
                     {product.originalPrice && (
@@ -77,14 +78,16 @@ export function ProductCarousel({ products, title, subtitle }: ProductCarouselPr
                         </span>
                       </div>
                     )}
-                  </div>
+                  </Link>
 
                   {/* Product Info */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2 mb-2">
-                      <h4 className="font-black text-sm uppercase italic leading-tight truncate">
-                        {product.name}
-                      </h4>
+                      <Link href={`/product/${product.sku}`} className="block">
+                        <h4 className="font-black text-sm uppercase italic leading-tight truncate hover:text-primary transition-colors">
+                          {product.name}
+                        </h4>
+                      </Link>
                       <div className="flex flex-col items-end flex-shrink-0">
                         {product.originalPrice && (
                           <span className="text-[10px] text-slate-400 line-through font-bold">

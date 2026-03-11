@@ -1,18 +1,26 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, Lock, User, ChevronRight, CreditCard, Banknote, ShieldCheck, Mail, IdCard, Info, MapPin, Hash, UserCircle } from "lucide-react";
-import { useCartStore } from "@/stores/useCartStore";
+import { ArrowLeft, Lock, User, ChevronRight, CreditCard, Banknote, Mail, IdCard, MapPin, UserCircle, Car, Truck, FileText, AlertCircle } from "lucide-react";
+import { useCartStore, CartItem } from "@/stores/useCartStore";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { motion, AnimatePresence } from "framer-motion";
 import { showPickyAlert } from "@/components/ui/Alert";
 
+function getActivePromo(qty: number, item: CartItem) {
+  if (item.wholesalePrice && qty >= (item.wholesaleMinQuantity ?? 10)) {
+    return { label: `Por mayor`, saving: item.price - item.wholesalePrice };
+  }
+  if (qty >= 10) return { label: "15% OFF", saving: Math.round(item.price * 0.15) };
+  if (qty >= 5) return { label: "10% OFF", saving: Math.round(item.price * 0.10) };
+  return null;
+}
+
 export default function CheckoutPage() {
   const router = useRouter();
-  const { items, total, clearCart } = useCartStore();
+  const { items, clearCart } = useCartStore();
   const [step, setStep] = useState<"details" | "payment">("details");
   const [mounted, setMounted] = useState(false);
   
@@ -31,10 +39,21 @@ export default function CheckoutPage() {
     setMounted(true);
   }, []);
 
-  const cartTotal = total();
-  const tax = cartTotal * 0.21;
-  const shipping = 0; // Free shipping
-  const finalTotal = cartTotal + tax + shipping;
+  // Calcular totales considerando promos
+  const { subtotal, totalSavings } = items.reduce((acc, item) => {
+    const promo = getActivePromo(item.quantity, item);
+    const effectivePrice = promo ? item.price - Math.round(promo.saving / item.quantity) : item.price;
+    const saving = promo ? Math.round(promo.saving / item.quantity) * item.quantity : 0;
+    
+    return {
+        subtotal: acc.subtotal + (effectivePrice * item.quantity),
+        totalSavings: acc.totalSavings + saving
+    };
+  }, { subtotal: 0, totalSavings: 0 });
+
+  const tax = subtotal * 0.21;
+  const shipping = pickupMethod === "delivery" ? 8500 : 0;
+  const finalTotal = subtotal + tax + shipping;
 
   const handleNextStep = (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,40 +75,50 @@ export default function CheckoutPage() {
     }, 2000);
   };
 
-
   if (!mounted) return null;
 
   if (items.length === 0) {
       return (
-        <div className="flex flex-col items-center justify-center min-h-screen p-6 text-center bg-background-light dark:bg-background-dark">
+        <div className="flex flex-col items-center justify-center min-h-[100dvh] p-6 text-center bg-background-light dark:bg-background-dark font-display">
             <div className="size-20 bg-primary/10 rounded-full flex items-center justify-center mb-6">
                 <Lock className="text-primary size-10" />
             </div>
-            <h2 className="text-xl font-black uppercase italic tracking-tighter">Tu carrito está vacío</h2>
-            <p className="text-slate-500 text-sm mt-2">Agregá productos para iniciar la compra.</p>
-            <Link href="/store/all" className="mt-8">
-                <Button variant="gradient-purple-pink" className="rounded-2xl px-8 h-12 uppercase italic font-black">Ir a la tienda</Button>
+            <h2 className="text-xl font-black uppercase italic tracking-tighter text-slate-900 dark:text-white">Tu canasta está vacía</h2>
+            <p className="text-slate-500 text-sm mt-2 font-bold">Agregá productos para iniciar la compra.</p>
+            <Link href="/scan" className="mt-8">
+                <Button variant="gradient-logo" className="rounded-2xl px-8 h-14 uppercase italic font-black shadow-xl">Volver al Scanner</Button>
             </Link>
         </div>
       );
   }
 
+  // Helper para mostrar el nombre del método de entrega
+  const getDeliveryName = () => {
+      switch(pickupMethod) {
+          case 'counter': return 'Mostrador Principal';
+          case 'locker': return 'Smart Locker Picky';
+          case 'picky-car': return 'Retiro en Picky Car';
+          case 'delivery': return 'Envío a Domicilio';
+          default: return '';
+      }
+  };
+
   return (
-    <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden pb-32 bg-background-light dark:bg-background-dark text-slate-900 dark:text-white font-display antialiased">
+    <div className="relative flex min-h-[100dvh] w-full flex-col overflow-x-hidden pb-32 bg-background-light dark:bg-background-dark text-slate-900 dark:text-white font-display antialiased">
       {/* Header */}
-      <div className="sticky top-0 z-20 flex items-center bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md p-4 pb-2 justify-between">
+      <div className="sticky top-0 z-20 flex items-center bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-xl p-4 pt-12 pb-4 justify-between border-b border-slate-100 dark:border-slate-800/50">
         <button 
             onClick={() => step === 'payment' ? setStep('details') : router.back()}
-            className="flex size-10 shrink-0 items-center justify-center rounded-full bg-white dark:bg-slate-800 shadow-sm border border-gray-100 dark:border-gray-700 active:scale-95 transition-transform"
+            className="flex size-10 shrink-0 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 shadow-sm transition-transform active:scale-95"
         >
             <ArrowLeft size={20} />
         </button>
-        <h2 className="font-display text-[10px] font-black tracking-[0.3em] uppercase flex-1 text-center pr-10">
-            {step === 'details' ? 'Datos del Cliente' : 'Método de Pago'}
+        <h2 className="text-[10px] font-black tracking-[0.3em] uppercase flex-1 text-center pr-10">
+            {step === 'details' ? 'Datos y Entrega' : 'Pago y Resumen'}
         </h2>
       </div>
 
-      <div className="px-6 py-8">
+      <div className="px-5 py-6">
         <AnimatePresence mode="wait">
             {step === 'details' ? (
                 <motion.form 
@@ -209,9 +238,9 @@ export default function CheckoutPage() {
                                 </div>
                             </div>
 
-                            {/* Pickup Method */}
+                            {/* Nuevos métodos de Retiro/Envío aplicados */}
                             <div className="space-y-4">
-                                <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 pl-1">Método de Retiro</h3>
+                                <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 pl-1">Método de Entrega</h3>
                                 <div className="grid grid-cols-1 gap-3">
                                     <label className="group cursor-pointer">
                                         <input type="radio" name="pickup" className="peer sr-only" checked={pickupMethod === "counter"} onChange={() => setPickupMethod("counter")} />
@@ -219,10 +248,11 @@ export default function CheckoutPage() {
                                             <div className="size-12 rounded-2xl bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-500">
                                                 <MapPin size={24} />
                                             </div>
-                                            <div>
+                                            <div className="flex-1">
                                                 <p className="font-black text-sm uppercase italic">Mostrador Principal</p>
-                                                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Entrega inmediata en tienda</p>
+                                                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Retiro por tienda local</p>
                                             </div>
+                                            <div className="text-[10px] font-black uppercase text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded-lg">Gratis</div>
                                         </div>
                                     </label>
                                     
@@ -232,19 +262,59 @@ export default function CheckoutPage() {
                                             <div className="size-12 rounded-2xl bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-500">
                                                 <Lock size={24} />
                                             </div>
-                                            <div>
+                                            <div className="flex-1">
                                                 <p className="font-black text-sm uppercase italic">Smart Locker Picky</p>
                                                 <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Retiro sin contacto 24/7</p>
                                             </div>
+                                            <div className="text-[10px] font-black uppercase text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded-lg">Gratis</div>
+                                        </div>
+                                    </label>
+
+                                    <label className="group cursor-pointer">
+                                        <input type="radio" name="pickup" className="peer sr-only" checked={pickupMethod === "picky-car"} onChange={() => setPickupMethod("picky-car")} />
+                                        <div className="flex items-center gap-4 p-5 rounded-[2rem] bg-white dark:bg-slate-800 border-2 border-transparent peer-checked:border-secondary peer-checked:bg-secondary/5 transition-all shadow-sm relative overflow-hidden">
+                                            <div className="absolute top-0 right-0 bg-secondary text-white text-[8px] font-black uppercase px-3 py-1 rounded-bl-xl z-10">Nuevo</div>
+                                            <div className="size-12 rounded-2xl bg-secondary/10 flex items-center justify-center text-secondary">
+                                                <Car size={24} />
+                                            </div>
+                                            <div className="flex-1">
+                                                <p className="font-black text-sm uppercase italic">Picky Car (Drive-Thru)</p>
+                                                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Te lo llevamos a tu vehículo</p>
+                                            </div>
+                                            <div className="text-[10px] font-black uppercase text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded-lg">Gratis</div>
+                                        </div>
+                                    </label>
+
+                                    <label className="group cursor-pointer">
+                                        <input type="radio" name="pickup" className="peer sr-only" checked={pickupMethod === "delivery"} onChange={() => setPickupMethod("delivery")} />
+                                        <div className="flex items-center gap-4 p-5 rounded-[2rem] bg-white dark:bg-slate-800 border-2 border-transparent peer-checked:border-primary peer-checked:bg-primary/5 transition-all shadow-sm">
+                                            <div className="size-12 rounded-2xl bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-500">
+                                                <Truck size={24} />
+                                            </div>
+                                            <div className="flex-1">
+                                                <p className="font-black text-sm uppercase italic">Envío a Domicilio</p>
+                                                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Entrega en 2 a 4 días hábiles</p>
+                                            </div>
+                                            <div className="text-sm font-black italic">+$8.500</div>
                                         </div>
                                     </label>
                                 </div>
                             </div>
 
-                            <Button type="submit" variant="gradient-purple-pink" className="w-full h-16 rounded-[2rem] text-lg font-black uppercase italic shadow-2xl">
+                            <Button type="submit" variant="gradient-logo" className="w-full h-16 rounded-[2rem] text-lg font-black uppercase italic shadow-2xl">
                                 Continuar al Pago
                                 <ChevronRight size={24} strokeWidth={3} />
                             </Button>
+
+                            {/* Botón de Arrepentimiento */}
+                            <div className="flex justify-center mt-6">
+                                <Link href="/arrepentimiento">
+                                    <button type="button" className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
+                                        <AlertCircle size={12} />
+                                        Botón de Arrepentimiento
+                                    </button>
+                                </Link>
+                            </div>
                         </div>
                     )}
                 </motion.form>
@@ -254,87 +324,145 @@ export default function CheckoutPage() {
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -20 }}
-                    className="space-y-8"
+                    className="space-y-6"
                 >
-                    {/* Order Summary - Minimalist List */}
-                    <div className="space-y-4">
-                        <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 pl-1">Resumen del Pedido</h3>
+                    {/* Order Details - Sumario Simplificado */}
+                    <div className="bg-slate-50 dark:bg-slate-900/50 rounded-[2rem] p-6 border border-slate-100 dark:border-slate-800 space-y-4">
+                        <div className="flex items-center gap-3 pb-3 border-b border-slate-200 dark:border-slate-700">
+                            <div className="size-10 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-500">
+                                <User size={18} />
+                            </div>
+                            <div>
+                                <p className="font-black text-sm uppercase italic truncate">{firstName} {lastName}</p>
+                                <p className="text-[10px] font-bold text-slate-400">{dni} · {email}</p>
+                            </div>
+                        </div>
                         
-                        {/* Items List - No images, minimalist */}
-                        <div className="bg-white dark:bg-slate-800 rounded-[2rem] p-6 border border-slate-100 dark:border-slate-700 space-y-3">
-                            {items.map((item, index) => (
-                                <div key={item.id} className={`flex items-center justify-between py-3 ${index !== items.length - 1 ? 'border-b border-slate-100 dark:border-slate-700' : ''}`}>
-                                    <div className="flex-1 min-w-0 pr-4">
-                                        <p className="text-sm font-black uppercase italic leading-tight truncate">
-                                            {item.name}
-                                        </p>
-                                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">
-                                            {item.quantity}x • {item.category}
-                                        </p>
+                        <div className="flex items-center gap-3">
+                            <div className="size-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                                {pickupMethod === "delivery" ? <Truck size={18} /> : 
+                                 pickupMethod === "picky-car" ? <Car size={18} /> : 
+                                 pickupMethod === "locker" ? <Lock size={18} /> : <MapPin size={18} />}
+                            </div>
+                            <div>
+                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Entrega seleccionada</p>
+                                <p className="font-black text-sm uppercase italic">{getDeliveryName()}</p>
+                            </div>
+                            <button onClick={() => setStep('details')} className="ml-auto text-[10px] font-black uppercase text-primary underline">Editar</button>
+                        </div>
+                    </div>
+
+                    {/* PDF Simulador */}
+                    <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-100 dark:border-slate-700 flex items-center gap-3 shadow-sm">
+                        <div className="size-10 bg-red-50 dark:bg-red-900/20 text-red-500 rounded-xl flex items-center justify-center">
+                            <FileText size={20} />
+                        </div>
+                        <div className="flex-1">
+                            <p className="text-xs font-black uppercase">Factura B (Borrrador)</p>
+                            <p className="text-[9px] text-slate-400 uppercase tracking-wider">Documento generado para validación</p>
+                        </div>
+                        <Button variant="outline" size="sm" className="h-8 text-[10px] rounded-lg">Ver PDF</Button>
+                    </div>
+
+                    {/* Unified Order Summary */}
+                    <div className="bg-white dark:bg-slate-800 rounded-[2.5rem] p-8 border-2 border-dashed border-slate-200 dark:border-slate-700 space-y-6 shadow-sm">
+                        <div className="flex items-center justify-between mb-2">
+                            <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Resumen de Compra</h3>
+                            <span className="text-xl font-black italic tracking-tighter gradient-text-logo">${finalTotal.toLocaleString("es-AR")}</span>
+                        </div>
+                        
+                        <div className="space-y-4">
+                            {items.map((item) => {
+                                const promo = getActivePromo(item.quantity, item);
+                                const effectivePrice = promo ? item.price - Math.round(promo.saving / item.quantity) : item.price;
+                                
+                                return (
+                                    <div key={item.id} className="flex justify-between items-start text-sm font-bold uppercase tracking-tight">
+                                        <div className="flex flex-col">
+                                            <span className="text-slate-900 dark:text-white leading-tight pr-4">{item.name} <span className="text-slate-400">x{item.quantity}</span></span>
+                                        </div>
+                                        <span className="font-black shrink-0 text-right">${(effectivePrice * item.quantity).toLocaleString("es-AR")}</span>
                                     </div>
-                                    <p className="text-sm font-black gradient-text-primary shrink-0">
-                                        ${(item.price * item.quantity).toLocaleString("es-AR")}
-                                    </p>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
 
-                        {/* Price Breakdown */}
-                        <div className="bg-slate-50 dark:bg-slate-900/50 rounded-[2rem] p-6 border border-slate-100 dark:border-slate-800 space-y-3">
-                            <div className="flex justify-between text-sm">
-                                <span className="font-bold text-slate-500 dark:text-slate-400">Subtotal</span>
-                                <span className="font-black">${cartTotal.toLocaleString("es-AR")}</span>
+                        <div className="space-y-3 pt-6 border-t border-slate-200 dark:border-slate-700">
+                            <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-slate-400">
+                                <span>Subtotal</span>
+                                <span className="text-slate-900 dark:text-white">${subtotal.toLocaleString("es-AR")}</span>
                             </div>
-                            <div className="flex justify-between text-sm">
-                                <span className="font-bold text-slate-500 dark:text-slate-400">IVA (21%)</span>
-                                <span className="font-black">${tax.toLocaleString("es-AR")}</span>
+                            {totalSavings > 0 && (
+                                <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-emerald-500">
+                                    <span>Ahorro por descuentos</span>
+                                    <span>-${totalSavings.toLocaleString("es-AR")}</span>
+                                </div>
+                            )}
+                            <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-slate-400">
+                                <span>IVA (21%)</span>
+                                <span className="text-slate-900 dark:text-white">${tax.toLocaleString("es-AR")}</span>
                             </div>
-                            <div className="flex justify-between text-sm">
-                                <span className="font-bold text-slate-500 dark:text-slate-400">Envío</span>
-                                <span className="font-black text-green-500">Gratis</span>
+                            <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-slate-400">
+                                <span>Costo de envío</span>
+                                <span className="text-slate-900 dark:text-white">{shipping > 0 ? `$${shipping.toLocaleString("es-AR")}` : 'Gratis'}</span>
                             </div>
-                            <div className="h-px bg-slate-200 dark:bg-slate-700"></div>
-                            <div className="flex justify-between items-end">
-                                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Total</span>
-                                <span className="text-2xl font-black italic tracking-tighter gradient-text-logo">${finalTotal.toLocaleString("es-AR")}</span>
-                            </div>
+                        </div>
+
+                        <div className="flex justify-between items-end pt-4 border-t-2 border-slate-100 dark:border-slate-700">
+                            <span className="text-[12px] font-black uppercase tracking-widest text-slate-500">Total a Pagar</span>
+                            <span className="text-3xl font-black italic tracking-tighter gradient-text-logo leading-none">${finalTotal.toLocaleString("es-AR")}</span>
                         </div>
                     </div>
 
                     {/* Payment Method */}
                     <div className="space-y-4">
-                        <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 pl-1">Método de Pago</h3>
+                        <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 pl-1">Seleccionar Medio de Pago</h3>
                         <div className="grid grid-cols-1 gap-3">
                             <label className="group cursor-pointer">
                                 <input type="radio" name="payment" className="peer sr-only" checked={paymentMethod === "mercadopago"} onChange={() => setPaymentMethod("mercadopago")} />
-                                <div className="flex items-center gap-4 p-5 rounded-[2.5rem] bg-white dark:bg-slate-800 border-2 border-transparent peer-checked:border-primary peer-checked:bg-primary/5 transition-all shadow-sm">
+                                <div className="flex items-center gap-4 p-5 rounded-[2rem] bg-white dark:bg-slate-800 border-2 border-transparent peer-checked:border-primary peer-checked:bg-primary/5 transition-all shadow-sm">
                                     <div className="size-12 rounded-2xl bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-500">
                                         <CreditCard size={24} />
                                     </div>
-                                    <p className="font-black text-sm uppercase italic">Mercado Pago / Tarjeta</p>
+                                    <p className="font-black text-sm uppercase italic">Tarjeta vía Mercado Pago</p>
                                 </div>
                             </label>
 
                             <label className="group cursor-pointer">
                                 <input type="radio" name="payment" className="peer sr-only" checked={paymentMethod === "cash"} onChange={() => setPaymentMethod("cash")} />
-                                <div className="flex items-center gap-4 p-5 rounded-[2.5rem] bg-white dark:bg-slate-800 border-2 border-transparent peer-checked:border-primary peer-checked:bg-primary/5 transition-all shadow-sm">
+                                <div className="flex items-center gap-4 p-5 rounded-[2rem] bg-white dark:bg-slate-800 border-2 border-transparent peer-checked:border-primary peer-checked:bg-primary/5 transition-all shadow-sm">
                                     <div className="size-12 rounded-2xl bg-green-50 dark:bg-green-900/20 flex items-center justify-center text-green-600">
                                         <Banknote size={24} />
                                     </div>
-                                    <p className="font-black text-sm uppercase italic">Efectivo en Caja</p>
+                                    <div className="flex-1">
+                                        <p className="font-black text-sm uppercase italic">Efectivo en Caja</p>
+                                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Abonás al retirar</p>
+                                    </div>
                                 </div>
                             </label>
                         </div>
                     </div>
 
-                    <Button 
-                        onClick={handlePay}
-                        disabled={processing}
-                        variant="gradient-purple-pink"
-                        className="w-full h-20 rounded-[2.5rem] text-xl font-black uppercase italic shadow-2xl"
-                    >
-                        {processing ? "Procesando..." : "Confirmar Compra"}
-                    </Button>
+                    <div className="pt-2">
+                        <Button 
+                            onClick={handlePay}
+                            disabled={processing}
+                            variant="gradient-logo"
+                            className="w-full h-18 rounded-[2rem] text-xl font-black uppercase italic shadow-2xl"
+                        >
+                            {processing ? "Procesando el Pago..." : "Finalizar Compra"}
+                        </Button>
+                    </div>
+
+                    {/* Botón de Arrepentimiento en la vista de pago tmb */}
+                    <div className="flex justify-center pt-2 pb-6">
+                        <Link href="/arrepentimiento">
+                            <button type="button" className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
+                                <AlertCircle size={12} />
+                                Botón de Arrepentimiento
+                            </button>
+                        </Link>
+                    </div>
                 </motion.div>
             )}
         </AnimatePresence>
@@ -342,3 +470,4 @@ export default function CheckoutPage() {
     </div>
   );
 }
+

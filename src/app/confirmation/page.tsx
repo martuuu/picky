@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { 
   X, 
   Share2, 
@@ -11,7 +12,6 @@ import {
   Box, 
   Timer, 
   Receipt, 
-  Star, 
   Rocket, 
   ArrowRight,
   ChevronRight,
@@ -23,15 +23,16 @@ import {
   Sparkles,
   TrendingUp,
   Zap,
-  Baby
+  Baby,
+  ScanLine
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { BeforeCheckoutCarousel } from "@/components/ui/BeforeCheckoutCarousel";
 import { motion, AnimatePresence } from "framer-motion";
 import { products } from "@/lib/data";
 
-// Order status types
-type OrderStatus = "payment-pending" | "payment-confirmed" | "preparing" | "ready";
+// Order status types (Simplified to 3 steps)
+type OrderStatus = "payment-confirmed" | "preparing" | "ready";
 
 interface StatusStep {
   id: OrderStatus;
@@ -43,14 +44,6 @@ interface StatusStep {
 }
 
 const STATUS_STEPS: StatusStep[] = [
-  {
-    id: "payment-pending",
-    label: "Pago Pendiente",
-    icon: <CreditCard size={20} strokeWidth={3} />,
-    color: "text-tertiary",
-    gradient: "bg-gradient-tertiary",
-    estimatedTime: "Procesando..."
-  },
   {
     id: "payment-confirmed",
     label: "Pago Confirmado",
@@ -78,10 +71,12 @@ const STATUS_STEPS: StatusStep[] = [
 ];
 
 export default function ConfirmationPage() {
+  const router = useRouter();
   const [mounted, setMounted] = useState(false);
-  const [currentStatus, setCurrentStatus] = useState<OrderStatus>("payment-confirmed");
+  const [currentStatus, setCurrentStatus] = useState<OrderStatus>("preparing");
   const [progress, setProgress] = useState(0);
   const [orderNumber, setOrderNumber] = useState("");
+  const [showSplash, setShowSplash] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -94,6 +89,27 @@ export default function ConfirmationPage() {
     const newProgress = ((statusIndex + 1) / STATUS_STEPS.length) * 100;
     setProgress(newProgress);
   }, [currentStatus]);
+
+  const handleStatusChange = (newStatus: OrderStatus) => {
+      setCurrentStatus(newStatus);
+  };
+
+  const advanceStatus = () => {
+    if (currentStatus === "payment-confirmed") handleStatusChange("preparing");
+    else if (currentStatus === "preparing") handleStatusChange("ready");
+  };
+
+  const regressStatus = () => {
+    if (currentStatus === "ready") handleStatusChange("preparing");
+    else if (currentStatus === "preparing") handleStatusChange("payment-confirmed");
+  };
+
+  // Allow clicking the QR code to simulate it being scanned
+  const handleQRScan = () => {
+    if (currentStatus === "ready") {
+        router.push("/finalizado");
+    }
+  };
 
   // Products for "Antes de Comprar"
   const relatedProducts = products.slice(0, 5);
@@ -130,6 +146,8 @@ export default function ConfirmationPage() {
 
   return (
     <div className="relative flex min-h-screen w-full flex-col bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-white transition-colors duration-500 pb-32 overflow-x-hidden">
+
+
       {/* Ambient Background Effects */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
         <div className="absolute top-0 right-0 w-96 h-96 bg-primary/20 dark:bg-primary/30 rounded-full blur-[120px] animate-float"></div>
@@ -145,7 +163,9 @@ export default function ConfirmationPage() {
         </Link>
         <div className="flex flex-col items-center">
             <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Estado en Vivo</span>
-            <h1 className="text-xl font-black uppercase italic tracking-tighter gradient-text-logo">#{orderNumber}</h1>
+            <button onClick={regressStatus} className="active:scale-95 transition-transform outline-none focus:outline-none focus:ring-0 appearance-none">
+              <h1 className="text-xl font-black uppercase italic tracking-tighter gradient-text-logo">#{orderNumber}</h1>
+            </button>
         </div>
         <button className="flex h-12 w-12 items-center justify-center rounded-full bg-white dark:bg-slate-800 shadow-lg border border-slate-100 dark:border-slate-700 active:scale-90 transition-all">
             <Share2 size={20} className="gradient-text-primary" />
@@ -153,7 +173,12 @@ export default function ConfirmationPage() {
       </header>
 
       {/* Dynamic Status Indicator with QR Progress */}
-      <section className="px-4 py-4">
+      <section className="px-4 py-4 cursor-pointer" onClick={(e) => {
+          // Avoid triggering advance if clicking exactly on the Ready QR
+          if (currentStatus !== 'ready') {
+              advanceStatus();
+          }
+      }}>
         <div className="relative overflow-hidden rounded-[2.5rem] p-5 bg-white dark:bg-slate-800 shadow-2xl border border-slate-100 dark:border-slate-700 min-h-[160px] flex items-center">
 
             {/* Animated Background */}
@@ -163,46 +188,61 @@ export default function ConfirmationPage() {
               {/* QR Code / Progress Indicator */}
               <motion.div 
                 layout
-                className={`relative flex-shrink-0 rounded-3xl overflow-hidden bg-slate-100 dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 shadow-inner flex items-center justify-center
-                  ${currentStatus === 'ready' ? 'size-32 sm:size-40' : 'size-24'}`}
+                onClick={handleQRScan}
+                className={`relative flex-shrink-0 rounded-3xl overflow-hidden bg-slate-100 dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-700 shadow-inner flex items-center justify-center transition-all duration-700
+                  ${currentStatus === 'ready' ? 'size-32 sm:size-40 cursor-pointer hover:scale-105 active:scale-95' : 'size-24'}`}
               >
                 {/* QR Pattern Placeholder */}
-                <div className="absolute inset-0 p-3 grid grid-cols-4 grid-rows-4 gap-1 opacity-20 group">
+                <div className="absolute inset-0 p-3 grid grid-cols-4 grid-rows-4 gap-1">
                   {[...Array(16)].map((_, i) => (
-                    <div key={i} className={`rounded-sm bg-slate-900 dark:bg-white ${Math.random() > 0.5 ? 'opacity-100' : 'opacity-20'}`}></div>
+                    <motion.div 
+                      key={i} 
+                      className="rounded-sm bg-slate-900 dark:bg-white opacity-20"
+                      animate={currentStatus === 'preparing' ? { 
+                        opacity: [0.2, 1, 0.2],
+                        backgroundColor: ["#94a3b8", "#f97316", "#94a3b8"] 
+                      } : {
+                        opacity: 0.1
+                      }}
+                      transition={{ 
+                        duration: 3, 
+                        repeat: Infinity, 
+                        delay: i * 0.2, // increased delay for slower cascading
+                        ease: "easeOut"
+                      }}
+                    />
                   ))}
                 </div>
-
-                {/* Gradient Fill Animation */}
-                <motion.div 
-                  className={`absolute bottom-0 left-0 w-full ${currentStep.gradient} z-10 transition-all duration-1000 ease-out`}
-                  initial={{ height: "0%" }}
-                  animate={{ height: `${progress}%` }}
-                />
 
                 {/* Overlaid Icon or Real QR */}
                 <div className="relative z-20 flex items-center justify-center w-full h-full p-2">
                   {currentStatus === 'ready' ? (
                     <motion.div 
-                      initial={{ scale: 0.5, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      className="w-full h-full bg-white rounded-xl p-2 flex items-center justify-center"
+                      initial={{ scale: 0, opacity: 0, rotate: -10 }}
+                      animate={{ scale: 1, opacity: 1, rotate: 0 }}
+                      transition={{ type: "spring", damping: 15 }}
+                      className="w-full h-full bg-white rounded-[1.25rem] p-2 flex items-center justify-center relative group/qr shadow-2xl"
                     >
                       {/* Generics QR Placeholder/Image */}
                       <svg viewBox="0 0 100 100" className="w-full h-full text-black">
                         <path d="M10 10h30v30h-30z m5 5h20v20h-20z M60 10h30v30h-30z m5 5h20v20h-20z M10 60h30v30h-30z m5 5h20v20h-20z M60 60h10v10h-10z M75 60h15v15h-15z M60 75h10v15h-10z M75 80h10v10h-10z" fill="currentColor" />
                       </svg>
+                      
+                      <div className="absolute inset-0 bg-black/80 rounded-[1.25rem] flex flex-col items-center justify-center text-white opacity-0 group-hover/qr:opacity-100 transition-opacity backdrop-blur-sm">
+                         <ScanLine className="size-8 mb-1" />
+                         <span className="text-[8px] font-black uppercase text-center leading-tight">Simular<br/>Retiro QR</span>
+                      </div>
                     </motion.div>
                   ) : (
-                    <div className="text-white drop-shadow-lg">
-                      {currentStep.icon}
+                    <div className="text-white drop-shadow-lg scale-150 relative z-30">
+                      <ShoppingBasket size={32} className="text-slate-800 dark:text-slate-300 drop-shadow-xl" />
                     </div>
                   )}
                 </div>
 
                 {/* Ready Pulse Effect */}
                 {currentStatus === 'ready' && (
-                  <div className="absolute inset-0 rounded-3xl animate-ping opacity-10 bg-gradient-accent"></div>
+                  <div className="absolute inset-0 rounded-3xl animate-ping opacity-20 bg-gradient-accent"></div>
                 )}
               </motion.div>
 
@@ -214,10 +254,9 @@ export default function ConfirmationPage() {
                     {currentStep.label}
                   </h2>
                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">
-                    {currentStatus === "payment-pending" && "Procesando tu pago..."}
                     {currentStatus === "payment-confirmed" && "¡Pago exitoso! Armando pedido"}
                     {currentStatus === "preparing" && "Tu pedido está siendo preparado"}
-                    {currentStatus === "ready" && "¡Listo! Escaneá para retirar"}
+                    {currentStatus === "ready" && "¡Listo! Mostrale este QR al picker"}
                   </p>
                 </div>
 
@@ -239,61 +278,6 @@ export default function ConfirmationPage() {
         </div>
       </section>
 
-      {/* Progress Stepper - Clickable */}
-      <section className="px-4 py-6">
-        <div className="relative">
-          {/* Progress Bar Background */}
-          <div className="absolute left-0 top-6 h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full"></div>
-          
-          {/* Animated Progress Bar */}
-          <div 
-            className="absolute left-0 top-6 h-2 bg-gradient-logo-full rounded-full transition-all duration-1000 ease-out glow-primary"
-            style={{ width: `${progress}%` }}
-          ></div>
-          
-          {/* Status Steps - Clickable */}
-          <div className="relative flex items-center justify-between">
-            {STATUS_STEPS.map((step, index) => {
-              const isActive = index <= currentStepIndex;
-              const isCurrent = index === currentStepIndex;
-              
-              return (
-                <button
-                  key={step.id}
-                  onClick={() => setCurrentStatus(step.id)}
-                  className="flex flex-col items-center gap-2 relative z-10 cursor-pointer group"
-                >
-                  <motion.div
-                    animate={{
-                      scale: isCurrent ? [1, 1.1, 1] : 1,
-                    }}
-                    transition={{
-                      duration: 1,
-                      repeat: isCurrent ? Infinity : 0,
-                    }}
-                    className={`size-12 rounded-full flex items-center justify-center transition-all ${
-                      isActive
-                        ? `${step.gradient} text-white shadow-xl`
-                        : "bg-slate-100 dark:bg-slate-800 text-slate-300"
-                    } group-hover:scale-110`}
-                  >
-                    {isActive && index < currentStepIndex ? (
-                      <Check size={20} strokeWidth={3} />
-                    ) : (
-                      step.icon
-                    )}
-                  </motion.div>
-                  <span className={`text-[8px] font-black uppercase tracking-widest text-center max-w-[60px] leading-tight ${
-                    isActive ? currentStep.color : "text-slate-400"
-                  }`}>
-                    {step.label}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </section>
 
       {/* "¡Estás a Tiempo!" - Fixed height, can add items to order */}
       {currentStatus !== "ready" && (
@@ -411,7 +395,7 @@ export default function ConfirmationPage() {
       </section>
 
       {/* Picky Lounge - Always visible */}
-      <section className="px-8 pb-6 space-y-6">
+      <section className="px-4 pb-6 space-y-6">
         <div className="group relative overflow-hidden rounded-[3rem] bg-white dark:bg-slate-800 shadow-xl border border-slate-100 dark:border-slate-700">
             <div className="aspect-[16/10] relative overflow-hidden">
                 <Image 
@@ -447,7 +431,7 @@ export default function ConfirmationPage() {
       </section>
 
       {/* Kids Zone - New section similar to Picky Lounge */}
-      <section className="px-8 pb-12 space-y-6">
+      <section className="px-4 pb-12 space-y-6">
         <div className="group relative overflow-hidden rounded-[3rem] bg-white dark:bg-slate-800 shadow-xl border border-slate-100 dark:border-slate-700">
             <div className="aspect-[16/10] relative overflow-hidden">
                 <Image 
@@ -481,31 +465,6 @@ export default function ConfirmationPage() {
             </div>
         </div>
       </section>
-
-      {/* Rating - Only show when ready */}
-      {currentStatus === "ready" && (
-        <section className="px-6 pb-12">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="p-8 rounded-[3rem] bg-gradient-to-br from-slate-900 to-slate-800 text-white text-center space-y-4 shadow-2xl"
-          >
-              <h3 className="text-xl font-black italic uppercase tracking-tighter">Calificá tu Experiencia</h3>
-              <p className="text-[10px] font-black text-white/50 uppercase tracking-widest">¿Cómo fue tu compra hoy?</p>
-              <div className="flex justify-center gap-2 py-2">
-                  {[1,2,3,4,5].map(s => <Star key={s} size={32} className={s <= 4 ? "fill-tertiary text-tertiary" : "text-slate-700"} />)}
-              </div>
-              <textarea 
-                  className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-xs font-medium outline-none focus:ring-2 focus:ring-tertiary/50 placeholder:text-white/20"
-                  placeholder="¿Algo más que nos quieras decir?"
-                  rows={3}
-              ></textarea>
-              <Button variant="gradient-logo" className="w-full">
-                Enviar Calificación
-              </Button>
-          </motion.div>
-        </section>
-      )}
     </div>
   );
 }

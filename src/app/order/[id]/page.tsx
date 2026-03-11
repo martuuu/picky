@@ -11,7 +11,6 @@ import {
   Box, 
   Timer, 
   Receipt, 
-  Star, 
   Rocket, 
   ArrowRight,
   ChevronRight,
@@ -22,15 +21,21 @@ import {
   Package,
   Sparkles,
   TrendingUp,
-  Zap
+  Zap,
+  AlertCircle,
+  MessageCircle,
+  Star,
+  CheckCircle2
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { ProductCarousel } from "@/components/ui/ProductCarousel";
 import { motion, AnimatePresence } from "framer-motion";
 import { products } from "@/lib/data";
+import { useCartStore } from "@/stores/useCartStore";
+import { showPickyAlert } from "@/components/ui/Alert";
 
-// Order status types
-type OrderStatus = "payment-pending" | "payment-confirmed" | "preparing" | "ready" | "picked-up";
+// Order status types (Simplified to 3 steps)
+type OrderStatus = "payment-confirmed" | "preparing" | "ready";
 
 interface StatusStep {
   id: OrderStatus;
@@ -41,13 +46,6 @@ interface StatusStep {
 }
 
 const STATUS_STEPS: StatusStep[] = [
-  {
-    id: "payment-pending",
-    label: "Pago Pendiente",
-    icon: <CreditCard size={20} strokeWidth={3} />,
-    color: "text-tertiary",
-    gradient: "bg-gradient-tertiary"
-  },
   {
     id: "payment-confirmed",
     label: "Pago Confirmado",
@@ -64,7 +62,7 @@ const STATUS_STEPS: StatusStep[] = [
   },
   {
     id: "ready",
-    label: "Listo para Retirar",
+    label: "Enviado / Retirado",
     icon: <Package size={24} />,
     color: "text-accent",
     gradient: "bg-gradient-accent"
@@ -74,19 +72,52 @@ const STATUS_STEPS: StatusStep[] = [
 export default function OrderStatusPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const [mounted, setMounted] = useState(false);
-  const [currentStatus, setCurrentStatus] = useState<OrderStatus>("payment-pending");
+  const [currentStatus, setCurrentStatus] = useState<OrderStatus>("payment-confirmed");
   const [progress, setProgress] = useState(0);
+  const { addItem } = useCartStore();
+
+  // Encuesta feedback
+  const [showSurveyBtn, setShowSurveyBtn] = useState(true);
+  const [isSurveyOpen, setIsSurveyOpen] = useState(false);
+  const [surveySubmitted, setSurveySubmitted] = useState(false);
+  const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState("");
+
+  const handleSurveySubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSurveySubmitted(true);
+    setTimeout(() => {
+        setIsSurveyOpen(false);
+    }, 2000);
+  };
+
+  const handleAddFood = (offer: any) => {
+    addItem({
+      id: `food-${offer.id}`,
+      name: offer.name,
+      price: offer.price,
+      image: offer.image,
+      category: "CAFETERÍA",
+      sku: `FOOD-${offer.id}`,
+      description: "Agregado desde el Picky Lounge",
+      stock: 50,
+      specs: [],
+    }, 1);
+    showPickyAlert(offer.name, "Suma exitosa a tu pedido pendiente", "success");
+  };
 
   // Simulate dynamic status changes every 5 seconds
   useEffect(() => {
     setMounted(true);
     
-    const statusSequence: OrderStatus[] = ["payment-pending", "payment-confirmed", "preparing", "ready"];
+    const statusSequence: OrderStatus[] = ["payment-confirmed", "preparing", "ready"];
     let currentIndex = 0;
 
     const interval = setInterval(() => {
-      currentIndex = (currentIndex + 1) % statusSequence.length;
-      setCurrentStatus(statusSequence[currentIndex]);
+      currentIndex++;
+      if (currentIndex < statusSequence.length) {
+          setCurrentStatus(statusSequence[currentIndex]);
+      }
     }, 5000); // Change every 5 seconds
 
     return () => clearInterval(interval);
@@ -134,6 +165,8 @@ export default function OrderStatusPage({ params }: { params: Promise<{ id: stri
 
   return (
     <div className="relative flex min-h-screen w-full flex-col bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-white transition-colors duration-500 pb-32 max-w-md mx-auto shadow-2xl overflow-x-hidden">
+
+
       {/* Ambient Background Effects */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
         <div className="absolute top-0 right-0 w-96 h-96 bg-primary/20 dark:bg-primary/30 rounded-full blur-[120px] animate-float"></div>
@@ -171,7 +204,7 @@ export default function OrderStatusPage({ params }: { params: Promise<{ id: stri
             
             <div className="relative z-10 flex items-center gap-6">
               <div className={`size-20 rounded-3xl ${currentStep.gradient} text-white shadow-2xl flex items-center justify-center relative`}>
-                <div className="absolute inset-0 rounded-3xl animate-ping opacity-20 ${currentStep.gradient}"></div>
+                <div className={`absolute inset-0 rounded-3xl animate-ping opacity-20 ${currentStep.gradient}`}></div>
                 {currentStep.icon}
               </div>
               <div className="flex-1">
@@ -179,13 +212,24 @@ export default function OrderStatusPage({ params }: { params: Promise<{ id: stri
                   {currentStep.label}
                 </h2>
                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                  {currentStatus === "payment-pending" && "Procesando tu pago..."}
                   {currentStatus === "payment-confirmed" && "¡Pago exitoso! Armando pedido"}
                   {currentStatus === "preparing" && "Tu pedido está siendo preparado"}
-                  {currentStatus === "ready" && "¡Listo! Retiralo en Sector B"}
+                  {currentStatus === "ready" && "¡Listo! Ya podés disfrutarlo"}
                 </p>
               </div>
             </div>
+            
+            {/* Regret button inline */}
+            {currentStatus !== "ready" && (
+                <div className="mt-6 flex justify-center">
+                    <Link href="/arrepentimiento">
+                        <button className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
+                            <AlertCircle size={14} />
+                            Botón de Arrepentimiento
+                        </button>
+                    </Link>
+                </div>
+            )}
           </motion.div>
         </AnimatePresence>
       </section>
@@ -251,10 +295,10 @@ export default function OrderStatusPage({ params }: { params: Promise<{ id: stri
             </div>
             <div className="flex-1">
               <h3 className="text-lg font-black italic uppercase tracking-tighter leading-tight gradient-text-tertiary">
-                Listo en ~{currentStatus === "payment-pending" ? "12" : currentStatus === "payment-confirmed" ? "10" : "5"} minutos
+                Listo en ~{currentStatus === "payment-confirmed" ? "10" : "5"} minutos
               </h3>
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">
-                Retiro en Sector B • Pasillo 4
+                Te avisaremos enseguida
               </p>
             </div>
           </div>
@@ -342,7 +386,7 @@ export default function OrderStatusPage({ params }: { params: Promise<{ id: stri
                 <h4 className="text-xl font-black italic uppercase tracking-tighter mb-3">
                   {offer.name}
                 </h4>
-                <Button variant="gradient-logo" size="sm" className="w-full gap-2">
+                <Button onClick={() => handleAddFood(offer)} variant="gradient-logo" size="sm" className="w-full gap-2">
                   <UtensilsCrossed size={16} />
                   Agregar al Pedido
                 </Button>
@@ -377,7 +421,7 @@ export default function OrderStatusPage({ params }: { params: Promise<{ id: stri
       </section>
 
       {/* Picky Lounge */}
-      <section className="px-8 pb-12 space-y-6">
+      <section className="px-6 pb-12 space-y-6">
         <div className="group relative overflow-hidden rounded-[3rem] bg-white dark:bg-slate-800 shadow-xl border border-slate-100 dark:border-slate-700">
             <div className="aspect-[16/10] relative overflow-hidden">
                 <Image 
@@ -412,30 +456,97 @@ export default function OrderStatusPage({ params }: { params: Promise<{ id: stri
         </div>
       </section>
 
-      {/* Rating */}
-      {currentStatus === "ready" && (
-        <section className="px-8 pb-12">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="p-8 rounded-[3rem] bg-gradient-to-br from-slate-900 to-slate-800 text-white text-center space-y-4 shadow-2xl"
+      {/* Floating Survey Button / Expandable Survey Component */}
+      <AnimatePresence>
+        {showSurveyBtn && !isSurveyOpen && (
+          <motion.button
+            key="floating-btn"
+            initial={{ scale: 0, opacity: 0, y: 50 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0, opacity: 0 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setIsSurveyOpen(true)}
+            className="fixed bottom-6 right-6 z-50 flex items-center gap-3 bg-gradient-accent text-white p-4 pr-6 rounded-full shadow-[0_20px_40px_-15px_rgba(var(--color-accent-rgb),1)] glow-accent"
           >
-              <h3 className="text-xl font-black italic uppercase tracking-tighter">Calificá tu Experiencia</h3>
-              <p className="text-[10px] font-black text-white/50 uppercase tracking-widest">¿Cómo fue tu compra hoy?</p>
-              <div className="flex justify-center gap-2 py-2">
-                  {[1,2,3,4,5].map(s => <Star key={s} size={32} className={s <= 4 ? "fill-tertiary text-tertiary" : "text-slate-700"} />)}
-              </div>
-              <textarea 
-                  className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-xs font-medium outline-none focus:ring-2 focus:ring-tertiary/50 placeholder:text-white/20"
-                  placeholder="¿Algo más que nos quieras decir?"
-                  rows={3}
-              ></textarea>
-              <Button variant="gradient-logo" className="w-full">
-                Enviar Calificación
-              </Button>
+            <div className="bg-white/20 p-2 rounded-full">
+              <MessageCircle size={24} className="animate-pulse" />
+            </div>
+            <span className="font-black text-xs uppercase tracking-wider pr-1">¿Que te pareció la experiencia Picky?</span>
+          </motion.button>
+        )}
+
+        {isSurveyOpen && (
+          <motion.div
+            key="survey-modal"
+            initial={{ opacity: 0, y: 50, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 50, scale: 0.9 }}
+            className="fixed inset-x-4 bottom-6 z-50 p-6 rounded-[3rem] bg-gradient-to-br from-slate-900 to-slate-800 text-white text-center shadow-2xl border border-white/10 mx-auto max-w-sm"
+          >
+            <button 
+                onClick={() => setIsSurveyOpen(false)}
+                className="absolute top-4 right-4 p-2 text-white/50 hover:text-white transition-colors"
+            >
+                <X size={20} />
+            </button>
+
+            {surveySubmitted ? (
+               <motion.div 
+                 initial={{ opacity: 0, scale: 0.8 }}
+                 animate={{ opacity: 1, scale: 1 }}
+                 className="py-10 space-y-4"
+               >
+                 <div className="flex justify-center text-accent">
+                    <CheckCircle2 size={48} />
+                 </div>
+                 <h3 className="text-2xl font-black italic uppercase tracking-tighter">¡Gracias!</h3>
+                 <p className="text-xs font-medium text-white/60">Tu opinión nos ayuda a mejorar.</p>
+               </motion.div>
+            ) : (
+                <form onSubmit={handleSurveySubmit} className="space-y-6 pt-2">
+                    <div className="space-y-2">
+                        <h3 className="text-xl font-black italic uppercase tracking-tighter">Calificá tu Experiencia</h3>
+                        <p className="text-[10px] font-black text-white/50 uppercase tracking-widest">¿Cómo fue tu compra hoy?</p>
+                    </div>
+
+                    <div className="flex justify-center gap-2 py-2">
+                        {[1,2,3,4,5].map(s => (
+                            <button
+                                key={s}
+                                type="button"
+                                onClick={() => setRating(s)}
+                                className="focus:outline-none transition-transform hover:scale-110 active:scale-90"
+                            >
+                                <Star 
+                                    size={36} 
+                                    className={`transition-colors duration-300 ${rating >= s ? "fill-tertiary text-tertiary" : "text-slate-700"}`} 
+                                />
+                            </button>
+                        ))}
+                    </div>
+
+                    <textarea 
+                        value={comment}
+                        onChange={(e) => setComment(e.target.value)}
+                        className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-xs font-medium outline-none focus:ring-2 focus:ring-tertiary/50 placeholder:text-white/20 resize-none"
+                        placeholder="¿Algo más que nos quieras decir?"
+                        rows={3}
+                    ></textarea>
+
+                    <Button 
+                        type="submit" 
+                        variant="gradient-logo" 
+                        className="w-full shadow-lg"
+                        disabled={rating === 0}
+                    >
+                        Enviar Calificación
+                    </Button>
+                </form>
+            )}
           </motion.div>
-        </section>
-      )}
+        )}
+      </AnimatePresence>
     </div>
   );
 }

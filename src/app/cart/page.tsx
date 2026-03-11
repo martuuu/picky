@@ -2,47 +2,54 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, ScanBarcode, Minus, Plus, Trash2, ChevronRight, ShoppingBag } from "lucide-react";
-import { useCartStore } from "@/stores/useCartStore";
+import { ArrowLeft, ScanBarcode, ChevronRight, ShoppingBag } from "lucide-react";
+import { useCartStore, CartItem } from "@/stores/useCartStore";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { CartItemCard } from "@/components/ui/CartItemCard";
 import { BeforeCheckoutCarousel } from "@/components/ui/BeforeCheckoutCarousel";
-import { PromotionsSection } from "@/components/ui/PromotionsSection";
 import { motion, AnimatePresence } from "framer-motion";
 import { products } from "@/lib/data";
 
+function getActivePromo(qty: number, item: CartItem) {
+  if (item.wholesalePrice && qty >= (item.wholesaleMinQuantity ?? 10)) {
+    return { label: `Por mayor`, saving: item.price - item.wholesalePrice };
+  }
+  if (qty >= 10) return { label: "15% OFF", saving: Math.round(item.price * 0.15) };
+  if (qty >= 5) return { label: "10% OFF", saving: Math.round(item.price * 0.10) };
+  return null;
+}
+
 export default function CartPage() {
   const router = useRouter();
-  const { items, updateQuantity, removeItem, total } = useCartStore();
+  const { items, updateQuantity, removeItem } = useCartStore();
 
-  const cartTotal = total();
-  const tax = cartTotal * 0.21;
-  const finalTotal = cartTotal + tax;
-  const itemCount = items.reduce((acc, item) => acc + item.quantity, 0);
+  // Calcular totales considerando promos
+  const { subtotal, totalSavings } = items.reduce((acc, item) => {
+    const promo = getActivePromo(item.quantity, item);
+    const effectivePrice = promo ? item.price - Math.round(promo.saving / item.quantity) : item.price;
+    const saving = promo ? Math.round(promo.saving / item.quantity) * item.quantity : 0;
+    
+    return {
+        subtotal: acc.subtotal + (effectivePrice * item.quantity),
+        totalSavings: acc.totalSavings + saving
+    };
+  }, { subtotal: 0, totalSavings: 0 });
 
-  // Convert cart items to CartItemCard format
-  const cartItems = items.map(item => ({
-    id: item.id,
-    name: item.name,
-    price: item.price,
-    quantity: item.quantity,
-    category: item.category,
-    sku: item.sku,
-    specs: item.specs
-  }));
+  const tax = subtotal * 0.21;
+  const finalTotal = subtotal + tax;
 
   return (
-    <div className="flex flex-col min-h-screen bg-background-light dark:bg-background-dark pb-64 text-slate-900 dark:text-white font-display antialiased">
+    <div className="flex flex-col min-h-[100dvh] bg-background-light dark:bg-background-dark pb-64 text-slate-900 dark:text-white font-display antialiased">
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-xl px-6 py-6 flex items-center justify-between border-b border-slate-100 dark:border-slate-800/50">
+      <header className="sticky top-0 z-40 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-xl px-6 py-6 pt-12 flex items-center justify-between border-b border-slate-100 dark:border-slate-800/50">
         <button 
             onClick={() => router.back()}
             className="flex items-center justify-center size-10 rounded-full bg-slate-100 dark:bg-slate-800 transition-all active:scale-95"
         >
             <ArrowLeft size={20} />
         </button>
-        <h1 className="text-sm font-black tracking-[0.3em] uppercase italic">Mi Canasta</h1>
+        <h1 className="text-sm font-black tracking-[0.3em] uppercase italic text-slate-900 dark:text-white">Carrito</h1>
         <Link href="/scan">
             <button className="flex items-center justify-center size-10 rounded-xl bg-gradient-purple-pink text-white shadow-lg glow-primary">
                 <ScanBarcode size={20} strokeWidth={3} />
@@ -51,34 +58,32 @@ export default function CartPage() {
       </header>
 
       {/* Cart Items */}
-      <main className="px-6 flex-1 space-y-4 pt-6">
+      <main className="px-5 flex-1 pt-6 space-y-1">
         <AnimatePresence mode="popLayout">
             {items.length === 0 ? (
                 <motion.div 
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="flex flex-col items-center justify-center py-24 text-center"
+                    className="flex flex-col items-center justify-center py-24 text-center mt-10"
                 >
-                    <div className="size-20 bg-slate-100 dark:bg-slate-800 rounded-3xl flex items-center justify-center mb-6">
+                    <div className="size-20 bg-slate-100 dark:bg-slate-800/50 rounded-3xl flex items-center justify-center mb-6">
                         <ShoppingBag size={32} className="text-slate-300" />
                     </div>
-                    <p className="text-xl font-black text-slate-400 uppercase italic tracking-tighter">Tu carrito está vacío</p>
-                    <p className="text-xs text-slate-400 mt-2 font-medium">Escaneá productos para comenzar</p>
-                    <Link href="/scan" className="mt-6">
-                        <Button variant="gradient-purple-pink" size="lg" className="gap-2">
+                    <p className="text-xl font-black text-slate-400 uppercase italic tracking-tighter">Tu canasta está vacía</p>
+                    <p className="text-xs text-slate-400 mt-2 font-bold uppercase tracking-widest">Escaneá productos en góndola</p>
+                    <Link href="/scan" className="mt-8">
+                        <Button variant="gradient-purple-pink" size="lg" className="h-14 px-8 rounded-2xl gap-3 shadow-xl">
                             <ScanBarcode size={20} strokeWidth={2.5} />
                             Comenzar a Escanear
                         </Button>
                     </Link>
                 </motion.div>
             ) : (
-                cartItems.map((item) => (
+                items.map((item) => (
                     <CartItemCard
                         key={item.id}
                         item={item}
-                        onUpdateQuantity={(id, quantity) => {
-                            updateQuantity(id, quantity);
-                        }}
+                        onUpdateQuantity={(id, quantity) => updateQuantity(id, quantity)}
                         onRemove={(id) => removeItem(id)}
                     />
                 ))
@@ -86,16 +91,9 @@ export default function CartPage() {
         </AnimatePresence>
       </main>
 
-      {/* Promotions Section - Show when cart has items */}
+      {/* Before Checkout Carousel - Solo si hay items */}
       {items.length > 0 && (
-        <section className="px-6 pb-6">
-          <PromotionsSection />
-        </section>
-      )}
-
-      {/* Before Checkout Carousel - Show when cart has items */}
-      {items.length > 0 && (
-        <section className="px-6 pb-6 pt-8 border-t border-slate-100 dark:border-slate-800">
+        <section className="px-6 pb-12 mb-10 pt-8 mt-4 border-t border-slate-100 dark:border-slate-800">
           <BeforeCheckoutCarousel
             products={products.slice(0, 5)}
             title="Antes de Comprar..."
@@ -106,28 +104,42 @@ export default function CartPage() {
 
       {/* Footer Info */}
       {items.length > 0 && (
-        <footer className="fixed bottom-0 left-0 w-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-t border-slate-100 dark:border-slate-800 rounded-t-[3rem] shadow-[0_-20px_50px_rgba(0,0,0,0.1)] z-50">
-            <div className="px-8 pt-8 pb-10 space-y-6">
-                <div className="space-y-4">
-                    <div className="flex justify-between text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
-                        <span>Base Imponible</span>
-                        <span className="text-slate-900 dark:text-white">${cartTotal.toLocaleString("es-AR")}</span>
+        <footer className="fixed bottom-0 left-0 w-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-t border-slate-100 dark:border-slate-800 rounded-t-[2.5rem] shadow-[0_-20px_50px_rgba(0,0,0,0.1)] z-50">
+            <div className="px-6 pt-6 pb-8 space-y-5">
+                <div className="bg-slate-50 dark:bg-slate-800/50 rounded-[1.5rem] p-5 space-y-3">
+                    <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+                        <span>Total sin impuestos</span>
+                        <span className="text-slate-900 dark:text-white text-xs">${subtotal.toLocaleString("es-AR")}</span>
                     </div>
-                    <div className="flex justify-between text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
-                        <span>IVA (21%)</span>
-                        <span className="text-slate-900 dark:text-white">${tax.toLocaleString("es-AR")}</span>
-                    </div>
-                    <div className="h-px bg-slate-100 dark:bg-slate-800 w-full border-t border-dashed"></div>
-                    <div className="flex items-end justify-between">
-                        <div className="flex flex-col">
-                            <span className="text-[10px] font-black uppercase gradient-text-primary tracking-widest">Total Final</span>
-                            <span className="text-4xl font-black italic tracking-tighter uppercase leading-none mt-1">${finalTotal.toLocaleString("es-AR")}</span>
+
+                    {totalSavings > 0 && (
+                        <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-[0.2em] text-emerald-500">
+                            <span>Ahorro por descuentos</span>
+                            <span className="text-xs font-black">-${totalSavings.toLocaleString("es-AR")}</span>
                         </div>
+                    )}
+
+                    <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+                        <span>IVA (21%)</span>
+                        <span className="text-slate-900 dark:text-white text-xs">${tax.toLocaleString("es-AR")}</span>
+                    </div>
+                    <div className="h-px bg-slate-200 dark:bg-slate-700 w-full border-t border-dashed my-3"></div>
+                    <div className="flex items-end justify-between">
+                        <span className="text-[10px] font-black uppercase gradient-text-primary tracking-widest leading-none mb-1">Total Final</span>
+                        <motion.span 
+                            key={`total-${finalTotal}`}
+                            initial={{ scale: 1.15, color: '#a855f7' }}
+                            animate={{ scale: 1, color: '' }}
+                            transition={{ duration: 0.3 }}
+                            className="text-3xl font-black italic tracking-tighter uppercase leading-none text-slate-900 dark:text-white origin-right inline-block"
+                        >
+                            ${finalTotal.toLocaleString("es-AR")}
+                        </motion.span>
                     </div>
                 </div>
 
                 <Link href="/checkout" className="block w-full">
-                    <button className="w-full h-16 bg-gradient-purple-pink hover:opacity-90 active:scale-[0.98] transition-all rounded-[2rem] flex items-center justify-center text-white font-black uppercase italic text-lg shadow-2xl glow-primary gap-3 group">
+                    <button className="w-full h-16 bg-gradient-purple-pink hover:opacity-90 active:scale-[0.98] transition-all rounded-[2rem] flex items-center justify-center text-white font-black uppercase italic text-lg shadow-xl glow-primary gap-3 group">
                         Confirmar Pedido
                         <ChevronRight size={24} strokeWidth={3} className="group-hover:translate-x-1 transition-transform" />
                     </button>
@@ -138,3 +150,4 @@ export default function CartPage() {
     </div>
   );
 }
+

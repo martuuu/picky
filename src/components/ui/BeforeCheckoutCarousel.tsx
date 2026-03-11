@@ -2,11 +2,12 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { ShoppingCart, Plus } from "lucide-react";
+import Link from "next/link";
+import { Plus, CheckCircle2 } from "lucide-react";
 import { Product } from "@/lib/data";
 import { Button } from "./Button";
 import { useCartStore } from "@/stores/useCartStore";
-import { showPickyAlert } from "./Alert";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface BeforeCheckoutCarouselProps {
   products: Product[];
@@ -16,6 +17,7 @@ interface BeforeCheckoutCarouselProps {
 
 export function BeforeCheckoutCarousel({ products, title, subtitle }: BeforeCheckoutCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [addedItemIds, setAddedItemIds] = useState<string[]>([]);
   const { addItem } = useCartStore();
 
   // Auto-scroll every 5 seconds
@@ -28,7 +30,11 @@ export function BeforeCheckoutCarousel({ products, title, subtitle }: BeforeChec
 
   const handleAddToCart = (product: Product) => {
     addItem(product, 1);
-    showPickyAlert(product.name, "Agregado a tu pedido", "cart");
+    
+    setAddedItemIds(prev => [...prev, product.id]);
+    setTimeout(() => {
+        setAddedItemIds(prev => prev.filter(id => id !== product.id));
+    }, 1200);
   };
 
   if (products.length === 0) return null;
@@ -51,12 +57,12 @@ export function BeforeCheckoutCarousel({ products, title, subtitle }: BeforeChec
             className="shrink-0 w-40 rounded-2xl overflow-hidden bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-lg"
           >
             {/* Product Image */}
-            <div className="relative h-32 bg-slate-50 dark:bg-slate-900">
+            <Link href={`/product/${product.sku}`} className="block relative h-32 bg-slate-50 dark:bg-slate-900 overflow-hidden">
               <Image
                 src={product.image}
                 alt={product.name}
                 fill
-                className="object-contain p-3"
+                className="object-contain p-3 transition-transform hover:scale-110"
                 unoptimized
               />
               {product.originalPrice && (
@@ -66,14 +72,16 @@ export function BeforeCheckoutCarousel({ products, title, subtitle }: BeforeChec
                   </span>
                 </div>
               )}
-            </div>
+            </Link>
 
             {/* Product Info */}
-            <div className="p-3 space-y-2">
+            <div className="p-3 space-y-2 bg-slate-800/40 flex-1 flex flex-col justify-between">
               {/* Name */}
-              <h4 className="font-black text-xs uppercase italic leading-tight line-clamp-2 min-h-[2.5rem]">
-                {product.name}
-              </h4>
+              <Link href={`/product/${product.sku}`} className="block">
+                <h4 className="font-black text-xs uppercase italic leading-tight line-clamp-2 min-h-[2.5rem] hover:text-primary transition-colors">
+                  {product.name}
+                </h4>
+              </Link>
 
               {/* Price */}
               <div className="flex flex-col">
@@ -90,10 +98,39 @@ export function BeforeCheckoutCarousel({ products, title, subtitle }: BeforeChec
               {/* Add Button */}
               <button
                 onClick={() => handleAddToCart(product)}
-                className="w-full h-9 rounded-xl bg-gradient-purple-orange text-white text-[9px] font-black uppercase flex items-center justify-center gap-1 shadow-lg glow-tertiary hover:scale-105 active:scale-95 transition-all"
+                className={`w-full h-9 rounded-xl text-white text-[9px] font-black uppercase flex items-center justify-center gap-1 shadow-lg hover:scale-105 active:scale-95 transition-all relative overflow-hidden ${
+                  addedItemIds.includes(product.id) 
+                    ? "bg-emerald-500 shadow-emerald-500/20"
+                    : "bg-gradient-purple-orange glow-tertiary"
+                }`}
               >
-                <Plus size={14} strokeWidth={3} />
-                Agregar
+                <AnimatePresence mode="wait">
+                  {addedItemIds.includes(product.id) ? (
+                    <motion.div
+                      key="added"
+                      initial={{ scale: 0, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      exit={{ scale: 0, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="flex items-center gap-1"
+                    >
+                      <CheckCircle2 size={14} strokeWidth={3} />
+                      ¡Agregado!
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="add"
+                      initial={{ scale: 0, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      exit={{ scale: 0, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="flex items-center gap-1"
+                    >
+                      <Plus size={14} strokeWidth={3} />
+                      Agregar
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </button>
             </div>
           </div>

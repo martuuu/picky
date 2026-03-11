@@ -1,8 +1,11 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { Sparkles, Percent, ShoppingCart } from "lucide-react";
 import { Button } from "./Button";
+import { useCartStore } from "@/stores/useCartStore";
+import { showPickyAlert } from "./Alert";
 
 interface Promotion {
   id: number;
@@ -49,6 +52,24 @@ const PROMOTIONS: Promotion[] = [
 ];
 
 export function PromotionsSection() {
+  const { addItem } = useCartStore();
+
+  const handleAddPromo = (promo: Promotion) => {
+    addItem({
+      id: `promo-${promo.id}`,
+      name: promo.title,
+      price: promo.finalPrice,
+      image: promo.image,
+      category: promo.type === "combo" ? "COMBO ESPECIAL" : "PROMO ACTIVA",
+      sku: `PRM-${promo.id}`,
+      description: promo.description,
+      stock: 50,
+      specs: [],
+      originalPrice: promo.originalPrice,
+    }, 1);
+    showPickyAlert(promo.title, "Promoción agregada con éxito", "success");
+  };
+
   return (
     <div className="space-y-4">
       {/* Header */}
@@ -68,7 +89,7 @@ export function PromotionsSection() {
           >
             <div className="flex gap-4 p-4">
               {/* Image */}
-              <div className="relative w-24 h-24 rounded-xl overflow-hidden bg-slate-50 dark:bg-slate-900 shrink-0">
+              <Link href="/scan" className="block relative w-24 h-24 rounded-xl overflow-hidden bg-slate-50 dark:bg-slate-900 shrink-0">
                 <Image
                   src={promo.image}
                   alt={promo.title}
@@ -83,7 +104,7 @@ export function PromotionsSection() {
                     <span className="text-xs font-black">{promo.discount}</span>
                   </div>
                 </div>
-              </div>
+              </Link>
 
               {/* Info */}
               <div className="flex-1 flex flex-col justify-between min-w-0">
@@ -98,9 +119,11 @@ export function PromotionsSection() {
                       {promo.type === "combo" ? "Combo" : "Promo"}
                     </span>
                   </div>
-                  <h4 className="font-black text-sm uppercase italic leading-tight text-slate-900 dark:text-white">
-                    {promo.title}
-                  </h4>
+                  <Link href="/scan" className="block">
+                    <h4 className="font-black text-sm uppercase italic leading-tight text-slate-900 dark:text-white hover:text-primary transition-colors">
+                      {promo.title}
+                    </h4>
+                  </Link>
                   <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium mt-1">
                     {promo.description}
                   </p>
@@ -117,7 +140,10 @@ export function PromotionsSection() {
                     </span>
                   </div>
 
-                  <button className="size-10 rounded-xl bg-gradient-pink-orange text-white shadow-lg glow-secondary flex items-center justify-center hover:scale-110 active:scale-95 transition-all">
+                  <button 
+                    onClick={() => handleAddPromo(promo)}
+                    className="size-10 rounded-xl bg-gradient-pink-orange text-white shadow-lg glow-secondary flex items-center justify-center hover:scale-110 active:scale-95 transition-all"
+                  >
                     <ShoppingCart size={18} strokeWidth={2.5} />
                   </button>
                 </div>
