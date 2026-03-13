@@ -39,10 +39,9 @@ export function CompetitorProducts({ currentProduct, allProducts }: CompetitorPr
   return (
     <section className="pb-6">
       <div className="mb-4">
-        <div className="flex items-center gap-2 mb-2">
-          <TrendingUp size={20} className="gradient-text-tertiary" />
-          <h3 className="text-xl font-black italic uppercase tracking-tighter">
-            La <span className="gradient-text-tertiary">Competencia</span>
+        <div>
+          <h3 className="text-lg font-black italic uppercase tracking-tighter">
+            La Competencia
           </h3>
         </div>
         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
@@ -57,6 +56,9 @@ export function CompetitorProducts({ currentProduct, allProducts }: CompetitorPr
               ? Math.round(((currentProduct.price - product.price) / currentProduct.price) * 100)
               : Math.round(((product.price - currentProduct.price) / currentProduct.price) * 100);
 
+            const brandSpec = product.specs?.find(s => s.label.toLowerCase() === 'marca');
+            const brandName = brandSpec ? brandSpec.value : 'Original Picky';
+
             return (
               <Link
                 key={product.id}
@@ -65,6 +67,11 @@ export function CompetitorProducts({ currentProduct, allProducts }: CompetitorPr
               >
                 {/* Product Image Box */}
                 <div className="relative aspect-square bg-slate-900/50 p-3 flex items-center justify-center">
+                  <div className="absolute top-2 right-2 z-10">
+                    <span className="bg-emerald-500 text-white text-[9px] font-black px-2 py-1 rounded-lg uppercase shadow-lg shadow-emerald-500/20">
+                      {isCheaper ? `-${diffPerc}% OFF` : `+${diffPerc}%`}
+                    </span>
+                  </div>
                   <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-inner border border-white/5">
                     <Image
                       src={product.image}
@@ -78,22 +85,17 @@ export function CompetitorProducts({ currentProduct, allProducts }: CompetitorPr
 
                 {/* Info Container */}
                 <div className="flex flex-col flex-1 p-4 justify-between bg-slate-800/40">
-                  <div className="space-y-3">
-                    <h4 className="font-black text-xs uppercase italic leading-tight line-clamp-2 text-white/90 group-hover:text-white transition-colors">
+                  <div className="space-y-1">
+                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{brandName}</p>
+                    <h4 className="font-black text-[10px] uppercase italic leading-tight line-clamp-2 text-white/90 group-hover:text-white transition-colors">
                       {product.name}
                     </h4>
-                    
-                    <p className="text-xl font-black gradient-text-tertiary">
+                  </div>
+                  
+                  <div className="mt-3">
+                    <p className="text-xl font-black gradient-text-tertiary leading-none">
                       ${product.price.toLocaleString("es-AR")}
                     </p>
-                  </div>
-
-                  <div className="pt-4 mt-auto border-t border-slate-700/50">
-                    <span className={`text-[9px] font-black uppercase tracking-wider ${
-                      isCheaper ? "text-emerald-500" : "text-rose-500"
-                    }`}>
-                      {diffPerc}% {isCheaper ? 'más barato' : 'más caro'}
-                    </span>
                   </div>
                 </div>
               </Link>

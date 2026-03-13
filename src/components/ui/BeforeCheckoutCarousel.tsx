@@ -43,7 +43,7 @@ export function BeforeCheckoutCarousel({ products, title, subtitle }: BeforeChec
     <div className="space-y-3">
       {/* Header */}
       <div>
-        <h3 className="text-base font-black italic uppercase tracking-tighter gradient-text-tertiary">{title}</h3>
+        <h3 className="text-base font-black italic uppercase tracking-tighter gradient-text-logo">{title}</h3>
         {subtitle && (
           <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">{subtitle}</p>
         )}
@@ -57,12 +57,12 @@ export function BeforeCheckoutCarousel({ products, title, subtitle }: BeforeChec
             className="shrink-0 w-40 rounded-2xl overflow-hidden bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-lg"
           >
             {/* Product Image */}
-            <Link href={`/product/${product.sku}`} className="block relative h-32 bg-slate-50 dark:bg-slate-900 overflow-hidden">
+            <Link href={`/product/${product.sku}`} className="block relative h-32 bg-slate-50 dark:bg-slate-900 border-b border-slate-100 dark:border-slate-700 overflow-hidden">
               <Image
                 src={product.image}
                 alt={product.name}
                 fill
-                className="object-contain p-3 transition-transform hover:scale-110"
+                className="object-cover transition-transform hover:scale-110"
                 unoptimized
               />
               {product.originalPrice && (
@@ -75,7 +75,7 @@ export function BeforeCheckoutCarousel({ products, title, subtitle }: BeforeChec
             </Link>
 
             {/* Product Info */}
-            <div className="p-3 space-y-2 bg-slate-800/40 flex-1 flex flex-col justify-between">
+            <div className="p-3 space-y-2 flex-1 flex flex-col justify-between">
               {/* Name */}
               <Link href={`/product/${product.sku}`} className="block">
                 <h4 className="font-black text-xs uppercase italic leading-tight line-clamp-2 min-h-[2.5rem] hover:text-primary transition-colors">
@@ -90,7 +90,7 @@ export function BeforeCheckoutCarousel({ products, title, subtitle }: BeforeChec
                     ${product.originalPrice.toLocaleString("es-AR")}
                   </span>
                 )}
-                <span className="text-lg font-black gradient-text-tertiary">
+                <span className="text-lg font-black gradient-text-logo">
                   ${product.price.toLocaleString("es-AR")}
                 </span>
               </div>
@@ -101,7 +101,7 @@ export function BeforeCheckoutCarousel({ products, title, subtitle }: BeforeChec
                 className={`w-full h-9 rounded-xl text-white text-[9px] font-black uppercase flex items-center justify-center gap-1 shadow-lg hover:scale-105 active:scale-95 transition-all relative overflow-hidden ${
                   addedItemIds.includes(product.id) 
                     ? "bg-emerald-500 shadow-emerald-500/20"
-                    : "bg-gradient-purple-orange glow-tertiary"
+                    : "bg-gradient-logo-full"
                 }`}
               >
                 <AnimatePresence mode="wait">
@@ -145,7 +145,7 @@ export function BeforeCheckoutCarousel({ products, title, subtitle }: BeforeChec
             onClick={() => setCurrentIndex(index)}
             className={`h-1.5 rounded-full transition-all ${
               index === currentIndex
-                ? "w-6 bg-gradient-purple-orange"
+                ? "w-6 bg-gradient-logo-full"
                 : "w-1.5 bg-slate-300 dark:bg-slate-700"
             }`}
           />

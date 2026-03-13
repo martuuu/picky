@@ -2,21 +2,14 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { ArrowLeft, Lock, User, ChevronRight, CreditCard, Banknote, Mail, IdCard, MapPin, UserCircle, Car, Truck, FileText, AlertCircle } from "lucide-react";
-import { useCartStore, CartItem } from "@/stores/useCartStore";
+import { ArrowLeft, Lock, User, ChevronRight, CreditCard, Banknote, Mail, IdCard, MapPin, UserCircle, Car, Truck, FileText, AlertCircle, Sparkles } from "lucide-react";
+import { useCartStore, CartItem, getItemPricing } from "@/stores/useCartStore";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { motion, AnimatePresence } from "framer-motion";
 import { showPickyAlert } from "@/components/ui/Alert";
 
-function getActivePromo(qty: number, item: CartItem) {
-  if (item.wholesalePrice && qty >= (item.wholesaleMinQuantity ?? 10)) {
-    return { label: `Por mayor`, saving: item.price - item.wholesalePrice };
-  }
-  if (qty >= 10) return { label: "15% OFF", saving: Math.round(item.price * 0.15) };
-  if (qty >= 5) return { label: "10% OFF", saving: Math.round(item.price * 0.10) };
-  return null;
-}
+
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -41,13 +34,11 @@ export default function CheckoutPage() {
 
   // Calcular totales considerando promos
   const { subtotal, totalSavings } = items.reduce((acc, item) => {
-    const promo = getActivePromo(item.quantity, item);
-    const effectivePrice = promo ? item.price - Math.round(promo.saving / item.quantity) : item.price;
-    const saving = promo ? Math.round(promo.saving / item.quantity) * item.quantity : 0;
+    const { effectivePrice, savingPerItem } = getItemPricing(item);
     
     return {
         subtotal: acc.subtotal + (effectivePrice * item.quantity),
-        totalSavings: acc.totalSavings + saving
+        totalSavings: acc.totalSavings + (savingPerItem * item.quantity)
     };
   }, { subtotal: 0, totalSavings: 0 });
 
@@ -353,7 +344,7 @@ export default function CheckoutPage() {
                     </div>
 
                     {/* PDF Simulador */}
-                    <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-100 dark:border-slate-700 flex items-center gap-3 shadow-sm">
+                    {/* <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-100 dark:border-slate-700 flex items-center gap-3 shadow-sm">
                         <div className="size-10 bg-red-50 dark:bg-red-900/20 text-red-500 rounded-xl flex items-center justify-center">
                             <FileText size={20} />
                         </div>
@@ -362,7 +353,7 @@ export default function CheckoutPage() {
                             <p className="text-[9px] text-slate-400 uppercase tracking-wider">Documento generado para validación</p>
                         </div>
                         <Button variant="outline" size="sm" className="h-8 text-[10px] rounded-lg">Ver PDF</Button>
-                    </div>
+                    </div> */}
 
                     {/* Unified Order Summary */}
                     <div className="bg-white dark:bg-slate-800 rounded-[2.5rem] p-8 border-2 border-dashed border-slate-200 dark:border-slate-700 space-y-6 shadow-sm">
@@ -373,8 +364,7 @@ export default function CheckoutPage() {
                         
                         <div className="space-y-4">
                             {items.map((item) => {
-                                const promo = getActivePromo(item.quantity, item);
-                                const effectivePrice = promo ? item.price - Math.round(promo.saving / item.quantity) : item.price;
+                                const { effectivePrice } = getItemPricing(item);
                                 
                                 return (
                                     <div key={item.id} className="flex justify-between items-start text-sm font-bold uppercase tracking-tight">
@@ -393,9 +383,21 @@ export default function CheckoutPage() {
                                 <span className="text-slate-900 dark:text-white">${subtotal.toLocaleString("es-AR")}</span>
                             </div>
                             {totalSavings > 0 && (
-                                <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-emerald-500">
-                                    <span>Ahorro por descuentos</span>
-                                    <span>-${totalSavings.toLocaleString("es-AR")}</span>
+                                <div className="flex justify-between items-center text-[10px] uppercase tracking-[0.2em] text-emerald-500 overflow-hidden bg-emerald-50 dark:bg-emerald-500/10 p-2.5 rounded-xl border border-emerald-100 dark:border-emerald-500/20 my-2">
+                                    <span className="flex items-center gap-1.5 font-black">
+                                        Descuento Picky
+                                    </span>
+                                    <AnimatePresence mode="popLayout">
+                                        <motion.span 
+                                            key={`savings-${totalSavings}`}
+                                            initial={{ scale: 1.5, opacity: 0, y: -10, rotate: -5 }}
+                                            animate={{ scale: 1, opacity: 1, y: 0, rotate: 0 }}
+                                            transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                                            className="text-sm font-black flex items-center gap-1 drop-shadow-md text-emerald-600 dark:text-emerald-400"
+                                        >
+                                            -${totalSavings.toLocaleString("es-AR")}
+                                        </motion.span>
+                                    </AnimatePresence>
                                 </div>
                             )}
                             <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-slate-400">

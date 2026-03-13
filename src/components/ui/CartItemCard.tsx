@@ -1,18 +1,10 @@
 "use client";
 
-import { Minus, Plus, Trash2 } from "lucide-react";
-import { motion } from "framer-motion";
+import { Minus, Plus, Trash2, AlertCircle } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useState } from "react";
 
-interface CartItem {
-  id: string;
-  name: string;
-  price: number;
-  quantity: number;
-  category: string;
-  sku: string;
-  wholesalePrice?: number;
-  wholesaleMinQuantity?: number;
-}
+
 
 interface CartItemCardProps {
   item: CartItem;
@@ -20,20 +12,23 @@ interface CartItemCardProps {
   onRemove: (id: string) => void;
 }
 
-function getActivePromo(qty: number, item: CartItem) {
-  if (item.wholesalePrice && qty >= (item.wholesaleMinQuantity ?? 10)) {
-    return { label: `Por mayor`, saving: item.price - item.wholesalePrice };
-  }
-  if (qty >= 10) return { label: "15% OFF", saving: Math.round(item.price * 0.15) };
-  if (qty >= 5) return { label: "10% OFF", saving: Math.round(item.price * 0.10) };
-  return null;
-}
+import { getItemPricing, CartItem } from "@/stores/useCartStore";
 
 export function CartItemCard({ item, onUpdateQuantity, onRemove }: CartItemCardProps) {
-  const promo = getActivePromo(item.quantity, item);
-  const effectivePrice = promo ? item.price - Math.round(promo.saving / item.quantity) : item.price;
+  const [showConfirmRemove, setShowConfirmRemove] = useState(false);
+
+  const { effectivePrice, originalPrice, savingPerItem, promoLabel } = getItemPricing(item);
   const subtotal = effectivePrice * item.quantity;
-  const originalSubtotal = item.price * item.quantity;
+  const originalSubtotal = originalPrice * item.quantity;
+  const totalSaving = savingPerItem * item.quantity;
+
+  const handleMinus = () => {
+    if (item.quantity <= 1) {
+      setShowConfirmRemove(true);
+    } else {
+      onUpdateQuantity(item.id, item.quantity - 1);
+    }
+  };
 
   return (
     <motion.div
@@ -45,55 +40,88 @@ export function CartItemCard({ item, onUpdateQuantity, onRemove }: CartItemCardP
     >
       <div className="flex justify-between relative">
         {/* Info del producto: Nombre y Categoría */}
-        <div className="flex-1 min-w-0 pr-4">
-          <h3 className="text-sm font-black uppercase italic leading-tight text-slate-900 dark:text-white line-clamp-2">
+        <div className="flex-1 min-w-0 pr-2">
+          <h3 className="text-xs font-black uppercase italic leading-tight text-slate-900 dark:text-white line-clamp-2">
             {item.name}
           </h3>
-          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mt-1.5 truncate">
+          <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 mt-1 truncate">
             {item.category} · {item.sku}
           </p>
           
           {/* Optional: Promos */}
-          {promo && (
-            <div className="flex gap-2 items-center mt-2">
-              <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">{promo.label}</span>
-              <span className="text-[10px] text-slate-400 font-bold line-through">${originalSubtotal.toLocaleString("es-AR")}</span>
+          {promoLabel && savingPerItem > 0 && (
+            <div className="flex gap-2 items-center mt-1.5">
+              <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">{promoLabel}</span>
+              <span className="text-[9px] text-slate-400 font-bold line-through">${originalSubtotal.toLocaleString("es-AR")}</span>
             </div>
           )}
         </div>
 
-        {/* Lado derecho: Basurero, Precio y Stepper */}
-        <div className="flex flex-col items-end shrink-0 gap-3 relative">
-          <button
-            onClick={() => onRemove(item.id)}
-            className="text-slate-400 hover:text-red-500 transition-colors absolute top-0 right-0 -mr-1 -mt-1 p-1"
-          >
-            <Trash2 size={16} />
-          </button>
-
-          <div className="flex flex-col items-end gap-1.5 mt-6">
-            <p className="text-xl font-black italic tracking-tighter gradient-text-primary leading-none">
-              ${subtotal.toLocaleString("es-AR")}
-            </p>
-            <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800/80 rounded-xl p-1.5 border border-slate-200 dark:border-slate-700 mt-0.5 shadow-inner">
-              <button
-                onClick={() => onUpdateQuantity(item.id, Math.max(1, item.quantity - 1))}
-                className="size-6 rounded-md flex items-center justify-center text-slate-500 hover:text-primary transition-all active:scale-90 bg-transparent"
-              >
-                <Minus size={14} strokeWidth={3} />
-              </button>
-              <span className="text-xs font-black w-4 text-center italic text-slate-900 dark:text-white">
-                {item.quantity}
-              </span>
-              <button
-                onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
-                className="size-6 rounded-md bg-slate-300 dark:bg-slate-600/80 text-slate-700 dark:text-slate-200 flex items-center justify-center active:scale-90 transition-all shadow-sm"
-              >
-                <Plus size={14} strokeWidth={3} />
-              </button>
-            </div>
-          </div>
-        </div>
+        {/* Lado derecho: Controles dinámicos */}
+        <AnimatePresence mode="popLayout" initial={false}>
+          {showConfirmRemove ? (
+            <motion.div
+              key="confirm"
+              initial={{ opacity: 0, scale: 0.9, x: 20 }}
+              animate={{ opacity: 1, scale: 1, x: 0 }}
+              exit={{ opacity: 0, scale: 0.9, x: 20 }}
+              className="flex flex-col items-end justify-center shrink-0 pl-3 py-1"
+            >
+              <div className="flex items-center gap-1 text-[10px] font-black uppercase text-rose-500 mb-2">
+                <AlertCircle size={12} strokeWidth={3} />
+                <span>¿Quitar?</span>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setShowConfirmRemove(false)}
+                  className="px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-[9px] font-black uppercase active:scale-95 transition-all text-slate-500"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={() => onRemove(item.id)}
+                  className="px-2.5 py-1.5 rounded-lg bg-rose-500 text-white text-[9px] font-black uppercase active:scale-95 transition-all shadow-md shadow-rose-500/20"
+                >
+                  Confirmar
+                </button>
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="controls"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="flex flex-col items-end justify-center shrink-0 gap-1"
+            >
+              {totalSaving > 0 && (
+                <span className="text-[9px] font-black text-emerald-500 leading-none">
+                  Ahorrás ${totalSaving.toLocaleString("es-AR")}
+                </span>
+              )}
+              <p className="text-lg font-black italic tracking-tighter gradient-text-primary leading-none">
+                ${subtotal.toLocaleString("es-AR")}
+              </p>
+              <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800/80 rounded-[0.6rem] p-1 border border-slate-200 dark:border-slate-700 shadow-inner">
+                <button
+                  onClick={handleMinus}
+                  className="size-5 rounded flex items-center justify-center text-slate-500 hover:text-primary transition-all active:scale-90 bg-transparent"
+                >
+                  <Minus size={12} strokeWidth={3} />
+                </button>
+                <span className="text-[10px] font-black min-w-[1rem] text-center italic text-slate-900 dark:text-white">
+                  {item.quantity}
+                </span>
+                <button
+                  onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
+                  className="size-5 rounded bg-slate-300 dark:bg-slate-600/80 text-slate-700 dark:text-slate-200 flex items-center justify-center active:scale-90 transition-all shadow-sm"
+                >
+                  <Plus size={12} strokeWidth={3} />
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </motion.div>
   );

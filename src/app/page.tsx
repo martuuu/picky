@@ -109,9 +109,8 @@ export default function WelcomePage() {
           <Button
             variant="gradient-logo"
             size="lg"
-            className="w-full h-16 text-xl font-black uppercase italic gap-3 shadow-2xl transition-all hover:scale-[1.02] active:scale-95 group rounded-[2rem]"
+            className="w-full h-16 text-xl font-black uppercase italic gap-3 shadow-lg transition-all hover:scale-[1.02] active:scale-95 group rounded-[2rem]"
           >
-            <Zap className="size-6 fill-current group-hover:animate-bounce" />
             Comenzar a Comprar
           </Button>
         </Link>

@@ -12,11 +12,10 @@ import { CompetitorProducts } from "@/components/ui/CompetitorProducts";
 import { PromotionsSection } from "@/components/ui/PromotionsSection";
 import { useRouter } from "next/navigation";
 
-// Tipos de promociones por cantidad para el snippet
 const PROMO_SNIPPETS = [
-  { type: "bulk", icon: <Package size={12} />, label: "x5+ unidades", desc: "10% OFF", color: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" },
-  { type: "quantity", icon: <Tag size={12} />, label: "x10+ unidades", desc: "15% OFF", color: "bg-blue-500/10 text-blue-600 border-blue-500/20" },
-  { type: "wholesale", icon: <Layers size={12} />, label: "Precio mayorista", desc: "Desde x10", color: "bg-purple-500/10 text-purple-600 border-purple-500/20" },
+  { type: "bulk", icon: <Package size={12} />, label: "x5+ unidades", desc: "10% OFF", color: "bg-tertiary/10 text-tertiary border-tertiary/20" },
+  { type: "quantity", icon: <Tag size={12} />, label: "x10+ unidades", desc: "15% OFF", color: "bg-secondary/10 text-secondary border-secondary/20" },
+  { type: "wholesale", icon: <Layers size={12} />, label: "Precio mayorista", desc: "35% OFF", color: "bg-tertiary/10 text-tertiary border-tertiary/20" },
 ];
 
 function getActivePromo(qty: number, product: Product) {
@@ -153,7 +152,7 @@ export default function ScanPage() {
                               initial={{ scale: 0 }}
                               animate={{ scale: 1 }}
                               exit={{ scale: 0 }}
-                              className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-gradient-purple-pink text-[10px] font-black text-white border-2 border-black glow-primary"
+                              className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-gradient-logo-full text-[10px] font-black text-white border-2 border-black shadow-md"
                             >
                               {itemCount}
                             </motion.span>
@@ -216,7 +215,7 @@ export default function ScanPage() {
               <div className="absolute bottom-0 left-0 w-16 h-16 border-b-4 border-l-4 border-primary rounded-bl-[3rem]"></div>
               <div className="absolute bottom-0 right-0 w-16 h-16 border-b-4 border-r-4 border-primary rounded-br-[3rem]"></div>
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="absolute w-full h-1 bg-gradient-purple-pink shadow-2xl glow-primary animate-scan"></div>
+                <div className="absolute w-full h-1 bg-gradient-logo-full shadow-2xl animate-scan"></div>
               </div>
             </div>
             <p className="absolute bottom-32 text-white/60 text-xs font-black uppercase tracking-widest">
@@ -280,7 +279,7 @@ export default function ScanPage() {
                         </h2>
                         {/* Fila 2: Categoría + SKU */}
                         <div className="flex items-center gap-2 mt-1">
-                          <span className="px-2 py-0.5 bg-primary/10 dark:bg-primary/20 gradient-text-primary rounded-lg text-[8px] font-black tracking-[0.2em] uppercase">
+                          <span className="px-2 py-0.5 bg-primary/10 dark:bg-primary/20 gradient-text-logo rounded-lg text-[8px] font-black tracking-[0.2em] uppercase">
                             {scannedProduct.category}
                           </span>
                           <span className="text-slate-400 text-[8px] font-black uppercase tracking-[0.2em]">
@@ -294,7 +293,7 @@ export default function ScanPage() {
                     <div className="flex items-center gap-3 bg-slate-50 dark:bg-slate-900/50 rounded-2xl p-3 border border-slate-100 dark:border-slate-800">
                       {/* Precio */}
                       <div className="flex-1">
-                        <p className="gradient-text-primary font-black text-xl italic tracking-tighter leading-none">
+                        <p className="gradient-text-logo font-black text-xl italic tracking-tighter leading-none">
                           ${effectiveUnitPrice.toLocaleString("es-AR")}
                         </p>
                         {activePromo && (
@@ -323,7 +322,7 @@ export default function ScanPage() {
                         <span className="text-sm font-black min-w-[1rem] text-center italic">{quantity}</span>
                         <button
                           onClick={() => setQuantity(Math.min(scannedProduct.stock, quantity + 1))}
-                          className="size-7 rounded-lg bg-gradient-purple-pink text-white shadow-md flex items-center justify-center active:scale-90 transition-all"
+                          className="size-7 rounded-lg bg-gradient-logo-full text-white shadow-md flex items-center justify-center active:scale-90 transition-all"
                         >
                           <Plus size={13} strokeWidth={3} />
                         </button>
@@ -332,7 +331,7 @@ export default function ScanPage() {
 
                       {/* Fila 4: Snippet de Promociones por cantidad */}
                       <div className="space-y-2">
-                        <p className="text-[8px] font-black uppercase tracking-widest text-slate-400 pl-0.5">Descuentos por cantidad</p>
+                        <h3 className="text-lg font-black italic uppercase tracking-tighter pl-0.5">Descuentos por Cantidad</h3>
                         <div className="flex flex-col gap-2">
                           {PROMO_SNIPPETS.map((promo) => {
                             const targetQty = promo.type === 'wholesale' ? (scannedProduct.wholesaleMinQuantity ?? 10) : (promo.type === 'quantity' ? 10 : 5);
@@ -343,15 +342,18 @@ export default function ScanPage() {
                               <button
                                 key={promo.type}
                                 onClick={() => setQuantity(Math.max(quantity, targetQty))}
-                                className={`flex items-center text-left gap-3 px-3 py-2.5 rounded-xl border text-[10px] font-black ${promo.color} ${
+                                className={`flex items-center text-left gap-3 px-3 py-2.5 rounded-xl border-2 text-[10px] font-black transition-all w-full active:scale-95 relative ${
                                   isActive
-                                    ? 'ring-1 ring-current scale-[1.02] shadow-sm'
-                                    : 'opacity-70 hover:opacity-100 hover:scale-[1.01]'
-                                } transition-all w-full active:scale-95`}
+                                    ? 'bg-white dark:bg-slate-900 border-transparent'
+                                    : `${promo.color} opacity-80 hover:opacity-100`
+                                }`}
                               >
-                                {promo.icon}
-                                <span>{promo.label}</span>
-                                <span className="font-black ml-auto">
+                                {isActive && (
+                                  <div className="absolute inset-0 rounded-xl bg-gradient-logo-full -z-10 -m-[2px]" />
+                                )}
+                                <span className={isActive ? 'gradient-text-logo' : ''}>{promo.icon}</span>
+                                <span className={isActive ? 'gradient-text-logo' : ''}>{promo.label}</span>
+                                <span className={`font-black ml-auto ${isActive ? 'gradient-text-logo' : ''}`}>
                                   {isActive ? '✓ APLICADO' : `→ APLICAR ${promo.desc}`}
                                 </span>
                               </button>
@@ -362,7 +364,7 @@ export default function ScanPage() {
                         <motion.div
                           initial={{ opacity: 0, y: -4 }}
                           animate={{ opacity: 1, y: 0 }}
-                          className="flex items-center gap-2 px-3 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600"
+                          className="flex items-center gap-2 px-3 py-2 rounded-xl bg-gradient-logo-full text-white shadow-md border-transparent"
                         >
                           <CheckCircle2 size={14} strokeWidth={2.5} />
                           <span className="text-[9px] font-black">{activePromo.label} · Ahorrás ${activePromo.saving.toLocaleString("es-AR")}</span>
@@ -399,7 +401,7 @@ export default function ScanPage() {
                             {scannedProduct.name}
                           </h1>
                           <div className="flex items-center gap-2 mt-1">
-                            <span className="px-2 py-0.5 bg-primary/10 dark:bg-primary/20 gradient-text-primary rounded-lg text-[9px] font-black tracking-[0.2em] uppercase">
+                            <span className="px-2 py-0.5 bg-primary/10 dark:bg-primary/20 gradient-text-logo rounded-lg text-[9px] font-black tracking-[0.2em] uppercase">
                               {scannedProduct.category}
                             </span>
                             <span className="text-slate-400 text-[9px] font-black uppercase tracking-[0.2em]">
@@ -408,7 +410,7 @@ export default function ScanPage() {
                           </div>
                         </div>
                       </div>
-                      <p className="gradient-text-primary font-black text-3xl pt-1 italic tracking-tighter">
+                      <p className="gradient-text-logo font-black text-3xl pt-1 italic tracking-tighter">
                         ${effectiveUnitPrice.toLocaleString("es-AR")}
                         <span className="text-sm text-slate-400 font-bold normal-case tracking-normal ml-2">
                           c/u · Stock: {scannedProduct.stock}
@@ -419,7 +421,7 @@ export default function ScanPage() {
                     <div className="space-y-4">
                       {/* Descripción */}
                       <div className="bg-slate-50 dark:bg-slate-900/30 p-4 rounded-2xl border border-slate-100 dark:border-slate-800">
-                        <h3 className="text-[9px] font-black uppercase tracking-widest text-slate-900 dark:text-white mb-2 italic">Descripción</h3>
+                        <h3 className="text-lg font-black italic uppercase tracking-tighter mb-2">Descripción</h3>
                         <p className="text-slate-500 dark:text-slate-400 leading-relaxed text-sm font-medium">
                           {scannedProduct.description}
                         </p>
@@ -438,14 +440,14 @@ export default function ScanPage() {
                       {/* Variantes — movidas del Preview */}
                       {scannedProduct.variants?.map((v, i) => (
                         <div key={i} className="space-y-2">
-                          <h3 className="text-[9px] font-black uppercase tracking-widest text-slate-400 italic">{v.label}</h3>
+                          <h3 className="text-lg font-black italic uppercase tracking-tighter">{v.label}</h3>
                           <div className="flex flex-wrap gap-2">
                             {v.options.map((opt, j) => (
                               <button
                                 key={j}
                                 className={`px-4 py-2 rounded-xl border-2 transition-all font-black text-[9px] uppercase ${
                                   j === 0
-                                    ? 'border-primary bg-gradient-purple-pink text-white shadow-lg glow-primary'
+                                    ? 'border-transparent bg-gradient-logo-full text-white shadow-lg'
                                     : 'border-slate-100 dark:border-slate-800 text-slate-400'
                                 }`}
                               >
@@ -463,7 +465,7 @@ export default function ScanPage() {
 
                       {/* Snippets de descuentos seleccionables */}
                       <div className="space-y-2">
-                        <h3 className="text-[9px] font-black uppercase tracking-widest text-slate-400 italic">Descuentos por Cantidad</h3>
+                        <h3 className="text-lg font-black italic uppercase tracking-tighter">Descuentos por Cantidad</h3>
                         <div className="flex flex-col gap-2">
                           {PROMO_SNIPPETS.map((promo) => {
                             const targetQty = promo.type === 'wholesale' ? (scannedProduct.wholesaleMinQuantity ?? 10) : (promo.type === 'quantity' ? 10 : 5);
@@ -474,15 +476,18 @@ export default function ScanPage() {
                               <button
                                 key={promo.type}
                                 onClick={() => setQuantity(Math.max(quantity, targetQty))}
-                                className={`flex items-center text-left gap-3 px-3 py-2.5 rounded-xl border text-[10px] font-black ${promo.color} ${
+                                className={`flex items-center text-left gap-3 px-3 py-2.5 rounded-xl border-2 text-[10px] font-black transition-all w-full active:scale-95 relative ${
                                   isActive
-                                    ? 'ring-1 ring-current scale-[1.02] shadow-sm'
-                                    : 'opacity-70 hover:opacity-100 hover:scale-[1.01]'
-                                } transition-all w-full active:scale-95`}
+                                    ? 'bg-white dark:bg-slate-900 border-transparent'
+                                    : `${promo.color} opacity-80 hover:opacity-100`
+                                }`}
                               >
-                                {promo.icon}
-                                <span>{promo.label}</span>
-                                <span className="font-black ml-auto">
+                                {isActive && (
+                                  <div className="absolute inset-0 rounded-xl bg-gradient-logo-full -z-10 -m-[2px]" />
+                                )}
+                                <span className={isActive ? 'gradient-text-logo' : ''}>{promo.icon}</span>
+                                <span className={isActive ? 'gradient-text-logo' : ''}>{promo.label}</span>
+                                <span className={`font-black ml-auto ${isActive ? 'gradient-text-logo' : ''}`}>
                                   {isActive ? '✓ APLICADO' : `→ APLICAR ${promo.desc}`}
                                 </span>
                               </button>
@@ -504,7 +509,7 @@ export default function ScanPage() {
                           <span className="text-base font-black min-w-[1rem] text-center italic">{quantity}</span>
                           <button
                             onClick={() => setQuantity(Math.min(scannedProduct.stock, quantity + 1))}
-                            className="size-9 rounded-lg bg-gradient-purple-pink text-white shadow-lg glow-primary flex items-center justify-center active:scale-90 transition-all"
+                            className="size-9 rounded-lg bg-gradient-logo-full text-white shadow-lg flex items-center justify-center active:scale-90 transition-all"
                           >
                             <Plus size={16} strokeWidth={3} />
                           </button>
@@ -525,11 +530,11 @@ export default function ScanPage() {
               </div>
 
               {/* Fixed Action Bar */}
-              <div className="absolute bottom-0 left-0 w-full p-5 bg-white/95 dark:bg-background-dark/95 backdrop-blur-xl border-t border-slate-100 dark:border-slate-800 shadow-2xl shrink-0">
+              <div className="absolute bottom-0 left-0 w-full z-50 p-5 bg-white/95 dark:bg-background-dark/95 backdrop-blur-xl border-t border-slate-100 dark:border-slate-800 shadow-2xl shrink-0">
                 <Button
                   onClick={handleAddToCart}
-                  variant="gradient-purple-pink"
-                  className="w-full h-14 text-base font-black italic uppercase shadow-2xl rounded-2xl gap-3 group relative overflow-hidden"
+                  variant="gradient-logo"
+                  className="w-full h-14 text-base font-black italic uppercase shadow-lg rounded-2xl gap-3 group relative overflow-hidden"
                 >
                   <AnimatePresence mode="wait">
                     {showCartSplash ? (
@@ -550,13 +555,7 @@ export default function ScanPage() {
                         animate={{ opacity: 1 }}
                         className="flex items-center gap-2"
                       >
-                        <ShoppingBag size={20} strokeWidth={2.5} />
                         Agregar al Carrito · ${totalPrice.toLocaleString("es-AR")}
-                        {activePromo && (
-                          <span className="text-[9px] bg-white/20 rounded-lg px-2 py-0.5">
-                            Con desc.
-                          </span>
-                        )}
                       </motion.span>
                     )}
                   </AnimatePresence>

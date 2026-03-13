@@ -6,6 +6,55 @@ export interface CartItem extends Product {
   quantity: number;
 }
 
+export function getItemPricing(item: CartItem) {
+  const qty = item.quantity;
+  
+  if (item.originalPrice) {
+    return {
+      effectivePrice: item.price,
+      originalPrice: item.originalPrice,
+      savingPerItem: item.originalPrice - item.price,
+      promoLabel: "Promo Especial"
+    };
+  }
+
+  if (item.wholesalePrice && qty >= (item.wholesaleMinQuantity ?? 10)) {
+    return {
+      effectivePrice: item.wholesalePrice,
+      originalPrice: item.price,
+      savingPerItem: item.price - item.wholesalePrice,
+      promoLabel: "Precio Mayorista"
+    };
+  }
+
+  if (qty >= 10) {
+    const saving = Math.round(item.price * 0.15);
+    return {
+      effectivePrice: item.price - saving,
+      originalPrice: item.price,
+      savingPerItem: saving,
+      promoLabel: "15% OFF"
+    };
+  }
+
+  if (qty >= 5) {
+    const saving = Math.round(item.price * 0.10);
+    return {
+      effectivePrice: item.price - saving,
+      originalPrice: item.price,
+      savingPerItem: saving,
+      promoLabel: "10% OFF"
+    };
+  }
+
+  return {
+    effectivePrice: item.price,
+    originalPrice: item.price,
+    savingPerItem: 0,
+    promoLabel: null
+  };
+}
+
 interface CartStore {
   items: CartItem[];
   addItem: (product: Product, quantity?: number) => void;

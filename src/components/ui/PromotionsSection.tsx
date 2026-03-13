@@ -73,10 +73,9 @@ export function PromotionsSection() {
   return (
     <div className="space-y-4">
       {/* Header */}
-      <div className="flex items-center gap-2">
-        <Sparkles size={20} className="gradient-text-secondary" />
+      <div>
         <h3 className="text-lg font-black italic uppercase tracking-tighter">
-          Promociones <span className="gradient-text-secondary">&</span> Combos
+          Promociones <span className="gradient-text-logo">&</span> Combos
         </h3>
       </div>
 
@@ -99,7 +98,7 @@ export function PromotionsSection() {
                 />
                 {/* Discount Badge */}
                 <div className="absolute top-2 right-2">
-                  <div className="bg-gradient-secondary text-white rounded-lg px-2 py-1 flex items-center gap-1 shadow-lg glow-secondary">
+                  <div className="bg-gradient-logo-full text-white rounded-lg px-2 py-1 flex items-center gap-1 shadow-lg">
                     <Percent size={10} strokeWidth={3} />
                     <span className="text-xs font-black">{promo.discount}</span>
                   </div>
@@ -113,8 +112,8 @@ export function PromotionsSection() {
                   <div className="flex items-center gap-2 mb-1">
                     <span className={`px-2 py-0.5 rounded-md text-[8px] font-black uppercase tracking-wider ${
                       promo.type === "combo" 
-                        ? "bg-tertiary/10 dark:bg-tertiary/20 gradient-text-tertiary"
-                        : "bg-secondary/10 dark:bg-secondary/20 gradient-text-secondary"
+                        ? "bg-tertiary/10 dark:bg-tertiary/20 gradient-text-logo"
+                        : "bg-secondary/10 dark:bg-secondary/20 gradient-text-logo"
                     }`}>
                       {promo.type === "combo" ? "Combo" : "Promo"}
                     </span>
@@ -135,14 +134,14 @@ export function PromotionsSection() {
                     <span className="text-[9px] text-slate-400 line-through font-bold">
                       ${promo.originalPrice.toLocaleString("es-AR")}
                     </span>
-                    <span className="text-xl font-black gradient-text-secondary">
+                    <span className="text-xl font-black gradient-text-logo">
                       ${promo.finalPrice.toLocaleString("es-AR")}
                     </span>
                   </div>
 
                   <button 
                     onClick={() => handleAddPromo(promo)}
-                    className="size-10 rounded-xl bg-gradient-pink-orange text-white shadow-lg glow-secondary flex items-center justify-center hover:scale-110 active:scale-95 transition-all"
+                    className="size-10 rounded-xl bg-gradient-logo-full text-white shadow-lg flex items-center justify-center hover:scale-110 active:scale-95 transition-all"
                   >
                     <ShoppingCart size={18} strokeWidth={2.5} />
                   </button>

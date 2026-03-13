@@ -25,7 +25,7 @@ const buttonVariants = cva(
         "gradient-orange-cyan": "bg-gradient-orange-cyan text-white glow-tertiary hover:opacity-90 hover:scale-[1.02]",
         
         // Full Logo Gradient (3 colors)
-        "gradient-logo": "bg-gradient-logo-full text-white shadow-2xl hover:opacity-90 hover:scale-[1.02] animate-glow",
+        "gradient-logo": "bg-gradient-logo-full text-white shadow-lg hover:opacity-90 hover:scale-[1.02]",
         
         // Standard Variants
         secondary: "bg-secondary text-white hover:bg-secondary-dark glow-secondary",
