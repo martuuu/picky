@@ -3,7 +3,7 @@
 import { Product } from "@/lib/data";
 import Image from "next/image";
 import Link from "next/link";
-import { TrendingUp, ArrowRight } from "lucide-react";
+import { TrendingUp, ArrowRight, ShoppingCart } from "lucide-react";
 
 interface CompetitorProductsProps {
   currentProduct: Product;
@@ -66,13 +66,13 @@ export function CompetitorProducts({ currentProduct, allProducts }: CompetitorPr
                 className="group flex flex-col rounded-[2rem] overflow-hidden bg-slate-800 dark:bg-slate-800/80 border border-slate-700 shadow-xl transition-all hover:scale-[1.02]"
               >
                 {/* Product Image Box */}
-                <div className="relative aspect-square bg-slate-900/50 p-3 flex items-center justify-center">
+                <div className="relative h-24 bg-slate-900/50 p-2 flex items-center justify-center">
                   <div className="absolute top-2 right-2 z-10">
-                    <span className="bg-emerald-500 text-white text-[9px] font-black px-2 py-1 rounded-lg uppercase shadow-lg shadow-emerald-500/20">
+                    <span className="bg-emerald-500 text-white text-[8px] font-black px-2 py-0.5 rounded uppercase shadow-lg shadow-emerald-500/20">
                       {isCheaper ? `-${diffPerc}% OFF` : `+${diffPerc}%`}
                     </span>
                   </div>
-                  <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-inner border border-white/5">
+                  <div className="relative w-full h-full rounded-xl overflow-hidden shadow-inner border border-white/5">
                     <Image
                       src={product.image}
                       alt={product.name}
@@ -84,18 +84,27 @@ export function CompetitorProducts({ currentProduct, allProducts }: CompetitorPr
                 </div>
 
                 {/* Info Container */}
-                <div className="flex flex-col flex-1 p-4 justify-between bg-slate-800/40">
-                  <div className="space-y-1">
-                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{brandName}</p>
-                    <h4 className="font-black text-[10px] uppercase italic leading-tight line-clamp-2 text-white/90 group-hover:text-white transition-colors">
+                <div className="flex flex-col flex-1 p-3 justify-between bg-slate-800/40">
+                  <div className="space-y-0.5">
+                    <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">{brandName}</p>
+                    <h4 className="font-black text-[9px] uppercase italic leading-tight line-clamp-2 text-white/90 group-hover:text-white transition-colors">
                       {product.name}
                     </h4>
                   </div>
                   
-                  <div className="mt-3">
-                    <p className="text-xl font-black gradient-text-tertiary leading-none">
+                  <div className="mt-2 flex items-center justify-between">
+                    <p className="text-sm font-black gradient-text-tertiary leading-none">
                       ${product.price.toLocaleString("es-AR")}
                     </p>
+                    <button 
+                      className="size-6 rounded-lg border border-slate-600 text-slate-400 flex items-center justify-center hover:bg-slate-700 active:scale-90 transition-all"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        // Optional Add to Cart Logic here
+                      }}
+                    >
+                      <ShoppingCart size={12} strokeWidth={2.5} />
+                    </button>
                   </div>
                 </div>
               </Link>

@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronLeft, Flashlight, Minus, Plus, ShoppingBag, ExternalLink, CheckCircle2, Tag, Layers, Package } from "lucide-react";
+import { ChevronLeft, ChevronDown, Flashlight, Minus, Plus, ShoppingBag, ExternalLink, CheckCircle2, Tag, Layers, Package } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { motion, AnimatePresence } from "framer-motion";
 import { products, Product } from "@/lib/data";
@@ -15,12 +15,12 @@ import { useRouter } from "next/navigation";
 const PROMO_SNIPPETS = [
   { type: "bulk", icon: <Package size={12} />, label: "x5+ unidades", desc: "10% OFF", color: "bg-tertiary/10 text-tertiary border-tertiary/20" },
   { type: "quantity", icon: <Tag size={12} />, label: "x10+ unidades", desc: "15% OFF", color: "bg-secondary/10 text-secondary border-secondary/20" },
-  { type: "wholesale", icon: <Layers size={12} />, label: "Precio mayorista", desc: "35% OFF", color: "bg-tertiary/10 text-tertiary border-tertiary/20" },
+  { type: "wholesale", icon: <Layers size={12} />, label: "Prec. mayorista (x20+)", desc: "Precio Especial", color: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" },
 ];
 
 function getActivePromo(qty: number, product: Product) {
   if (!product.wholesalePrice) return null;
-  if (qty >= (product.wholesaleMinQuantity ?? 10)) {
+  if (qty >= (product.wholesaleMinQuantity ?? 20)) {
     return { label: `Precio mayorista aplicado`, saving: product.price - product.wholesalePrice };
   }
   if (qty >= 10) return { label: "15% OFF por cantidad", saving: Math.round(product.price * 0.15) };
@@ -32,6 +32,88 @@ function getEffectivePrice(qty: number, product: Product): number {
   const promo = getActivePromo(qty, product);
   if (!promo) return product.price;
   return product.price - Math.round(promo.saving / qty);
+}
+
+function QuantityDiscountsExpandable({ scannedProduct, quantity, setQuantity }: { scannedProduct: Product, quantity: number, setQuantity: (q: number) => void }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const activePromo = getActivePromo(quantity, scannedProduct);
+
+  return (
+    <div className="space-y-2 relative z-10">
+      <motion.div layout className="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden border border-slate-100 dark:border-slate-800 shadow-sm relative z-10 w-full mb-2">
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="w-full flex items-center justify-between p-4 text-left active:scale-[0.98] transition-all"
+        >
+          <div className="flex items-center gap-3">
+            <div className="size-8 rounded-xl bg-gradient-logo-full text-white flex items-center justify-center shadow-md">
+              <Tag size={16} />
+            </div>
+            <div className="flex flex-col">
+              <span className="font-black text-sm italic uppercase tracking-tight">Oferta Mayorista / Promos</span>
+              <span className="text-[9px] font-bold text-slate-400">Ver descuentos por cantidad</span>
+            </div>
+          </div>
+          <motion.div animate={{ rotate: isExpanded ? 180 : 0 }}>
+            <ChevronDown size={20} className="text-slate-400" />
+          </motion.div>
+        </button>
+        
+        <AnimatePresence>
+          {isExpanded && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="px-4 pb-4"
+            >
+              <div className="flex flex-col gap-2 pt-2 border-t border-slate-200 dark:border-slate-800">
+                {PROMO_SNIPPETS.map((promo) => {
+                  const targetQty = promo.type === 'wholesale' ? (scannedProduct.wholesaleMinQuantity ?? 20) : (promo.type === 'quantity' ? 10 : 5);
+                  if (promo.type === 'wholesale' && !scannedProduct.wholesalePrice) return null;
+                  const isActive = quantity >= targetQty;
+
+                  return (
+                    <button
+                      key={promo.type}
+                      onClick={() => setQuantity(Math.max(quantity, targetQty))}
+                      className={`flex items-center text-left gap-3 px-3 py-2.5 rounded-xl border-2 text-[10px] font-black transition-all w-full active:scale-95 relative ${
+                        isActive
+                          ? 'bg-primary/5 dark:bg-primary/10 border-primary shadow-sm'
+                          : `${promo.color} opacity-80 hover:opacity-100`
+                      }`}
+                    >
+                      {isActive && (
+                        <div className="absolute inset-0 rounded-xl bg-gradient-logo-full opacity-10 -z-10" />
+                      )}
+                      <span className={isActive ? 'text-primary' : ''}>{promo.icon}</span>
+                      <span className={isActive ? 'text-primary' : ''}>{promo.label}</span>
+                      <span className={`font-black ml-auto ${isActive ? 'text-primary' : ''}`}>
+                        {isActive ? '✓ APLICADO' : `→ APLICAR`}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+              
+              {activePromo && (
+                <motion.div
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex items-center gap-2 mt-3 px-3 py-2.5 rounded-xl bg-emerald-500/10 text-emerald-600 shadow-sm border border-emerald-500/20"
+                >
+                  <CheckCircle2 size={16} strokeWidth={2.5} />
+                  <span className="text-[10px] font-black">
+                    {activePromo.label} · <span className="underline">Ahorrás ${(activePromo.saving * quantity).toLocaleString("es-AR")}</span> en total
+                  </span>
+                </motion.div>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
+    </div>
+  );
 }
 
 export default function ScanPage() {
@@ -100,11 +182,11 @@ export default function ScanPage() {
       >
         <div className="relative w-full h-full opacity-60">
           <Image
-            src="https://images.unsplash.com/photo-1516937941344-00b4e0337589?auto=format&fit=crop&q=80&w=1200"
+            src="/picky-scan.png"
             alt="Corralón Camera View"
             fill
             className="object-cover"
-            unoptimized
+            priority
           />
         </div>
         <div className="absolute top-0 left-0 w-full h-40 bg-gradient-to-b from-black/80 via-black/20 to-transparent"></div>
@@ -277,13 +359,10 @@ export default function ScanPage() {
                         <h2 className="text-lg font-black text-slate-900 dark:text-white leading-tight uppercase italic tracking-tighter truncate">
                           {scannedProduct.name}
                         </h2>
-                        {/* Fila 2: Categoría + SKU */}
+                        {/* Fila 2: Categoría */}
                         <div className="flex items-center gap-2 mt-1">
                           <span className="px-2 py-0.5 bg-primary/10 dark:bg-primary/20 gradient-text-logo rounded-lg text-[8px] font-black tracking-[0.2em] uppercase">
                             {scannedProduct.category}
-                          </span>
-                          <span className="text-slate-400 text-[8px] font-black uppercase tracking-[0.2em]">
-                            SKU: {scannedProduct.sku}
                           </span>
                         </div>
                       </div>
@@ -330,47 +409,11 @@ export default function ScanPage() {
                     </div>
 
                       {/* Fila 4: Snippet de Promociones por cantidad */}
-                      <div className="space-y-2">
-                        <h3 className="text-lg font-black italic uppercase tracking-tighter pl-0.5">Descuentos por Cantidad</h3>
-                        <div className="flex flex-col gap-2">
-                          {PROMO_SNIPPETS.map((promo) => {
-                            const targetQty = promo.type === 'wholesale' ? (scannedProduct.wholesaleMinQuantity ?? 10) : (promo.type === 'quantity' ? 10 : 5);
-                            if (promo.type === 'wholesale' && !scannedProduct.wholesalePrice) return null;
-                            const isActive = quantity >= targetQty;
-
-                            return (
-                              <button
-                                key={promo.type}
-                                onClick={() => setQuantity(Math.max(quantity, targetQty))}
-                                className={`flex items-center text-left gap-3 px-3 py-2.5 rounded-xl border-2 text-[10px] font-black transition-all w-full active:scale-95 relative ${
-                                  isActive
-                                    ? 'bg-white dark:bg-slate-900 border-transparent'
-                                    : `${promo.color} opacity-80 hover:opacity-100`
-                                }`}
-                              >
-                                {isActive && (
-                                  <div className="absolute inset-0 rounded-xl bg-gradient-logo-full -z-10 -m-[2px]" />
-                                )}
-                                <span className={isActive ? 'gradient-text-logo' : ''}>{promo.icon}</span>
-                                <span className={isActive ? 'gradient-text-logo' : ''}>{promo.label}</span>
-                                <span className={`font-black ml-auto ${isActive ? 'gradient-text-logo' : ''}`}>
-                                  {isActive ? '✓ APLICADO' : `→ APLICAR ${promo.desc}`}
-                                </span>
-                              </button>
-                            );
-                          })}
-                        </div>
-                      {activePromo && (
-                        <motion.div
-                          initial={{ opacity: 0, y: -4 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="flex items-center gap-2 px-3 py-2 rounded-xl bg-gradient-logo-full text-white shadow-md border-transparent"
-                        >
-                          <CheckCircle2 size={14} strokeWidth={2.5} />
-                          <span className="text-[9px] font-black">{activePromo.label} · Ahorrás ${activePromo.saving.toLocaleString("es-AR")}</span>
-                        </motion.div>
-                      )}
-                    </div>
+                      <QuantityDiscountsExpandable
+                        scannedProduct={scannedProduct}
+                        quantity={quantity}
+                        setQuantity={setQuantity}
+                      />
                   </motion.div>
                 )}
 
@@ -403,9 +446,6 @@ export default function ScanPage() {
                           <div className="flex items-center gap-2 mt-1">
                             <span className="px-2 py-0.5 bg-primary/10 dark:bg-primary/20 gradient-text-logo rounded-lg text-[9px] font-black tracking-[0.2em] uppercase">
                               {scannedProduct.category}
-                            </span>
-                            <span className="text-slate-400 text-[9px] font-black uppercase tracking-[0.2em]">
-                              SKU: {scannedProduct.sku}
                             </span>
                           </div>
                         </div>
@@ -464,37 +504,11 @@ export default function ScanPage() {
                       </div>
 
                       {/* Snippets de descuentos seleccionables */}
-                      <div className="space-y-2">
-                        <h3 className="text-lg font-black italic uppercase tracking-tighter">Descuentos por Cantidad</h3>
-                        <div className="flex flex-col gap-2">
-                          {PROMO_SNIPPETS.map((promo) => {
-                            const targetQty = promo.type === 'wholesale' ? (scannedProduct.wholesaleMinQuantity ?? 10) : (promo.type === 'quantity' ? 10 : 5);
-                            if (promo.type === 'wholesale' && !scannedProduct.wholesalePrice) return null;
-                            const isActive = quantity >= targetQty;
-
-                            return (
-                              <button
-                                key={promo.type}
-                                onClick={() => setQuantity(Math.max(quantity, targetQty))}
-                                className={`flex items-center text-left gap-3 px-3 py-2.5 rounded-xl border-2 text-[10px] font-black transition-all w-full active:scale-95 relative ${
-                                  isActive
-                                    ? 'bg-white dark:bg-slate-900 border-transparent'
-                                    : `${promo.color} opacity-80 hover:opacity-100`
-                                }`}
-                              >
-                                {isActive && (
-                                  <div className="absolute inset-0 rounded-xl bg-gradient-logo-full -z-10 -m-[2px]" />
-                                )}
-                                <span className={isActive ? 'gradient-text-logo' : ''}>{promo.icon}</span>
-                                <span className={isActive ? 'gradient-text-logo' : ''}>{promo.label}</span>
-                                <span className={`font-black ml-auto ${isActive ? 'gradient-text-logo' : ''}`}>
-                                  {isActive ? '✓ APLICADO' : `→ APLICAR ${promo.desc}`}
-                                </span>
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
+                      <QuantityDiscountsExpandable
+                        scannedProduct={scannedProduct}
+                        quantity={quantity}
+                        setQuantity={setQuantity}
+                      />
 
                       {/* Cantidad en expanded */}
                       <div className="grid grid-cols-[1fr_auto] gap-3 items-center bg-slate-50 dark:bg-slate-900/50 p-3 rounded-2xl border border-slate-100 dark:border-slate-800">

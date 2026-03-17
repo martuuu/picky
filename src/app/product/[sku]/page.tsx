@@ -55,10 +55,11 @@ export default function ProductPage({ params }: { params: Promise<{ sku: string 
         >
             <ArrowLeft size={20} />
         </button>
-        <div className="flex flex-col items-center">
-            <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Detalle de Producto</span>
-            <span className="text-xs font-bold gradient-text-primary truncate max-w-[150px]">{product.sku}</span>
-        </div>
+          <div className="flex items-center gap-2 mb-3">
+            <span className="bg-primary/20 text-primary px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest backdrop-blur-md border border-primary/20 inline-block shadow-sm">
+              {product.category}
+            </span>
+          </div>
         <Link href="/cart">
             <button className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 text-primary">
                 <ShoppingBag size={20} />

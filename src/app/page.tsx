@@ -60,14 +60,14 @@ export default function WelcomePage() {
 
       {/* Hero Image — flex-1 para llenar espacio disponible sin scroll */}
       <div className="relative px-6 py-2 z-10 flex-1 min-h-0 group flex items-center justify-center">
-        <div className="relative aspect-square w-full max-w-[280px] rounded-[3.5rem] overflow-hidden shadow-2xl transition-transform duration-700 group-hover:scale-[1.01] border-4 border-transparent bg-gradient-logo-full p-1">
+        <div className="relative aspect-square w-full max-w-[280px] rounded-[3.5rem] overflow-hidden shadow-2xl transition-transform duration-700 group-hover:scale-[1.01] border-4 border-transparent bg-gradient-purple-pink p-1">
           <div className="relative w-full h-full rounded-[3rem] overflow-hidden">
             <Image
-              src="https://images.unsplash.com/photo-1581094794329-c8112a89af12?auto=format&fit=crop&q=80&w=800"
-              alt="Corralón Experience"
+              src="/picky-scan.png"
+              alt="Corralón Scanner Experience"
               fill
               className="object-cover"
-              unoptimized
+              priority
             />
             <div className="absolute inset-0 bg-gradient-to-t from-background-dark via-primary/40 to-transparent"></div>
             <div className="absolute inset-x-0 bottom-0 p-6 flex items-end">

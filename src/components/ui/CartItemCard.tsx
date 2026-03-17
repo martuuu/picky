@@ -38,26 +38,37 @@ export function CartItemCard({ item, onUpdateQuantity, onRemove }: CartItemCardP
       exit={{ opacity: 0, x: 20 }}
       className="bg-white dark:bg-slate-800/50 rounded-2xl p-3 border border-slate-100 dark:border-slate-800 shadow-sm mb-3 overflow-hidden"
     >
-      <div className="flex justify-between relative">
+      <div className="flex items-center justify-between relative gap-3">
         {/* Info del producto: Nombre y Categoría */}
-        <div className="flex-1 min-w-0 pr-2">
-          <h3 className="text-xs font-black uppercase italic leading-tight text-slate-900 dark:text-white line-clamp-2">
+        <div className="flex-[2] min-w-0">
+          <h3 className="text-[10px] font-black uppercase italic leading-tight text-slate-900 dark:text-white line-clamp-2">
             {item.name}
           </h3>
-          <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 mt-1 truncate">
-            {item.category} · {item.sku}
+          <p className="text-[8px] font-black uppercase tracking-[0.2em] text-slate-400 mt-0.5 truncate">
+            {item.category}
           </p>
-          
-          {/* Optional: Promos */}
-          {promoLabel && savingPerItem > 0 && (
-            <div className="flex gap-2 items-center mt-1.5">
-              <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">{promoLabel}</span>
-              <span className="text-[9px] text-slate-400 font-bold line-through">${originalSubtotal.toLocaleString("es-AR")}</span>
-            </div>
-          )}
         </div>
 
-        {/* Lado derecho: Controles dinámicos */}
+        {/* Quantity Controls - Middle */}
+        <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800/80 rounded block border border-slate-200 dark:border-slate-700 shadow-inner shrink-0 p-0.5">
+          <button
+            onClick={handleMinus}
+            className="size-5 rounded-sm flex items-center justify-center text-slate-500 hover:text-primary transition-all active:scale-90 bg-transparent"
+          >
+            <Minus size={11} strokeWidth={3} />
+          </button>
+          <span className="text-[10px] font-black min-w-[1rem] text-center italic text-slate-900 dark:text-white">
+            {item.quantity}
+          </span>
+          <button
+            onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
+            className="size-5 rounded-sm bg-slate-300 dark:bg-slate-600/80 text-slate-700 dark:text-slate-200 flex items-center justify-center active:scale-90 transition-all shadow-sm"
+          >
+            <Plus size={11} strokeWidth={3} />
+          </button>
+        </div>
+
+        {/* Lado derecho: Precio y Ahorro */}
         <AnimatePresence mode="popLayout" initial={false}>
           {showConfirmRemove ? (
             <motion.div
@@ -65,24 +76,20 @@ export function CartItemCard({ item, onUpdateQuantity, onRemove }: CartItemCardP
               initial={{ opacity: 0, scale: 0.9, x: 20 }}
               animate={{ opacity: 1, scale: 1, x: 0 }}
               exit={{ opacity: 0, scale: 0.9, x: 20 }}
-              className="flex flex-col items-end justify-center shrink-0 pl-3 py-1"
+              className="flex items-center justify-end shrink-0 py-1 flex-1"
             >
-              <div className="flex items-center gap-1 text-[10px] font-black uppercase text-rose-500 mb-2">
-                <AlertCircle size={12} strokeWidth={3} />
-                <span>¿Quitar?</span>
-              </div>
-              <div className="flex gap-2">
+              <div className="flex gap-1.5">
                 <button
                   onClick={() => setShowConfirmRemove(false)}
-                  className="px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-[9px] font-black uppercase active:scale-95 transition-all text-slate-500"
+                  className="px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-[10px] font-black uppercase active:scale-95 transition-all text-slate-500"
                 >
                   Cancelar
                 </button>
                 <button
                   onClick={() => onRemove(item.id)}
-                  className="px-2.5 py-1.5 rounded-lg bg-rose-500 text-white text-[9px] font-black uppercase active:scale-95 transition-all shadow-md shadow-rose-500/20"
+                  className="px-2.5 py-1.5 rounded-lg bg-rose-500 text-white text-[10px] font-black uppercase active:scale-95 transition-all shadow-md shadow-rose-500/20"
                 >
-                  Confirmar
+                  Quitar
                 </button>
               </div>
             </motion.div>
@@ -92,33 +99,16 @@ export function CartItemCard({ item, onUpdateQuantity, onRemove }: CartItemCardP
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="flex flex-col items-end justify-center shrink-0 gap-1"
+              className="flex flex-col items-end justify-center shrink-0 min-w-[4rem] flex-1"
             >
               {totalSaving > 0 && (
-                <span className="text-[9px] font-black text-emerald-500 leading-none">
+                <span className="text-[9px] font-black text-emerald-500 leading-none mb-1 text-right">
                   Ahorrás ${totalSaving.toLocaleString("es-AR")}
                 </span>
               )}
-              <p className="text-lg font-black italic tracking-tighter gradient-text-primary leading-none">
+              <p className="text-base font-black italic tracking-tighter gradient-text-primary leading-none text-right">
                 ${subtotal.toLocaleString("es-AR")}
               </p>
-              <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800/80 rounded-[0.6rem] p-1 border border-slate-200 dark:border-slate-700 shadow-inner">
-                <button
-                  onClick={handleMinus}
-                  className="size-5 rounded flex items-center justify-center text-slate-500 hover:text-primary transition-all active:scale-90 bg-transparent"
-                >
-                  <Minus size={12} strokeWidth={3} />
-                </button>
-                <span className="text-[10px] font-black min-w-[1rem] text-center italic text-slate-900 dark:text-white">
-                  {item.quantity}
-                </span>
-                <button
-                  onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
-                  className="size-5 rounded bg-slate-300 dark:bg-slate-600/80 text-slate-700 dark:text-slate-200 flex items-center justify-center active:scale-90 transition-all shadow-sm"
-                >
-                  <Plus size={12} strokeWidth={3} />
-                </button>
-              </div>
             </motion.div>
           )}
         </AnimatePresence>

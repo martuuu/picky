@@ -278,40 +278,6 @@ export default function ConfirmationPage() {
         </div>
       </section>
 
-
-      {/* "¡Estás a Tiempo!" - Fixed height, can add items to order */}
-      {currentStatus !== "ready" && (
-        <section className="px-4 pb-6">
-          <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-pink-orange p-5 text-white min-h-[180px] flex flex-col justify-between">
-            <div className="absolute top-0 right-0 opacity-20">
-              <Sparkles size={120} />
-            </div>
-            <div className="relative z-10">
-              <div className="flex items-center gap-2 mb-2">
-                <Zap size={20} className="animate-pulse" />
-                <h3 className="text-xl font-black italic uppercase tracking-tighter">
-                  ¡Estás a Tiempo!
-                </h3>
-              </div>
-              <p className="text-sm font-bold opacity-90 mb-4">
-                Agregá más artículos a tu pedido. Se cargarán y pagarán junto con tu orden actual.
-              </p>
-              <div className="flex gap-2">
-                <Button variant="glass-light" size="sm" className="flex-1">
-                  <TrendingUp size={14} />
-                  Ver Ofertas
-                </Button>
-                <Link href="/scan" className="flex-1">
-                  <Button variant="glass-light" size="sm" className="w-full">
-                    Escanear Más
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
-
       {/* Products Carousel - Compact like cart */}
       <section className="px-4 pb-6">
         <BeforeCheckoutCarousel
@@ -325,7 +291,7 @@ export default function ConfirmationPage() {
       <section className="px-4 pb-6">
         <div className="mb-4">
           <h3 className="text-xl font-black italic uppercase tracking-tighter">
-            Ofertas del <span className="gradient-text-tertiary">Patio de Comidas</span>
+            Ofertas del <span className="gradient-text-logo">Patio de Comidas</span>
           </h3>
           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">
             Disfrutá mientras esperás tu pedido
@@ -394,75 +360,94 @@ export default function ConfirmationPage() {
         </div>
       </section>
 
-      {/* Picky Lounge - Always visible */}
-      <section className="px-4 pb-6 space-y-6">
-        <div className="group relative overflow-hidden rounded-[3rem] bg-white dark:bg-slate-800 shadow-xl border border-slate-100 dark:border-slate-700">
-            <div className="aspect-[16/10] relative overflow-hidden">
-                <Image 
-                    src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&q=80&w=800"
-                    alt="Picky Lounge"
-                    fill
-                    className="object-cover transition-transform duration-1000 group-hover:scale-110"
-                    unoptimized
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-            </div>
-            <div className="p-8">
-                <div className="flex justify-between items-start">
-                    <div>
-                        <h4 className="text-2xl font-black italic uppercase tracking-tighter gradient-text-logo">Picky Lounge</h4>
-                        <p className="text-xs font-medium text-slate-500 mt-2 leading-relaxed">
-                          Disfrutá un café de especialidad mientras preparamos tu orden.
-                        </p>
-                    </div>
-                    <div className="size-12 bg-gradient-tertiary rounded-2xl flex items-center justify-center text-white glow-tertiary">
-                        <UtensilsCrossed size={20} />
-                    </div>
-                </div>
-                <div className="mt-8 flex justify-between items-center">
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Planta Alta • 50m</span>
-                    <button className="flex items-center gap-2 rounded-full bg-gradient-logo px-6 py-2.5 text-[10px] font-black text-white uppercase tracking-widest shadow-xl">
-                        Como llegar
-                        <ChevronRight size={14} strokeWidth={3} />
-                    </button>
-                </div>
-            </div>
+      {/* Espacios Picky - Reemplazando Picky Lounge y Kids Zone por el diseño de Ofertas */}
+      <section className="px-4 pb-12">
+        <div className="mb-4">
+          <h3 className="text-xl font-black italic uppercase tracking-tighter">
+            Espacios <span className="gradient-text-logo">Picky</span>
+          </h3>
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">
+            Disfrutá mientras esperás tu pedido
+          </p>
         </div>
-      </section>
 
-      {/* Kids Zone - New section similar to Picky Lounge */}
-      <section className="px-4 pb-12 space-y-6">
-        <div className="group relative overflow-hidden rounded-[3rem] bg-white dark:bg-slate-800 shadow-xl border border-slate-100 dark:border-slate-700">
-            <div className="aspect-[16/10] relative overflow-hidden">
-                <Image 
-                    src="https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?auto=format&fit=crop&q=80&w=800"
-                    alt="Picky Kids Zone"
-                    fill
-                    className="object-cover transition-transform duration-1000 group-hover:scale-110"
-                    unoptimized
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+        <div className="flex gap-4 overflow-x-auto no-scrollbar pb-4">
+          {/* Picky Lounge */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="shrink-0 w-72 rounded-[2.5rem] overflow-hidden bg-white dark:bg-slate-800 shadow-xl border border-slate-100 dark:border-slate-700 group"
+          >
+            <div className="relative h-40 overflow-hidden">
+              <Image 
+                  src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&q=80&w=800"
+                  alt="Picky Lounge"
+                  fill
+                  className="object-cover transition-transform duration-700 group-hover:scale-110"
+                  unoptimized
+              />
+              <div className="absolute inset-0 bg-gradient-to-br from-tertiary to-secondary opacity-40"></div>
+              <div className="absolute top-4 right-4">
+                <span className="bg-white/90 backdrop-blur-sm text-slate-900 px-3 py-1.5 rounded-full text-[10px] uppercase font-black tracking-widest">
+                  Planta Alta
+                </span>
+              </div>
             </div>
-            <div className="p-8">
-                <div className="flex justify-between items-start">
-                    <div>
-                        <h4 className="text-2xl font-black italic uppercase tracking-tighter gradient-text-secondary">Picky Kids Zone</h4>
-                        <p className="text-xs font-medium text-slate-500 mt-2 leading-relaxed">
-                          Espacio de entretenimiento para los más chicos con juegos y actividades.
-                        </p>
-                    </div>
-                    <div className="size-12 bg-gradient-pink-orange rounded-2xl flex items-center justify-center text-white glow-secondary">
-                        <Baby size={20} />
-                    </div>
-                </div>
-                <div className="mt-8 flex justify-between items-center">
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Planta Baja • 30m</span>
-                    <button className="flex items-center gap-2 rounded-full bg-gradient-pink-orange px-6 py-2.5 text-[10px] font-black text-white uppercase tracking-widest shadow-xl glow-secondary">
-                        Como llegar
-                        <ChevronRight size={14} strokeWidth={3} />
-                    </button>
-                </div>
+            <div className="p-6">
+              <div className="flex items-center gap-2 mb-2">
+                <UtensilsCrossed size={16} className="text-tertiary" />
+                <h4 className="text-xl font-black italic uppercase tracking-tighter gradient-text-logo">
+                  Picky Lounge
+                </h4>
+              </div>
+              <p className="text-[10px] font-medium text-slate-500 mb-4 leading-relaxed line-clamp-2">
+                Café de especialidad mientras preparamos tu orden.
+              </p>
+              <Button variant="outline" size="sm" className="w-full gap-2 rounded-xl text-xs font-black uppercase tracking-widest text-slate-500 hover:text-primary hover:border-primary">
+                <MapPin size={14} />
+                Como llegar (50m)
+              </Button>
             </div>
+          </motion.div>
+
+          {/* Picky Kids Zone */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.1 }}
+            className="shrink-0 w-72 rounded-[2.5rem] overflow-hidden bg-white dark:bg-slate-800 shadow-xl border border-slate-100 dark:border-slate-700 group"
+          >
+            <div className="relative h-40 overflow-hidden">
+              <Image 
+                  src="https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?auto=format&fit=crop&q=80&w=800"
+                  alt="Picky Kids Zone"
+                  fill
+                  className="object-cover transition-transform duration-700 group-hover:scale-110"
+                  unoptimized
+              />
+              <div className="absolute inset-0 bg-gradient-to-br from-secondary to-primary opacity-40"></div>
+              <div className="absolute top-4 right-4">
+                <span className="bg-white/90 backdrop-blur-sm text-slate-900 px-3 py-1.5 rounded-full text-[10px] uppercase font-black tracking-widest">
+                  Planta Baja
+                </span>
+              </div>
+            </div>
+            <div className="p-6">
+              <div className="flex items-center gap-2 mb-2">
+                <Baby size={16} className="text-secondary" />
+                <h4 className="text-xl font-black italic uppercase tracking-tighter gradient-text-secondary">
+                  Kids Zone
+                </h4>
+              </div>
+              <p className="text-[10px] font-medium text-slate-500 mb-4 leading-relaxed line-clamp-2">
+                Juegos y actividades de entretenimiento infantil.
+              </p>
+              <Button variant="outline" size="sm" className="w-full gap-2 rounded-xl text-xs font-black uppercase tracking-widest text-slate-500 hover:text-secondary hover:border-secondary">
+                <MapPin size={14} />
+                Como llegar (30m)
+              </Button>
+            </div>
+          </motion.div>
         </div>
       </section>
     </div>

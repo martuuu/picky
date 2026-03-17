@@ -305,39 +305,6 @@ export default function OrderStatusPage({ params }: { params: Promise<{ id: stri
         </section>
       )}
 
-      {/* Add More Items Section - Only show if not ready */}
-      {currentStatus !== "ready" && (
-        <section className="px-6 pb-6">
-          <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-pink-orange p-6 text-white">
-            <div className="absolute top-0 right-0 opacity-20">
-              <Sparkles size={120} />
-            </div>
-            <div className="relative z-10">
-              <div className="flex items-center gap-2 mb-2">
-                <Zap size={20} className="animate-pulse" />
-                <h3 className="text-xl font-black italic uppercase tracking-tighter">
-                  ¡Estás a Tiempo!
-                </h3>
-              </div>
-              <p className="text-sm font-bold opacity-90 mb-4">
-                Agregá más artículos a tu pedido antes de que esté listo
-              </p>
-              <div className="flex gap-2">
-                <Button variant="glass-light" size="sm" className="flex-1">
-                  <TrendingUp size={14} />
-                  Ver Ofertas
-                </Button>
-                <Link href="/scan" className="flex-1">
-                  <Button variant="glass-light" size="sm" className="w-full">
-                    Escanear Más
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
-
       {/* Related Products Carousel */}
       <section className="px-6 pb-6">
         <ProductCarousel
