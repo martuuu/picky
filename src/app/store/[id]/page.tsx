@@ -142,7 +142,7 @@ export default function StoreProductDetail({ params }: { params: Promise<{ id: s
             </button>
             <button
               onClick={() => setShowQR(!showQR)}
-              className="h-9 px-4 rounded-xl bg-gradient-logo-full text-white text-[10px] font-black uppercase tracking-widest flex items-center gap-2 shadow-md active:scale-95"
+              className="h-9 px-4 rounded-xl bg-gradient-purple-pink text-white text-[10px] font-black uppercase tracking-widest flex items-center gap-2 shadow-md active:scale-95"
             >
               <QrCode size={14} />
               Ver QR
@@ -190,7 +190,7 @@ export default function StoreProductDetail({ params }: { params: Promise<{ id: s
                     <Printer size={13} />
                     Imprimir
                   </button>
-                  <button className="h-9 rounded-xl bg-gradient-logo-full text-[9px] font-black uppercase tracking-widest flex items-center justify-center gap-2 text-white shadow-sm">
+                  <button className="h-9 rounded-xl bg-gradient-purple-pink text-[9px] font-black uppercase tracking-widest flex items-center justify-center gap-2 text-white shadow-sm">
                     <Download size={13} />
                     Descargar
                   </button>

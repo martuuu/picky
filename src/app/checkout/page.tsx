@@ -45,6 +45,10 @@ export default function CheckoutPage() {
   const tax = subtotal * 0.21;
   const shipping = pickupMethod === "delivery" ? 8500 : 0;
   const finalTotal = subtotal + tax + shipping;
+  // Descuento por pago en efectivo (15%)
+  const cashDiscountRate = 0.15;
+  const finalTotalCash = finalTotal * (1 - cashDiscountRate);
+  const cashSaving = finalTotal - finalTotalCash;
 
   const handleNextStep = (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,7 +81,7 @@ export default function CheckoutPage() {
             <h2 className="text-xl font-black uppercase italic tracking-tighter text-slate-900 dark:text-white">Tu canasta está vacía</h2>
             <p className="text-slate-500 text-sm mt-2 font-bold">Agregá productos para iniciar la compra.</p>
             <Link href="/scan" className="mt-8">
-                <Button variant="gradient-logo" className="rounded-2xl px-8 h-14 uppercase italic font-black shadow-xl">Volver al Scanner</Button>
+                <Button variant="gradient-purple-pink" className="rounded-2xl px-8 h-14 uppercase italic font-black shadow-xl">Volver al Scanner</Button>
             </Link>
         </div>
       );
@@ -321,7 +325,7 @@ export default function CheckoutPage() {
                                 </div>
                             </div>
 
-                            <Button type="submit" variant="gradient-logo" className="w-full h-16 rounded-[2rem] text-lg font-black uppercase italic shadow-2xl">
+                            <Button type="submit" variant="gradient-purple-pink" className="w-full h-16 rounded-[2rem] text-lg font-black uppercase italic shadow-2xl">
                                 Continuar al Pago
                                 <ChevronRight size={24} strokeWidth={3} />
                             </Button>
@@ -462,27 +466,71 @@ export default function CheckoutPage() {
 
                             <label className="group cursor-pointer">
                                 <input type="radio" name="payment" className="peer sr-only" checked={paymentMethod === "cash"} onChange={() => setPaymentMethod("cash")} />
-                                <div className="flex items-center gap-4 p-5 rounded-[2rem] bg-white dark:bg-slate-800 border-2 border-transparent peer-checked:border-primary peer-checked:bg-primary/5 transition-all shadow-sm">
+                                <div className="flex items-center gap-4 p-5 rounded-[2rem] bg-white dark:bg-slate-800 border-2 border-transparent peer-checked:border-primary peer-checked:bg-primary/5 transition-all shadow-sm relative overflow-hidden">
+                                    <div className="absolute top-0 right-0 bg-emerald-500 rounded-bl-2xl text-white text-[8px] font-black px-3 py-1 uppercase shadow-md">
+                                        -15% OFF
+                                    </div>
                                     <div className="size-12 rounded-2xl bg-green-50 dark:bg-green-900/20 flex items-center justify-center text-green-600">
                                         <Banknote size={24} />
                                     </div>
                                     <div className="flex-1">
                                         <p className="font-black text-sm uppercase italic">Efectivo en Caja</p>
-                                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Abonás al retirar</p>
+                                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Abonás al retirar</p>
                                     </div>
                                 </div>
                             </label>
                         </div>
                     </div>
 
+                    {/* Totales dinámicos por método de pago */}
+                    <div className="bg-white dark:bg-slate-800 rounded-[2rem] border border-slate-100 dark:border-slate-700 overflow-hidden shadow-sm">
+                      <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-700">
+                        <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">Resumen</p>
+                      </div>
+                      <div className="px-5 py-4 space-y-2.5">
+                        <div className="flex justify-between items-center text-[10px] font-bold text-slate-500">
+                          <span className="uppercase tracking-wider">Subtotal s/ IVA</span>
+                          <span className="text-slate-900 dark:text-white font-black">${subtotal.toLocaleString("es-AR")}</span>
+                        </div>
+                        <div className="flex justify-between items-center text-[10px] font-bold text-slate-500">
+                          <span className="uppercase tracking-wider">IVA (21%)</span>
+                          <span className="text-slate-900 dark:text-white font-black">${tax.toLocaleString("es-AR")}</span>
+                        </div>
+                        {shipping > 0 && (
+                          <div className="flex justify-between items-center text-[10px] font-bold text-slate-500">
+                            <span className="uppercase tracking-wider">Envío</span>
+                            <span className="text-slate-900 dark:text-white font-black">${shipping.toLocaleString("es-AR")}</span>
+                          </div>
+                        )}
+                        <div className="h-px bg-slate-100 dark:bg-slate-700 my-1" />
+                        {paymentMethod === "cash" ? (
+                          <>
+                            <div className="flex justify-between items-center">
+                              <span className="text-[10px] font-black uppercase tracking-wider text-emerald-600">Descuento efectivo (15%)</span>
+                              <span className="text-[10px] font-black text-emerald-600">-${cashSaving.toLocaleString("es-AR")}</span>
+                            </div>
+                            <div className="flex justify-between items-end bg-emerald-50 dark:bg-emerald-500/10 rounded-2xl px-4 py-3">
+                              <span className="text-[11px] font-black uppercase tracking-wider text-emerald-700 dark:text-emerald-400">Total Efectivo</span>
+                              <span className="text-2xl font-black italic tracking-tighter text-emerald-600 dark:text-emerald-400">${finalTotalCash.toLocaleString("es-AR")}</span>
+                            </div>
+                          </>
+                        ) : (
+                          <div className="flex justify-between items-end bg-slate-50 dark:bg-slate-900/50 rounded-2xl px-4 py-3">
+                            <span className="text-[11px] font-black uppercase tracking-wider text-slate-600 dark:text-slate-300">Total con Tarjeta</span>
+                            <span className="text-2xl font-black italic tracking-tighter text-slate-900 dark:text-white">${finalTotal.toLocaleString("es-AR")}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
                     <div className="pt-2">
                         <Button 
                             onClick={handlePay}
                             disabled={processing}
-                            variant="gradient-logo"
+                            variant="gradient-purple-pink"
                             className="w-full h-18 rounded-[2rem] text-xl font-black uppercase italic shadow-2xl"
                         >
-                            {processing ? "Procesando el Pago..." : "Finalizar Compra"}
+                            {processing ? "Procesando el Pago..." : `Finalizar · $${(paymentMethod === 'cash' ? finalTotalCash : finalTotal).toLocaleString("es-AR")}`}
                         </Button>
                     </div>
 

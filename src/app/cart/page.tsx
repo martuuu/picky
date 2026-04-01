@@ -2,14 +2,13 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, ScanBarcode, ChevronRight, ShoppingBag, Sparkles } from "lucide-react";
+import { ArrowLeft, ScanBarcode, ChevronRight, ShoppingBag } from "lucide-react";
 import { useCartStore, CartItem, getItemPricing } from "@/stores/useCartStore";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { CartItemCard } from "@/components/ui/CartItemCard";
-import { BeforeCheckoutCarousel } from "@/components/ui/BeforeCheckoutCarousel";
 import { motion, AnimatePresence } from "framer-motion";
-import { products } from "@/lib/data";
+
 
 
 
@@ -82,16 +81,7 @@ export default function CartPage() {
         </AnimatePresence>
       </main>
 
-      {/* Before Checkout Carousel - Solo si hay items */}
-      {items.length > 0 && (
-        <section className="px-6 pb-12 mb-10 pt-8 mt-4 border-t border-slate-100 dark:border-slate-800">
-          <BeforeCheckoutCarousel
-            products={products.slice(0, 5)}
-            title="Antes de Comprar..."
-            subtitle="Productos que escaneaste pero no agregaste"
-          />
-        </section>
-      )}
+
 
       {/* Footer Info */}
       {items.length > 0 && (
@@ -128,7 +118,7 @@ export default function CartPage() {
                     </div>
                     <div className="h-px bg-slate-200 dark:bg-slate-700 w-full border-t border-dashed my-2"></div>
                     <div className="flex items-end justify-between">
-                        <span className="text-[10px] font-black uppercase gradient-text-primary tracking-widest leading-none mb-1">Total Final</span>
+                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Total Final</span>
                         <motion.span 
                             key={`total-${finalTotal}`}
                             initial={{ scale: 1.15, color: '#a855f7' }}

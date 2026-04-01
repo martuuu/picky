@@ -95,7 +95,7 @@ function QRModal({ product, onClose }: { product: Product; onClose: () => void }
               a.download = `QR-${product.sku}.svg`;
               a.click();
             }}
-            className="flex items-center justify-center gap-2 h-11 rounded-2xl bg-gradient-logo-full text-white text-[10px] font-black uppercase tracking-widest active:scale-95 transition-all shadow-md"
+            className="flex items-center justify-center gap-2 h-11 rounded-2xl bg-gradient-purple-pink text-white text-[10px] font-black uppercase tracking-widest active:scale-95 transition-all shadow-md"
           >
             <Download size={15} />
             Descargar
@@ -226,7 +226,7 @@ export default function StoreManager() {
               <Bell size={16} />
               {criticalCount > 0 && <span className="absolute top-1 right-1 size-2 bg-red-500 rounded-full" />}
             </button>
-            <button className="h-9 px-4 rounded-xl bg-gradient-logo-full text-white text-[10px] font-black uppercase tracking-widest flex items-center gap-2 shadow-md active:scale-95 transition-all">
+            <button className="h-9 px-4 rounded-xl bg-gradient-purple-pink text-white text-[10px] font-black uppercase tracking-widest flex items-center gap-2 shadow-md active:scale-95 transition-all">
               <Plus size={15} />
               Nuevo Producto
             </button>

@@ -39,14 +39,11 @@ export function CartItemCard({ item, onUpdateQuantity, onRemove }: CartItemCardP
       className="bg-white dark:bg-slate-800/50 rounded-2xl p-3 border border-slate-100 dark:border-slate-800 shadow-sm mb-3 overflow-hidden"
     >
       <div className="flex items-center justify-between relative gap-3">
-        {/* Info del producto: Nombre y Categoría */}
+        {/* Info del producto: Nombre */}
         <div className="flex-[2] min-w-0">
-          <h3 className="text-[10px] font-black uppercase italic leading-tight text-slate-900 dark:text-white line-clamp-2">
+          <h3 className="text-[10px] font-bold uppercase leading-tight text-slate-900 dark:text-white line-clamp-2">
             {item.name}
           </h3>
-          <p className="text-[8px] font-black uppercase tracking-[0.2em] text-slate-400 mt-0.5 truncate">
-            {item.category}
-          </p>
         </div>
 
         {/* Quantity Controls - Middle */}
@@ -106,7 +103,7 @@ export function CartItemCard({ item, onUpdateQuantity, onRemove }: CartItemCardP
                   Ahorrás ${totalSaving.toLocaleString("es-AR")}
                 </span>
               )}
-              <p className="text-base font-black italic tracking-tighter gradient-text-primary leading-none text-right">
+              <p className="text-base font-black italic tracking-tighter text-slate-900 dark:text-white leading-none text-right">
                 ${subtotal.toLocaleString("es-AR")}
               </p>
             </motion.div>

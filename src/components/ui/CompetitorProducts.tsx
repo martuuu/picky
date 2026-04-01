@@ -16,16 +16,16 @@ export function CompetitorProducts({ currentProduct, allProducts }: CompetitorPr
       p.category === currentProduct.category && 
       p.id !== currentProduct.id
     )
-    .slice(0, 4); // Show max 4 competitors
+    .slice(0, 6); // Show max 6 competitors
 
   // Fallback for prototype: Simulate competitors based on the current product
   if (competitors.length === 0) {
     competitors = allProducts
       .filter(p => p.id !== currentProduct.id)
-      .slice(0, 4)
+      .slice(0, 6)
       .map((p, index) => ({
         ...p,
-        name: `${currentProduct.name.split(' ')[0]} ${index === 0 ? 'Premium' : index === 1 ? 'Standard' : index === 2 ? 'Pro' : 'Eco'} Alternativo`,
+        name: `${currentProduct.name.split(' ')[0]} ${['Premium', 'Standard', 'Pro', 'Eco', 'Max', 'Lite'][index] || 'Extra'} Alternativo`,
         category: currentProduct.category,
         image: currentProduct.image,
         price: index % 2 === 0 
@@ -49,7 +49,7 @@ export function CompetitorProducts({ currentProduct, allProducts }: CompetitorPr
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="flex overflow-x-auto gap-3 snap-x snap-mandatory custom-scrollbar pb-4 pr-4">
         {competitors.map((product) => {
             const isCheaper = product.price < currentProduct.price;
             const diffPerc = isCheaper
@@ -63,7 +63,7 @@ export function CompetitorProducts({ currentProduct, allProducts }: CompetitorPr
               <Link
                 key={product.id}
                 href={`/product/${product.sku}`}
-                className="group flex flex-col rounded-[2rem] overflow-hidden bg-slate-800 dark:bg-slate-800/80 border border-slate-700 shadow-xl transition-all hover:scale-[1.02]"
+                className="group min-w-[160px] snap-center shrink-0 flex flex-col rounded-[2rem] overflow-hidden bg-slate-800 dark:bg-slate-800/80 border border-slate-700 shadow-xl transition-all hover:scale-[1.02]"
               >
                 {/* Product Image Box */}
                 <div className="relative h-24 bg-slate-900/50 p-2 flex items-center justify-center">
@@ -93,7 +93,7 @@ export function CompetitorProducts({ currentProduct, allProducts }: CompetitorPr
                   </div>
                   
                   <div className="mt-2 flex items-center justify-between">
-                    <p className="text-sm font-black gradient-text-tertiary leading-none">
+                    <p className="text-sm font-black text-white leading-none">
                       ${product.price.toLocaleString("es-AR")}
                     </p>
                     <button 

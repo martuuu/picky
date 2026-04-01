@@ -2,8 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Sparkles, Percent, ShoppingCart } from "lucide-react";
-import { Button } from "./Button";
+import { ShoppingCart, Percent } from "lucide-react";
 import { useCartStore } from "@/stores/useCartStore";
 import { showPickyAlert } from "./Alert";
 
@@ -48,6 +47,26 @@ const PROMOTIONS: Promotion[] = [
     finalPrice: 30000,
     image: "https://images.unsplash.com/photo-1581094794329-c8112a89af12?auto=format&fit=crop&q=80&w=800",
     type: "promo"
+  },
+  {
+    id: 4,
+    title: "Kit Construcción",
+    description: "Balde + Cuchara",
+    discount: 20,
+    originalPrice: 42000,
+    finalPrice: 33600,
+    image: "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&q=80&w=800",
+    type: "combo"
+  },
+  {
+    id: 5,
+    title: "Pinceles Profesionales",
+    description: "2x1 en herramientas",
+    discount: 50,
+    originalPrice: 18000,
+    finalPrice: 9000,
+    image: "https://images.unsplash.com/photo-1563861826131-7bcba75024d9?auto=format&fit=crop&q=80&w=800",
+    type: "promo"
   }
 ];
 
@@ -71,24 +90,46 @@ export function PromotionsSection() {
   };
 
   return (
-    <div className="space-y-4">
-      {/* Header */}
-      <div>
-        <h3 className="text-lg font-black italic uppercase tracking-tighter">
-          Promociones <span className="gradient-text-logo">&</span> Combos
-        </h3>
+    <section className="pb-2">
+      {/* Header — igual que La Competencia */}
+      <div className="mb-4">
+        <div>
+          <h3 className="text-lg font-black italic uppercase tracking-tighter">
+            Promociones & Combos
+          </h3>
+        </div>
+        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+          Ofertas especiales en tu tienda
+        </p>
       </div>
 
-      {/* Promotions Grid */}
-      <div className="space-y-3">
+      {/* Carousel de cards */}
+      <div className="flex overflow-x-auto gap-3 snap-x snap-mandatory custom-scrollbar pb-4 pr-4">
         {PROMOTIONS.map((promo) => (
           <div
             key={promo.id}
-            className="relative overflow-hidden rounded-2xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-lg group"
+            className="group min-w-[160px] snap-center shrink-0 flex flex-col rounded-[2rem] overflow-hidden bg-slate-800 dark:bg-slate-800/80 border border-slate-700 shadow-xl transition-all hover:scale-[1.02]"
           >
-            <div className="flex gap-4 p-4">
-              {/* Image */}
-              <Link href="/scan" className="block relative w-24 h-24 rounded-xl overflow-hidden bg-slate-50 dark:bg-slate-900 shrink-0">
+            {/* Product Image Box — full, grande como en Competencia */}
+            <div className="relative h-24 bg-slate-900/50">
+              {/* Discount badge — 2-color gradient */}
+              <div className="absolute top-2 right-2 z-10">
+                <div className="bg-gradient-purple-pink text-white rounded-lg px-2 py-1 flex items-center gap-0.5 shadow-lg">
+                  <Percent size={9} strokeWidth={3} />
+                  <span className="text-[10px] font-black">{promo.discount}</span>
+                </div>
+              </div>
+              {/* Type badge */}
+              <div className="absolute top-2 left-2 z-10">
+                <span className={`text-[7px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md ${
+                  promo.type === "combo"
+                    ? "bg-secondary/80 text-white"
+                    : "bg-primary/80 text-white"
+                }`}>
+                  {promo.type === "combo" ? "Combo" : "Promo"}
+                </span>
+              </div>
+              <div className="relative w-full h-full overflow-hidden">
                 <Image
                   src={promo.image}
                   alt={promo.title}
@@ -96,61 +137,40 @@ export function PromotionsSection() {
                   className="object-cover group-hover:scale-110 transition-transform duration-500"
                   unoptimized
                 />
-                {/* Discount Badge */}
-                <div className="absolute top-2 right-2">
-                  <div className="bg-gradient-logo-full text-white rounded-lg px-2 py-1 flex items-center gap-1 shadow-lg">
-                    <Percent size={10} strokeWidth={3} />
-                    <span className="text-xs font-black">{promo.discount}</span>
-                  </div>
-                </div>
-              </Link>
+              </div>
+            </div>
 
-              {/* Info */}
-              <div className="flex-1 flex flex-col justify-between min-w-0">
-                {/* Title & Description */}
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className={`px-2 py-0.5 rounded-md text-[8px] font-black uppercase tracking-wider ${
-                      promo.type === "combo" 
-                        ? "bg-tertiary/10 dark:bg-tertiary/20 gradient-text-logo"
-                        : "bg-secondary/10 dark:bg-secondary/20 gradient-text-logo"
-                    }`}>
-                      {promo.type === "combo" ? "Combo" : "Promo"}
-                    </span>
-                  </div>
-                  <Link href="/scan" className="block">
-                    <h4 className="font-black text-sm uppercase italic leading-tight text-slate-900 dark:text-white hover:text-primary transition-colors">
-                      {promo.title}
-                    </h4>
-                  </Link>
-                  <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium mt-1">
-                    {promo.description}
-                  </p>
-                </div>
+            {/* Info Container — mismo estilo que Competencia */}
+            <div className="flex flex-col flex-1 p-3 justify-between bg-slate-800/40">
+              <div className="space-y-0.5">
+                <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">
+                  {promo.description}
+                </p>
+                <h4 className="font-black text-[9px] uppercase italic leading-tight line-clamp-2 text-white/90 group-hover:text-white transition-colors">
+                  {promo.title}
+                </h4>
+              </div>
 
-                {/* Price & Action */}
-                <div className="flex items-end justify-between mt-2">
-                  <div className="flex flex-col">
-                    <span className="text-[9px] text-slate-400 line-through font-bold">
-                      ${promo.originalPrice.toLocaleString("es-AR")}
-                    </span>
-                    <span className="text-xl font-black gradient-text-logo">
-                      ${promo.finalPrice.toLocaleString("es-AR")}
-                    </span>
-                  </div>
-
-                  <button 
-                    onClick={() => handleAddPromo(promo)}
-                    className="size-10 rounded-xl bg-gradient-logo-full text-white shadow-lg flex items-center justify-center hover:scale-110 active:scale-95 transition-all"
-                  >
-                    <ShoppingCart size={18} strokeWidth={2.5} />
-                  </button>
+              <div className="mt-2 flex items-center justify-between">
+                <div className="flex flex-col">
+                  <span className="text-[8px] text-slate-400 line-through font-bold leading-none">
+                    ${promo.originalPrice.toLocaleString("es-AR")}
+                  </span>
+                  <span className="text-sm font-black text-white leading-tight">
+                    ${promo.finalPrice.toLocaleString("es-AR")}
+                  </span>
                 </div>
+                <button
+                  onClick={() => handleAddPromo(promo)}
+                  className="size-7 rounded-lg bg-gradient-purple-pink text-white shadow-lg flex items-center justify-center hover:scale-110 active:scale-95 transition-all"
+                >
+                  <ShoppingCart size={13} strokeWidth={2.5} />
+                </button>
               </div>
             </div>
           </div>
         ))}
       </div>
-    </div>
+    </section>
   );
 }

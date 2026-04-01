@@ -44,7 +44,7 @@ export default function FinalizadoPage() {
             initial={{ scale: 0.5, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ type: "spring", damping: 15 }}
-            className="size-32 rounded-[3xl] bg-gradient-logo flex items-center justify-center text-white shadow-2xl glow-primary mt-6"
+            className="size-32 rounded-[3xl] bg-gradient-purple-pink flex items-center justify-center text-white shadow-2xl glow-primary mt-6"
           >
               <Check size={64} strokeWidth={3} />
           </motion.div>
@@ -115,7 +115,7 @@ export default function FinalizadoPage() {
 
                     <Button 
                         type="submit" 
-                        variant="gradient-logo" 
+                        variant="gradient-purple-pink" 
                         className="w-full shadow-lg"
                         disabled={rating === 0}
                     >

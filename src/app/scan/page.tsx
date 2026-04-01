@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronLeft, ChevronDown, Flashlight, Minus, Plus, ShoppingBag, ExternalLink, CheckCircle2, Tag, Layers, Package } from "lucide-react";
+import { ChevronLeft, ChevronDown, Flashlight, Minus, Plus, ShoppingBag, CheckCircle2, Tag, Layers, Package, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { motion, AnimatePresence } from "framer-motion";
 import { products, Product } from "@/lib/data";
@@ -43,19 +43,14 @@ function QuantityDiscountsExpandable({ scannedProduct, quantity, setQuantity }: 
       <motion.div layout className="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden border border-slate-100 dark:border-slate-800 shadow-sm relative z-10 w-full mb-2">
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="w-full flex items-center justify-between p-4 text-left active:scale-[0.98] transition-all"
+          className="w-full flex items-center justify-between px-4 py-3 text-left active:scale-[0.98] transition-all"
         >
-          <div className="flex items-center gap-3">
-            <div className="size-8 rounded-xl bg-gradient-logo-full text-white flex items-center justify-center shadow-md">
-              <Tag size={16} />
-            </div>
-            <div className="flex flex-col">
-              <span className="font-black text-sm italic uppercase tracking-tight">Oferta Mayorista / Promos</span>
-              <span className="text-[9px] font-bold text-slate-400">Ver descuentos por cantidad</span>
-            </div>
+          <div className="flex flex-col">
+            <span className="font-black text-xs italic uppercase tracking-tight">Oferta Mayorista / Promos</span>
+            <span className="text-[9px] font-bold text-slate-400">Ver descuentos por cantidad</span>
           </div>
           <motion.div animate={{ rotate: isExpanded ? 180 : 0 }}>
-            <ChevronDown size={20} className="text-slate-400" />
+            <ChevronDown size={18} className="text-slate-400" />
           </motion.div>
         </button>
         
@@ -84,9 +79,8 @@ function QuantityDiscountsExpandable({ scannedProduct, quantity, setQuantity }: 
                       }`}
                     >
                       {isActive && (
-                        <div className="absolute inset-0 rounded-xl bg-gradient-logo-full opacity-10 -z-10" />
+                        <div className="absolute inset-0 rounded-xl bg-gradient-purple-pink opacity-10 -z-10" />
                       )}
-                      <span className={isActive ? 'text-primary' : ''}>{promo.icon}</span>
                       <span className={isActive ? 'text-primary' : ''}>{promo.label}</span>
                       <span className={`font-black ml-auto ${isActive ? 'text-primary' : ''}`}>
                         {isActive ? '✓ APLICADO' : `→ APLICAR`}
@@ -123,6 +117,7 @@ export default function ScanPage() {
   const [quantity, setQuantity] = useState(1);
   const { addItem, items } = useCartStore();
   const [mounted, setMounted] = useState(false);
+  const [showDescFull, setShowDescFull] = useState(false);
 
   // Splash animation state
   const [showCartSplash, setShowCartSplash] = useState(false);
@@ -223,7 +218,7 @@ export default function ScanPage() {
                     <Flashlight size={22} />
                   </button>
 
-                  {/* Carrito con label y splash */}
+                  {/* Carrito */}
                   <Link href="/cart">
                     <div className="relative flex flex-col items-center gap-0.5">
                       <button className="relative flex items-center justify-center size-12 rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-white transition-all active:scale-90">
@@ -234,7 +229,7 @@ export default function ScanPage() {
                               initial={{ scale: 0 }}
                               animate={{ scale: 1 }}
                               exit={{ scale: 0 }}
-                              className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-gradient-logo-full text-[10px] font-black text-white border-2 border-black shadow-md"
+                              className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-gradient-purple-pink text-[10px] font-black text-white border-2 border-black shadow-md"
                             >
                               {itemCount}
                             </motion.span>
@@ -248,7 +243,7 @@ export default function ScanPage() {
                               animate={{ scale: 1, opacity: 1 }}
                               exit={{ scale: 1.5, opacity: 0 }}
                               transition={{ type: "spring", stiffness: 400, damping: 20 }}
-                              className="absolute inset-0 rounded-full bg-emerald-500 flex items-center justify-center z-10"
+                              className="absolute inset-0 rounded-full bg-tertiary flex items-center justify-center z-10"
                             >
                               <CheckCircle2 size={22} className="text-white" strokeWidth={2.5} />
                             </motion.div>
@@ -269,7 +264,7 @@ export default function ScanPage() {
                 >
                   <button
                     onClick={handleGoToProduct}
-                    className="px-4 py-1.5 rounded-full bg-gradient-tertiary-yellow backdrop-blur-xl border border-tertiary/30 glow-tertiary shadow-xl hover:scale-105 active:scale-95 transition-all text-white text-[9px] font-black tracking-widest uppercase"
+                    className="px-4 py-1.5 rounded-full bg-gradient-purple-pink backdrop-blur-xl border border-primary/30 glow-primary shadow-xl hover:scale-105 active:scale-95 transition-all text-white text-[9px] font-black tracking-widest uppercase"
                   >
                     Info Técnica
                   </button>
@@ -324,13 +319,33 @@ export default function ScanPage() {
               transition={{ type: "spring", damping: 25, stiffness: 250 }}
               className="bg-background-light dark:bg-background-dark rounded-t-[3.5rem] shadow-[0_-20px_60px_rgba(0,0,0,0.4)] flex flex-col border-t border-white/10 overflow-hidden"
             >
-              {/* Swipe Handle — sin texto "Ver más" */}
-              <div
-                className="w-full flex flex-col items-center pt-5 pb-2 cursor-pointer group shrink-0"
+              {/* Swipe Handle — with swipe-up gesture */}
+              <motion.div
+                key={`handle-drag-${status}`}
+                drag="y"
+                dragConstraints={{ top: 0, bottom: 0 }}
+                dragElastic={0.2}
+                onDragEnd={(_, info) => {
+                  if (status === 'scanned' && info.offset.y < -40) setStatus('expanded');
+                  else if (status === 'expanded' && info.offset.y > 40) setStatus('scanned');
+                }}
+                className="w-full flex flex-col items-center pt-5 pb-2 cursor-grab active:cursor-grabbing group shrink-0"
                 onClick={() => setStatus(status === 'scanned' ? 'expanded' : 'scanned')}
               >
                 <div className="h-1.5 w-14 rounded-full bg-slate-200 dark:bg-slate-800 transition-colors group-hover:bg-primary"></div>
-              </div>
+                {status === 'scanned' && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 4 }}
+                    animate={{ opacity: 1, y: [0, -3, 0] }}
+                    transition={{ duration: 1.5, repeat: Infinity }}
+                    className="flex items-center gap-1 mt-1.5"
+                  >
+                    <ChevronUp size={12} className="text-slate-400" />
+                    <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Deslizá para más</span>
+                    <ChevronUp size={12} className="text-slate-400" />
+                  </motion.div>
+                )}
+              </motion.div>
 
               <div className="flex-1 overflow-y-auto custom-scrollbar px-5 pb-28">
                 <AnimatePresence mode="wait">
@@ -359,12 +374,9 @@ export default function ScanPage() {
                         <h2 className="text-lg font-black text-slate-900 dark:text-white leading-tight uppercase italic tracking-tighter truncate">
                           {scannedProduct.name}
                         </h2>
-                        {/* Fila 2: Categoría */}
-                        <div className="flex items-center gap-2 mt-1">
-                          <span className="px-2 py-0.5 bg-primary/10 dark:bg-primary/20 gradient-text-logo rounded-lg text-[8px] font-black tracking-[0.2em] uppercase">
-                            {scannedProduct.category}
-                          </span>
-                        </div>
+                        {scannedProduct.brand && (
+                          <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">{scannedProduct.brand}</p>
+                        )}
                       </div>
                     </div>
 
@@ -372,11 +384,11 @@ export default function ScanPage() {
                     <div className="flex items-center gap-3 bg-slate-50 dark:bg-slate-900/50 rounded-2xl p-3 border border-slate-100 dark:border-slate-800">
                       {/* Precio */}
                       <div className="flex-1">
-                        <p className="gradient-text-logo font-black text-xl italic tracking-tighter leading-none">
+                        <p className="font-black text-xl italic tracking-tighter leading-none text-slate-900 dark:text-white">
                           ${effectiveUnitPrice.toLocaleString("es-AR")}
                         </p>
                         {activePromo && (
-                          <p className="text-[8px] text-slate-400 font-bold line-through mt-0.5">
+                          <p className="text-[8px] font-bold line-through mt-0.5 text-tertiary">
                             ${scannedProduct.price.toLocaleString("es-AR")}
                           </p>
                         )}
@@ -385,7 +397,7 @@ export default function ScanPage() {
                       {/* Stock */}
                       <div className="flex flex-col items-center px-3 border-x border-slate-200 dark:border-slate-700">
                         <span className="text-[8px] font-black uppercase tracking-wider text-slate-400">Stock</span>
-                        <span className={`text-xs font-black ${scannedProduct.stock < 10 ? 'text-orange-500' : 'text-emerald-500'}`}>
+                        <span className="text-xs font-black text-orange-500">
                           {scannedProduct.stock}
                         </span>
                       </div>
@@ -401,7 +413,7 @@ export default function ScanPage() {
                         <span className="text-sm font-black min-w-[1rem] text-center italic">{quantity}</span>
                         <button
                           onClick={() => setQuantity(Math.min(scannedProduct.stock, quantity + 1))}
-                          className="size-7 rounded-lg bg-gradient-logo-full text-white shadow-md flex items-center justify-center active:scale-90 transition-all"
+                          className="size-7 rounded-lg bg-gradient-purple-pink text-white shadow-md flex items-center justify-center active:scale-90 transition-all"
                         >
                           <Plus size={13} strokeWidth={3} />
                         </button>
@@ -443,36 +455,45 @@ export default function ScanPage() {
                           <h1 className="text-xl font-black tracking-tighter text-slate-900 dark:text-white leading-none uppercase italic">
                             {scannedProduct.name}
                           </h1>
-                          <div className="flex items-center gap-2 mt-1">
-                            <span className="px-2 py-0.5 bg-primary/10 dark:bg-primary/20 gradient-text-logo rounded-lg text-[9px] font-black tracking-[0.2em] uppercase">
-                              {scannedProduct.category}
-                            </span>
-                          </div>
+                          {scannedProduct.brand && (
+                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">{scannedProduct.brand}</p>
+                          )}
                         </div>
                       </div>
-                      <p className="gradient-text-logo font-black text-3xl pt-1 italic tracking-tighter">
-                        ${effectiveUnitPrice.toLocaleString("es-AR")}
-                        <span className="text-sm text-slate-400 font-bold normal-case tracking-normal ml-2">
-                          c/u · Stock: {scannedProduct.stock}
-                        </span>
-                      </p>
+                      <div className="flex items-end gap-3">
+                        <p className="font-black text-3xl pt-1 italic tracking-tighter text-slate-900 dark:text-white">
+                          ${effectiveUnitPrice.toLocaleString("es-AR")}
+                        </p>
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-sm text-slate-400 font-bold">c/u</span>
+                          <span className="text-[9px] font-black text-orange-500 bg-orange-500/10 px-2 py-0.5 rounded-lg uppercase tracking-wider">Stock: {scannedProduct.stock}</span>
+                        </div>
+                      </div>
+                      {activePromo && (
+                        <p className="text-[10px] font-bold text-tertiary line-through">Precio original: ${scannedProduct.price.toLocaleString("es-AR")}</p>
+                      )}
                     </div>
 
                     <div className="space-y-4">
-                      {/* Descripción */}
+                      {/* Descripción — comprimida con toggle */}
                       <div className="bg-slate-50 dark:bg-slate-900/30 p-4 rounded-2xl border border-slate-100 dark:border-slate-800">
-                        <h3 className="text-lg font-black italic uppercase tracking-tighter mb-2">Descripción</h3>
-                        <p className="text-slate-500 dark:text-slate-400 leading-relaxed text-sm font-medium">
+                        <p className={`text-slate-500 dark:text-slate-400 leading-relaxed text-sm font-medium ${!showDescFull ? 'line-clamp-2' : ''}`}>
                           {scannedProduct.description}
                         </p>
+                        <button
+                          onClick={() => setShowDescFull(!showDescFull)}
+                          className="text-[9px] font-black text-primary uppercase tracking-widest mt-1"
+                        >
+                          {showDescFull ? 'Ver menos ↑' : 'Ver más ↓'}
+                        </button>
                       </div>
 
-                      {/* Specs Grid — movidas del Preview */}
+                      {/* Specs Grid — solo 2 specs */}
                       <div className="grid grid-cols-2 gap-2">
-                        {scannedProduct.specs.map((s, i) => (
+                        {scannedProduct.specs.slice(0, 2).map((s, i) => (
                           <div key={i} className="bg-white dark:bg-slate-800 p-3 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm">
                             <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1 leading-none">{s.label}</p>
-                            <p className="text-xs font-black truncate">{s.value}</p>
+                            <p className="text-xs font-bold truncate text-slate-900 dark:text-white">{s.value}</p>
                           </div>
                         ))}
                       </div>
@@ -487,7 +508,7 @@ export default function ScanPage() {
                                 key={j}
                                 className={`px-4 py-2 rounded-xl border-2 transition-all font-black text-[9px] uppercase ${
                                   j === 0
-                                    ? 'border-transparent bg-gradient-logo-full text-white shadow-lg'
+                                    ? 'border-transparent bg-gradient-purple-pink text-white shadow-lg'
                                     : 'border-slate-100 dark:border-slate-800 text-slate-400'
                                 }`}
                               >
@@ -523,7 +544,7 @@ export default function ScanPage() {
                           <span className="text-base font-black min-w-[1rem] text-center italic">{quantity}</span>
                           <button
                             onClick={() => setQuantity(Math.min(scannedProduct.stock, quantity + 1))}
-                            className="size-9 rounded-lg bg-gradient-logo-full text-white shadow-lg flex items-center justify-center active:scale-90 transition-all"
+                            className="size-9 rounded-lg bg-gradient-purple-pink text-white shadow-lg flex items-center justify-center active:scale-90 transition-all"
                           >
                             <Plus size={16} strokeWidth={3} />
                           </button>
@@ -544,10 +565,10 @@ export default function ScanPage() {
               </div>
 
               {/* Fixed Action Bar */}
-              <div className="absolute bottom-0 left-0 w-full z-50 p-5 bg-white/95 dark:bg-background-dark/95 backdrop-blur-xl border-t border-slate-100 dark:border-slate-800 shadow-2xl shrink-0">
+              <div className="absolute bottom-0 left-0 w-full z-50 p-4 bg-white/95 dark:bg-background-dark/95 backdrop-blur-xl border-t border-slate-100 dark:border-slate-800 shadow-2xl shrink-0 space-y-2">
                 <Button
                   onClick={handleAddToCart}
-                  variant="gradient-logo"
+                  variant="gradient-purple-pink"
                   className="w-full h-14 text-base font-black italic uppercase shadow-lg rounded-2xl gap-3 group relative overflow-hidden"
                 >
                   <AnimatePresence mode="wait">
@@ -574,6 +595,21 @@ export default function ScanPage() {
                     )}
                   </AnimatePresence>
                 </Button>
+                {/* Los botones Ver Carrito y Finalizar Compra se muestran solo cuando hay items */}
+                {/* {items.length > 0 && (
+                  <div className="grid grid-cols-2 gap-2">
+                    <Link href="/cart">
+                      <button className="w-full h-10 rounded-xl border-2 border-slate-200 dark:border-slate-700 text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-300 active:scale-95 transition-all">
+                        Ver Carrito ({items.reduce((a, i) => a + i.quantity, 0)})
+                      </button>
+                    </Link>
+                    <Link href="/checkout">
+                      <button className="w-full h-10 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-[10px] font-black uppercase tracking-widest active:scale-95 transition-all">
+                        Finalizar Compra
+                      </button>
+                    </Link>
+                  </div>
+                )} */}
               </div>
             </motion.div>
           </motion.div>

@@ -107,7 +107,7 @@ export default function WelcomePage() {
       <div className="relative flex flex-col px-8 pt-4 pb-12 mb-4 w-full z-10 shrink-0">
         <Link href="/scan" className="w-full">
           <Button
-            variant="gradient-logo"
+            variant="gradient-purple-pink"
             size="lg"
             className="w-full h-16 text-xl font-black uppercase italic gap-3 shadow-lg transition-all hover:scale-[1.02] active:scale-95 group rounded-[2rem]"
           >

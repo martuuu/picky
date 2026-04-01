@@ -21,7 +21,7 @@ export default function ArrepentimientoPage() {
           Hemos registrado tu solicitud de arrepentimiento. Te enviaremos las instrucciones de devolución a tu email en las próximas 24 hs hábiles.
         </p>
         <Link href="/">
-          <Button variant="gradient-logo" className="h-14 px-8 rounded-2xl uppercase font-black italic shadow-xl">
+          <Button variant="gradient-purple-pink" className="h-14 px-8 rounded-2xl uppercase font-black italic shadow-xl">
             Volver al Inicio
           </Button>
         </Link>
@@ -103,7 +103,7 @@ export default function ArrepentimientoPage() {
             </p>
           </div>
 
-          <Button type="submit" variant="gradient-logo" className="w-full h-16 rounded-[2rem] uppercase font-black italic shadow-2xl text-lg mt-6">
+          <Button type="submit" variant="gradient-purple-pink" className="w-full h-16 rounded-[2rem] uppercase font-black italic shadow-2xl text-lg mt-6">
             Iniciar Tramite
           </Button>
         </form>

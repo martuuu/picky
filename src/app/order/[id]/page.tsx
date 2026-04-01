@@ -353,7 +353,7 @@ export default function OrderStatusPage({ params }: { params: Promise<{ id: stri
                 <h4 className="text-xl font-black italic uppercase tracking-tighter mb-3">
                   {offer.name}
                 </h4>
-                <Button onClick={() => handleAddFood(offer)} variant="gradient-logo" size="sm" className="w-full gap-2">
+                <Button onClick={() => handleAddFood(offer)} variant="gradient-purple-pink" size="sm" className="w-full gap-2">
                   <UtensilsCrossed size={16} />
                   Agregar al Pedido
                 </Button>
@@ -414,7 +414,7 @@ export default function OrderStatusPage({ params }: { params: Promise<{ id: stri
                 </div>
                 <div className="mt-8 flex justify-between items-center">
                     <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Planta Alta • 50m</span>
-                    <button className="flex items-center gap-2 rounded-full bg-gradient-logo px-6 py-2.5 text-[10px] font-black text-white uppercase tracking-widest shadow-xl">
+                    <button className="flex items-center gap-2 rounded-full bg-gradient-purple-pink px-6 py-2.5 text-[10px] font-black text-white uppercase tracking-widest shadow-xl">
                         Como llegar
                         <ChevronRight size={14} strokeWidth={3} />
                     </button>
@@ -503,7 +503,7 @@ export default function OrderStatusPage({ params }: { params: Promise<{ id: stri
 
                     <Button 
                         type="submit" 
-                        variant="gradient-logo" 
+                        variant="gradient-purple-pink" 
                         className="w-full shadow-lg"
                         disabled={rating === 0}
                     >

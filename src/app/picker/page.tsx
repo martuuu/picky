@@ -168,7 +168,7 @@ function OrderCard({ order, compact = false }: { order: typeof ORDERS[0]; compac
       {/* CTA */}
       <Link href={`/picker/${order.id}`} className="block">
         <Button
-          variant="gradient-logo"
+          variant="gradient-purple-pink"
           className="w-full h-12 rounded-2xl font-black uppercase italic tracking-tight gap-2 text-sm"
         >
           {order.status === "active" ? "Continuar Armado" : "Iniciar Picking"}
@@ -206,7 +206,7 @@ export default function PickerDashboard() {
         {/* Logo area */}
         <div className="p-6 border-b border-slate-100 dark:border-slate-800">
           <div className="flex items-center gap-3">
-            <div className="size-10 bg-gradient-logo-full rounded-2xl flex items-center justify-center shadow-md">
+            <div className="size-10 bg-gradient-purple-pink rounded-2xl flex items-center justify-center shadow-md">
               <Zap size={20} className="text-white" strokeWidth={3} />
             </div>
             <div>
