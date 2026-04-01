@@ -324,10 +324,10 @@ export default function ScanPage() {
                 key={`handle-drag-${status}`}
                 drag="y"
                 dragConstraints={{ top: 0, bottom: 0 }}
-                dragElastic={0.2}
+                dragElastic={0.4}
                 onDragEnd={(_, info) => {
-                  if (status === 'scanned' && info.offset.y < -40) setStatus('expanded');
-                  else if (status === 'expanded' && info.offset.y > 40) setStatus('scanned');
+                  if (status === 'scanned' && (info.offset.y < -15 || info.velocity.y < -100)) setStatus('expanded');
+                  else if (status === 'expanded' && (info.offset.y > 15 || info.velocity.y > 100)) setStatus('scanned');
                 }}
                 className="w-full flex flex-col items-center pt-5 pb-2 cursor-grab active:cursor-grabbing group shrink-0"
                 onClick={() => setStatus(status === 'scanned' ? 'expanded' : 'scanned')}
