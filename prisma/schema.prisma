@@ -4,29 +4,144 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  // TODO (Supabase): set url = env("DATABASE_URL") and add directUrl for connection pooling
+  // url      = env("DATABASE_URL")
+  // directUrl = env("DIRECT_URL")
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// ENUMS
+// ─────────────────────────────────────────────────────────────────────────────
+
+enum OrderStatus {
+  PENDING    // Order created, payment being processed
+  PAYING     // User at payment screen (pre-confirm, useful for picker pre-staging)
+  PICKING    // Picker assigned and assembling the order
+  READY      // All items collected, waiting for customer pickup
+  DELIVERED  // Customer showed QR, order handed off
+  CANCELLED  // Order cancelled (arrepentimiento / out of stock)
+}
+
+enum PickupMethod {
+  COUNTER    // Mostrador Principal
+  LOCKER     // Smart Locker Picky
+  PICKY_CAR  // Drive-thru / Picky Car
+  DELIVERY   // Envío a domicilio
+}
+
+enum PaymentMethod {
+  MERCADOPAGO
+  CASH        // 15% discount applied
+  DEBIT
+  CREDIT
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CATALOG
+// ─────────────────────────────────────────────────────────────────────────────
+
 model Category {
-  id       String    @id @default(uuid())
-  name     String    @unique
-  products Product[]
+  id        String    @id @default(uuid())
+  name      String    @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  products  Product[]
 }
 
 model Product {
-  id            String    @id @default(uuid())
-  sku           String    @unique
-  name          String
-  description   String
-  price         Float
-  originalPrice Float?
-  image         String
-  stock         Int       @default(0)
-  categoryId    String
-  category      Category  @relation(fields: [categoryId], references: [id])
-  wholesalePrice Float?
-  wholesaleMinQuantity Int? @default(1)
-  variants      Json?     // Storing variants as JSON for flexibility in the prototype
-  specs         Json?     // Storing specs as JSON
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id                   String      @id @default(uuid())
+  sku                  String      @unique
+  name                 String
+  brand                String?
+  description          String
+  price                Float
+  originalPrice        Float?      // Crossed-out price (promo)
+  wholesalePrice       Float?      // Price when wholesaleMinQuantity reached
+  wholesaleMinQuantity Int?        @default(1)
+  image                String      // Primary image URL
+  images               String[]    @default([]) // Additional image URLs
+  stock                Int         @default(0)
+  zone                 String?     // Aisle/shelf location, e.g. "Pasillo 3 - Estante A"
+  categoryId           String
+  category             Category    @relation(fields: [categoryId], references: [id])
+  tiendaNubeId         Int?        @unique // External ID for TiendaNube sync
+  variants             Json?       // [{label, type, options[]}]
+  specs                Json?       // [{label, value}]
+  reviews              Json?       // [{user, rating, comment}]
+  createdAt            DateTime    @default(now())
+  updatedAt            DateTime    @updatedAt
+  orderItems           OrderItem[]
+
+  // TODO (Supabase): Add full-text search index on name, brand, description
+  // TODO (TiendaNube): Add lastSyncedAt for incremental sync
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ORDERS
+// ─────────────────────────────────────────────────────────────────────────────
+
+model Order {
+  id             String        @id @default(uuid())
+  // Auth: either linked user (logged-in) or guest (email only)
+  // TODO (Supabase Auth): userId String? @db.Uuid (link to auth.users)
+  customerName   String
+  customerEmail  String
+  dni            String
+  status         OrderStatus   @default(PENDING)
+  pickupMethod   PickupMethod  @default(COUNTER)
+  paymentMethod  PaymentMethod @default(MERCADOPAGO)
+  subtotal       Float         // Before cash discount
+  savings        Float         @default(0) // Promos + cash discount applied
+  total          Float         // Final amount charged
+  pickerId       String?       // TODO: FK to a future Staff/User model
+  items          OrderItem[]
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([status])             // Fast picker dashboard queries
+  @@index([customerEmail])
+}
+
+model OrderItem {
+  id              String   @id @default(uuid())
+  orderId         String
+  order           Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId       String
+  product         Product  @relation(fields: [productId], references: [id])
+  sku             String   // Denormalized: preserve SKU even if product is deleted
+  name            String   // Denormalized: preserve name at time of purchase
+  quantity        Int
+  priceAtPurchase Float    // Price locked at checkout (promotions may have applied)
+  picked          Boolean  @default(false) // Picker has physically retrieved this item
+  createdAt       DateTime @default(now())
+
+  @@index([orderId])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// FUTURE MODELS (commented out for MVP — uncomment when scaling)
+// ─────────────────────────────────────────────────────────────────────────────
+
+// model Staff {
+//   id        String   @id @default(uuid())
+//   name      String
+//   role      String   // 'picker' | 'admin' | 'cashier'
+//   zone      String?
+//   createdAt DateTime @default(now())
+// }
+
+// model OrderStatusHistory {
+//   id        String      @id @default(uuid())
+//   orderId   String
+//   status    OrderStatus
+//   changedBy String?     // Staff ID or 'customer' or 'system'
+//   note      String?
+//   createdAt DateTime    @default(now())
+// }
+
+// model Branch {
+//   id        String   @id @default(uuid())
+//   name      String
+//   address   String
+//   createdAt DateTime @default(now())
+// }

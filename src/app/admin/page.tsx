@@ -17,6 +17,7 @@ import {
   Settings,
   MoreHorizontal
 } from "lucide-react";
+import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { motion } from "framer-motion";
 
@@ -190,6 +191,10 @@ export default function AdminAnalytics() {
             <Users size={24} />
             <span className="text-[9px] font-black uppercase tracking-widest">Personal</span>
         </button>
+        <Link href="/admin/qrs" className="flex flex-col items-center gap-1 text-slate-500 hover:text-primary transition-colors">
+            <QrCode size={24} />
+            <span className="text-[9px] font-black uppercase tracking-widest">QR</span>
+        </Link>
         <button className="flex flex-col items-center gap-1 text-slate-500">
             <Settings size={24} />
             <span className="text-[9px] font-black uppercase tracking-widest">Panel</span>

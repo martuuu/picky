@@ -13,24 +13,9 @@
  *    TIENDANUBE_STORE_ID=your_store_id           (once obtained via OAuth)
  */
 
-const TIENDANUBE_API_URL = "https://api.tiendanube.com/v1";
+import type { TiendaNubeProduct } from './tiendanubeMapper';
 
-interface TiendaNubeProduct {
-  id: number;
-  name: { es: string };
-  description: { es: string };
-  price: string;
-  compare_at_price?: string;
-  images: Array<{ src: string }>;
-  variants: Array<{
-    id: number;
-    price: string;
-    stock_management: boolean;
-    stock: number;
-    attributes: Array<{ en: string; es: string }>;
-  }>;
-  categories: Array<{ id: number; name: { es: string } }>;
-}
+const TIENDANUBE_API_URL = "https://api.tiendanube.com/v1";
 
 function getHeaders() {
   const token = process.env.TIENDANUBE_ACCESS_TOKEN;

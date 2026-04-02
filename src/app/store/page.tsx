@@ -11,7 +11,7 @@ import {
   Filter, ChevronDown, Eye, Edit3, ExternalLink, MoreHorizontal, Bell
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { products, categories, brands } from "@/lib/data";
+import { products as mockProducts, categories, brands } from "@/lib/data";
 import type { Product } from "@/lib/data";
 
 const STOCK_THRESHOLD_LOW = 15;
@@ -125,10 +125,37 @@ export default function StoreManager() {
   const [qrProduct, setQrProduct] = useState<Product | null>(null);
   const [selectedProducts, setSelectedProducts] = useState<Set<string>>(new Set());
 
+  // TiendaNube integration toggle
+  // TODO (Supabase): Replace with a DB-backed sync flag per branch/store
+  const [useTiendaNube, setUseTiendaNube] = useState(false);
+  const [tnProducts, setTnProducts] = useState<Product[]>([]);
+  const [tnLoading, setTnLoading] = useState(false);
+  const [tnError, setTnError] = useState<string | null>(null);
+
+  // Active product catalog — mock or TiendaNube
+  const products: Product[] = useTiendaNube ? tnProducts : mockProducts;
+
   useEffect(() => { setMounted(true); }, []);
 
+  useEffect(() => {
+    if (!useTiendaNube) return;
+    setTnLoading(true);
+    setTnError(null);
+    fetch("/api/tiendanube/products")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.error) throw new Error(data.credentialsMissing ? "Credenciales de TiendaNube no configuradas. Revisá el .env." : data.error);
+        setTnProducts(data);
+      })
+      .catch((e) => {
+        setTnError(e.message);
+        setUseTiendaNube(false);
+      })
+      .finally(() => setTnLoading(false));
+  }, [useTiendaNube]);
+
   const filtered = useMemo(() => {
-    return products.filter(p => {
+    return products.filter((p: Product) => {
       const matchSearch = search === "" || p.name.toLowerCase().includes(search.toLowerCase()) || p.sku.toLowerCase().includes(search.toLowerCase()) || (p.brand ?? "").toLowerCase().includes(search.toLowerCase());
       const matchCat = filterCategory === "Todos" || p.category === filterCategory;
       const matchBrand = filterBrand === "Todas" || (p.brand ?? "") === filterBrand;
@@ -138,7 +165,7 @@ export default function StoreManager() {
         || (filterStock === "Normal" && p.stock > STOCK_THRESHOLD_LOW);
       return matchSearch && matchCat && matchBrand && stockOk;
     });
-  }, [search, filterCategory, filterBrand, filterStock]);
+  }, [products, search, filterCategory, filterBrand, filterStock]);
 
   const criticalCount = products.filter(p => p.stock <= STOCK_THRESHOLD_CRITICAL).length;
   const lowStockCount = products.filter(p => p.stock > STOCK_THRESHOLD_CRITICAL && p.stock <= STOCK_THRESHOLD_LOW).length;
@@ -221,7 +248,29 @@ export default function StoreManager() {
             <h2 className="text-xl font-black italic tracking-tighter uppercase">Gestión de Inventario</h2>
             <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">{products.length} productos registrados</p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
+            {/* TiendaNube data source toggle */}
+            <button
+              onClick={() => setUseTiendaNube((v) => !v)}
+              disabled={tnLoading}
+              className={`h-9 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 active:scale-95 transition-all border ${
+                useTiendaNube
+                  ? "bg-primary/10 text-primary border-primary/20"
+                  : "bg-slate-100 dark:bg-slate-800 text-slate-400 border-transparent hover:text-slate-600"
+              }`}
+            >
+              <ExternalLink size={13} />
+              {tnLoading ? "Cargando..." : useTiendaNube ? "TiendaNube ✓" : "Usar TiendaNube"}
+            </button>
+
+            {/* TiendaNube error pill */}
+            {tnError && (
+              <span className="h-9 px-3 rounded-xl bg-red-500/10 text-red-500 text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 border border-red-500/20 max-w-48 truncate" title={tnError}>
+                <AlertTriangle size={12} />
+                {tnError}
+              </span>
+            )}
+
             <button className="relative size-9 flex items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400">
               <Bell size={16} />
               {criticalCount > 0 && <span className="absolute top-1 right-1 size-2 bg-red-500 rounded-full" />}

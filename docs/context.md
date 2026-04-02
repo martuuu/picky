@@ -1,30 +1,28 @@
-# Contexto del Proyecto: Picky - Prototipo MVP
+# Contexto del Proyecto: Picky - Plataforma de Retail Inteligente
 
-## 1. Visión
-Construir un prototipo de alta fidelidad para "Picky", una aplicación de "Smart Shopping" para tiendas físicas (scan & go).
-El objetivo es transformar la experiencia de compra permitiendo a los usuarios escanear productos, armar un carrito virtual y pagar desde su móvil, para luego retirar el pedido preparado.
+## 1. Visión y Propósito
+**Picky** es una plataforma de "Smart Shopping" (Scan & Go) orientada inicialmente a Corralones y tiendas físicas de gran volumen, pero expansible a cualquier formato de retail moderno. 
+Transforma la experiencia de compra física eliminando filas y puntos de dolor: los usuarios ingresan a la tienda, escanean los códigos QR de los productos reales con su teléfono móvil web, arman un carrito de compras digital in-store, aplican descuentos en vivo y abonan desde el dispositivo (o en caja rápida con código/QR). Finalmente, retiran el pedido preparado por el personal (Pickers).
 
-**Fuente de Verdad de Diseño:**
-- Wireframes de "Stitch" ubicados en `stitch_smart_scanner_interface/`.
-- Cada carpeta contiene un `code.html` (referencia de estructura/clases) y `screen.png` (referencia visual).
-- **Importante:** Los diseños están en Inglés. La implementación debe ser **100% en Español Latinoamericano**.
+**Core Experience:**
+- **Cliente:** Experiencia mobile-first nativa desde el navegador (PWA). UI oscura premium, interacciones fluidas (bottom sheets arrastrables), escaneo Rápido, pagos con un toque, y una pantalla de "Status" de retiro atractiva e informativa para que pase sus tiempos muertos viendo ofertas relacionadas y cruzadas.
+- **Staff (Picker):** Interfaces preparadas para el trabajo en depósito. Optimizado en visibilidad de SKU, ubicación en depósito (Pasillos/Estantes) y flujos veloces.
+- **Admin:** Panel de métricas e inventario.
 
-## 2. Estado del Proyecto
-- **Inicio desde Cero:** No hay código previo en este directorio. Se inicializará un nuevo proyecto Next.js.
-- **Enfoque:** Frontend-First. Sin integraciones reales con SAP o Tiendanube por ahora (todo mockeado).
-- **Prioridad:** Estética "Premium", Animaciones fluidas, UX excelente.
+## 2. Estado Actual del Sistema (Abril 2026)
+- **Fase MVP de Alta Fidelidad:** El prototipo visual se encuentra en su iteración suprema, con **Dark Mode por defecto**, animaciones robustas y un branding corporativo de 3 colores (Violeta, Naranja, Rosa). 
+- **Integraciones Reales:**
+  - El catálogo de productos interactúa de forma nativa con **TiendaNube** utilizando credenciales de App (OAuth / REST API), permitiendo traer productos, variantes y precios reales de una tienda demostrativa.
+- **Flujos Implementados:** Listado, detalles interactivos, carruseles horizontales snap, checkout de ofertas cruzadas (15% Cash), y la finalización (pantalla de retiro con QR full-screen).
 
 ## 3. Stack Tecnológico
-- **Framework:** Next.js (App Router).
-- **Lenguaje:** TypeScript.
-- **Estilos:** Tailwind CSS v4.
-- **Iconos:** Lucide React.
-- **Animaciones:** Framer Motion.
-- **Estado Global:** Zustand.
-- **Notificaciones:** Sonner.
-- **Base de Datos:** PostgreSQL/Supabase con Prisma.
+- **Frontend Core:** Next.js (App Router), React 18, TypeScript, Tailwind CSS v4.
+- **Animaciones & UI:** Framer Motion (Drag gestures pesados e interfaces de pantalla táctil similares a apps nativas), Lucide-React para iconos.
+- **Gestión de Estado:** Zustand (para el cart client-side y el status local).
+- **Backend & Catálogo:** Interacción directa en funciones Edge o API Routes con el ecosistema de APIs de TiendaNube.
+- **Despliegue Asumido:** Vercel o similar.
 
-## 4. Estructura de Diseño (Basada en Stitch)
-El diseño se dividirá en componentes reutilizables extraídos de los mocks HTML proporcionados.
-Se debe prestar especial atención a la adaptación de mobile-first para la experiencia del cliente.
-Se implementará un sistema de alerts custom para mejorar la experiencia de usuario (Smart Toasts).
+## 4. Filosofía de Desarrollo & UX
+- **Mobile First Obligatorio:** Nada de vistas de cliente debe verse o sentirse mal en mobile. Los elementos interactables como carruseles y paneles bottom-sheet deben responder naturalmente al touch/pan.
+- **Diseño Premium:** Uso de glassmorphism sutil, gradientes duales controlados (ejs: *gradient-purple-pink*, *gradient-purple-orange*) para acciones clave. No usar grises planos aburridos.
+- **"Picky Smarts":** Notificaciones custom, cross-selling en carruseles antes de comprar, y comparativas automáticas con "la competencia". Todo apuntando a rentabilidad.

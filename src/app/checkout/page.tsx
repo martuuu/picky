@@ -3,7 +3,9 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ArrowLeft, Lock, User, ChevronRight, CreditCard, Banknote, Mail, IdCard, MapPin, UserCircle, Car, Truck, FileText, AlertCircle, Sparkles } from "lucide-react";
-import { useCartStore, CartItem, getItemPricing } from "@/stores/useCartStore";
+import { useCartStore, getItemPricing } from "@/stores/useCartStore";
+import { useOrderStore } from "@/stores/useOrderStore";
+import type { PickyOrderItem } from "@/stores/useOrderStore";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { motion, AnimatePresence } from "framer-motion";
@@ -14,6 +16,7 @@ import { showPickyAlert } from "@/components/ui/Alert";
 export default function CheckoutPage() {
   const router = useRouter();
   const { items, clearCart } = useCartStore();
+  const { createOrder } = useOrderStore();
   const [step, setStep] = useState<"details" | "payment">("details");
   const [mounted, setMounted] = useState(false);
   
@@ -62,12 +65,43 @@ export default function CheckoutPage() {
 
   const handlePay = () => {
     setProcessing(true);
-    // Simulate payment processing
-    setTimeout(() => {
-        clearCart();
-        showPickyAlert("Compra Confirmada", "Tu pedido ya está en preparación.", "success");
-        router.push("/confirmation");
-    }, 2000);
+
+    // Build order items from cart with prices locked at checkout
+    const orderItems: PickyOrderItem[] = items.map((item) => {
+      const { effectivePrice } = getItemPricing(item);
+      return {
+        productId: item.id,
+        sku: item.sku,
+        name: item.name,
+        brand: item.brand,
+        image: item.image,
+        zone: item.zone,
+        quantity: item.quantity,
+        priceAtPurchase: effectivePrice,
+        picked: false,
+      };
+    });
+
+    const isCash = paymentMethod === "cash";
+    const finalAmount = isCash ? finalTotalCash : finalTotal;
+    const cashDiscount = isCash ? cashSaving : 0;
+
+    // Create order with PAYING status — the processing page will advance it to PENDING
+    createOrder({
+      status: "PAYING",
+      items: orderItems,
+      customerName: `${firstName} ${lastName}`.trim(),
+      customerEmail: email,
+      dni,
+      pickupMethod,
+      paymentMethod,
+      subtotal,
+      savings: totalSavings + cashDiscount,
+      total: finalAmount,
+    });
+
+    clearCart();
+    router.push("/checkout/processing");
   };
 
   if (!mounted) return null;
