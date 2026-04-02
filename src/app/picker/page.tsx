@@ -295,7 +295,7 @@ function KanbanColumnView({
 
 export default function PickerDashboard() {
   const [mounted, setMounted] = useState(false);
-  const [activeColIndex, setActiveColIndex] = useState(0); // for mobile column indicator
+  const [activeColIndex, setActiveColIndex] = useState(0);
   const { orders, seedDemoOrders, clearAllOrders } = useOrderStore();
   const { items: liveCartItems, sessionCount: liveSessionCount } = useLiveCart();
 
@@ -372,7 +372,7 @@ export default function PickerDashboard() {
         </div>
 
         {/* ═══ CARRITOS EN VIVO ═══ */}
-        <div className="px-4 py-4 border-t border-slate-100 dark:border-slate-800">
+        {/* <div id="carritos" className="px-4 py-4 border-t border-slate-100 dark:border-slate-800">
           <div className="flex items-center gap-2 mb-3">
             <ShoppingCart size={13} className="text-secondary" />
             <p className="text-[9px] font-black text-secondary uppercase tracking-[0.2em]">Carritos en Vivo</p>
@@ -407,29 +407,34 @@ export default function PickerDashboard() {
               </div>
             </div>
           )}
-        </div>
+        </div> */}
 
         {/* Nav */}
         <nav className="px-4 mt-auto pb-6 space-y-1">
           {[
-            { icon: LayoutGrid,   label: "Órdenes",          active: true,  href: "/picker" },
-            { icon: ShoppingCart,  label: "Carritos en Vivo", active: false, href: "#carritos" },
-            { icon: History,      label: "Historial",         active: false, href: "/picker/history" },
-            { icon: Package,      label: "Inventario Rápido", active: false, href: "/store" },
-            { icon: Settings,     label: "Ajustes",           active: false, href: "#" },
+            { icon: LayoutGrid,  label: "Órdenes",          href: "/picker" },
+            { icon: History,     label: "Historial",         href: "/picker/history" },
+            { icon: Package,     label: "Inventario Rápido", href: "/store" },
+            { icon: Settings,    label: "Ajustes",           href: "#" },
           ].map((item) => (
             <Link key={item.label} href={item.href}>
-              <button className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${item.active ? "bg-primary/10 text-primary" : "text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"}`}>
+              <button className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800">
                 <item.icon size={16} />
                 {item.label}
-                {item.label === "Carritos en Vivo" && liveCartItems.length > 0 && (
-                  <span className="ml-auto size-5 rounded-full bg-secondary text-white text-[8px] font-black flex items-center justify-center animate-pulse">
-                    {liveCartItems.length}
-                  </span>
-                )}
               </button>
             </Link>
           ))}
+          <Link href="/picker/carts">
+            <button className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all text-secondary hover:bg-secondary/5">
+              <ShoppingCart size={16} />
+              Carritos en Vivo
+              {/* {liveCartItems.length > 0 && (
+                <span className="ml-auto size-5 rounded-full bg-secondary text-white text-[8px] font-black flex items-center justify-center animate-pulse">
+                  {liveCartItems.length}
+                </span>
+              )} */}
+            </button>
+          </Link>
           {/* Dev tools */}
           <div className="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-1">
             <p className="text-[8px] font-black text-slate-300 uppercase tracking-widest px-4 mb-2">Demo</p>
@@ -575,24 +580,30 @@ export default function PickerDashboard() {
       {/* ═══ MOBILE BOTTOM NAV ═══ */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 px-6 py-4 pb-safe-bottom flex justify-around items-center z-50">
         {[
-          { icon: LayoutGrid,   label: "Órdenes",   active: true,  href: "/picker",         badge: 0 },
-          { icon: ShoppingCart, label: "Carritos",   active: false, href: "#carritos",       badge: liveCartItems.length },
-          { icon: History,      label: "Historial",  active: false, href: "/picker/history", badge: 0 },
-          { icon: Settings,     label: "Ajustes",    active: false, href: "#",               badge: 0 },
+          { icon: LayoutGrid, label: "Órdenes",  href: "/picker",         badge: 0 },
+          { icon: History,    label: "Historial", href: "/picker/history", badge: 0 },
+          { icon: Settings,   label: "Ajustes",   href: "#",               badge: 0 },
         ].map((item) => (
           <Link key={item.label} href={item.href}>
-            <button className={`relative flex flex-col items-center gap-1 ${item.active ? "text-primary" : "text-slate-400"}`}>
+            <button className="relative flex flex-col items-center gap-1 text-slate-400">
               <item.icon size={22} />
-              {item.badge > 0 && (
-                <span className="absolute -top-1 -right-2 size-4 rounded-full bg-secondary text-white text-[7px] font-black flex items-center justify-center animate-pulse">
-                  {item.badge}
-                </span>
-              )}
               <span className="text-[9px] font-black uppercase tracking-widest">{item.label}</span>
             </button>
           </Link>
         ))}
+        <Link href="/picker/carts">
+          <button className="relative flex flex-col items-center gap-1 text-secondary">
+            <ShoppingCart size={22} />
+            {liveCartItems.length > 0 && (
+              <span className="absolute -top-1 -right-2 size-4 rounded-full bg-secondary text-white text-[7px] font-black flex items-center justify-center animate-pulse">
+                {liveCartItems.length}
+              </span>
+            )}
+            <span className="text-[9px] font-black uppercase tracking-widest">Carritos</span>
+          </button>
+        </Link>
       </nav>
+
     </div>
   );
 }

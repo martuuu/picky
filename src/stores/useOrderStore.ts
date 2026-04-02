@@ -1,6 +1,32 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Cross-device sync via /api/sync/orders relay (in-memory Map on the server).
+// Every mutation pushes the updated order to the relay so any device on the
+// same deployment sees live state without Supabase.
+//
+// TODO (Supabase): Replace syncOrderToRelay / pollOrderRelay with:
+//   - Writer: supabase.from('orders').upsert(order) on every mutation
+//   - Reader: supabase.channel('orders').on('postgres_changes', ...) subscription
+//   This eliminates polling and works across multiple Vercel instances.
+// ─────────────────────────────────────────────────────────────────────────────
+
+function syncOrderToRelay(order: PickyOrder) {
+  if (typeof window === 'undefined') return;
+  fetch('/api/sync/orders', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(order),
+  }).catch(() => { /* relay unavailable — localStorage-only fallback */ });
+}
+
+function syncDeleteAllToRelay() {
+  if (typeof window === 'undefined') return;
+  fetch('/api/sync/orders', { method: 'DELETE' })
+    .catch(() => { /* silent */ });
+}
+
 // Order status lifecycle:
 // PENDING → order created (payment processing)
 // PAYING  → user at payment screen (cross-tab: picker can pre-stage)
@@ -90,6 +116,7 @@ export const useOrderStore = create<OrderStore>()(
           updatedAt: now,
         };
         set((state) => ({ orders: [...state.orders, order], currentOrderId: order.id }));
+        syncOrderToRelay(order);
         return order;
       },
 
@@ -101,6 +128,8 @@ export const useOrderStore = create<OrderStore>()(
               : o
           ),
         }));
+        const updated = get().orders.find((o) => o.id === orderId);
+        if (updated) syncOrderToRelay(updated);
       },
 
       assignPicker: (orderId, pickerId) => {
@@ -111,6 +140,8 @@ export const useOrderStore = create<OrderStore>()(
               : o
           ),
         }));
+        const updated = get().orders.find((o) => o.id === orderId);
+        if (updated) syncOrderToRelay(updated);
       },
 
       toggleItemPicked: (orderId, productId) => {
@@ -129,6 +160,8 @@ export const useOrderStore = create<OrderStore>()(
               : o
           ),
         }));
+        const updated = get().orders.find((o) => o.id === orderId);
+        if (updated) syncOrderToRelay(updated);
       },
 
       getOrderById: (orderId) => {
@@ -144,7 +177,6 @@ export const useOrderStore = create<OrderStore>()(
         const before = (minutes: number) =>
           new Date(now.getTime() - minutes * 60 * 1000).toISOString();
 
-        // Always generate fresh IDs so re-seeding works after DELIVERED/CANCELLED
         const demoOrders: PickyOrder[] = [
           {
             id: generateOrderId(),
@@ -194,15 +226,15 @@ export const useOrderStore = create<OrderStore>()(
           },
         ];
 
-        set((state) => ({
-          orders: [...state.orders, ...demoOrders],
-        }));
-
-        // Return count so caller can show feedback
+        set((state) => ({ orders: [...state.orders, ...demoOrders] }));
+        demoOrders.forEach(syncOrderToRelay);
         return demoOrders.length;
       },
 
-      clearAllOrders: () => set({ orders: [], currentOrderId: null }),
+      clearAllOrders: () => {
+        set({ orders: [], currentOrderId: null });
+        syncDeleteAllToRelay();
+      },
     }),
     {
       name: 'picky-orders-storage',
@@ -211,18 +243,50 @@ export const useOrderStore = create<OrderStore>()(
 );
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Cross-tab synchronization
-// The `storage` event fires in EVERY tab EXCEPT the one that wrote the change.
-// When another tab updates an order (picker marking READY, etc.), this tab
-// rehydrates from localStorage and triggers re-renders automatically.
+// Cross-device synchronization via /api/sync/orders relay.
+// Polls every 3s and merges relay orders into the local store, so any device
+// on the same deployment sees live state.
+// Same-tab/same-browser: storage event still triggers an instant rehydrate.
 //
-// TODO (Supabase): Replace this with supabase.channel().on('postgres_changes')
-//   for real-time updates across different devices and browsers.
+// TODO (Supabase): Replace polling with supabase.channel('orders')
+//   .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, ...)
+//   This eliminates polling and works across all devices at any scale.
 // ─────────────────────────────────────────────────────────────────────────────
 if (typeof window !== 'undefined') {
+  // Same-browser cross-tab sync (instant)
   window.addEventListener('storage', (e) => {
     if (e.key === 'picky-orders-storage') {
       useOrderStore.persist.rehydrate();
     }
   });
+
+  // Cross-device polling via relay
+  const syncFromRelay = async () => {
+    try {
+      const res = await fetch('/api/sync/orders', { cache: 'no-store' });
+      if (!res.ok) return;
+      const relayOrders: PickyOrder[] = await res.json();
+      if (relayOrders.length === 0) return;
+
+      useOrderStore.setState((state) => {
+        const localById = new Map(state.orders.map((o) => [o.id, o]));
+
+        for (const relayOrder of relayOrders) {
+          const local = localById.get(relayOrder.id);
+          // Keep whichever version was updated more recently
+          if (!local || new Date(relayOrder.updatedAt) > new Date(local.updatedAt)) {
+            localById.set(relayOrder.id, relayOrder);
+          }
+        }
+
+        return { orders: Array.from(localById.values()) };
+      });
+    } catch {
+      // Relay unavailable — localStorage-only mode, no action needed
+    }
+  };
+
+  // Initial fetch on load + poll every 3s
+  syncFromRelay();
+  setInterval(syncFromRelay, 3000);
 }
