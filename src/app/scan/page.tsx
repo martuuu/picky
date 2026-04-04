@@ -6,7 +6,6 @@ import Link from "next/link";
 import {
   ChevronLeft, ChevronDown, Minus, Plus, ShoppingBag,
   CheckCircle2, Tag, Layers, Package, ChevronUp,
-  ScanLine, Camera, CameraOff,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { motion, AnimatePresence } from "framer-motion";
@@ -129,42 +128,6 @@ function QuantityDiscountsExpandable({
   );
 }
 
-// ─── Product Strip ────────────────────────────────────────────────────────────
-// DEMO HELPER: horizontal scrollable strip at the bottom of the scan viewport.
-// Tap any product card to simulate scanning its QR.
-// In production the real camera reads the physical QR pasted on the shelf.
-
-// function ProductStrip({ onSelect }: { onSelect: (product: Product) => void }) {
-//   return (
-//     <div className="w-full">
-//       <p className="text-center text-[8px] font-black text-white/40 uppercase tracking-widest mb-2">
-//         Elegir producto a escanear
-//       </p>
-//       <div className="flex gap-2 overflow-x-auto pb-2 px-4 no-scrollbar">
-//         {products.map((product) => (
-//           <button
-//             key={product.id}
-//             onClick={() => onSelect(product)}
-//             className="group flex-shrink-0 flex flex-col items-center bg-white/10 active:bg-primary/20 border border-white/15 rounded-2xl overflow-hidden w-20 active:scale-95 transition-all"
-//           >
-//             <div className="relative w-20 h-16">
-//               <Image src={product.image} alt={product.name} fill className="object-cover" unoptimized />
-//               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-//               <div className="absolute inset-0 flex items-center justify-center opacity-0 group-active:opacity-100 transition-opacity">
-//                 <ScanLine size={20} className="text-white" />
-//               </div>
-//             </div>
-//             <div className="px-1.5 py-1.5 w-full">
-//               <p className="text-[7px] font-black text-white uppercase italic leading-tight line-clamp-2">{product.name}</p>
-//               <p className="text-[7px] text-primary font-black mt-0.5">${product.price.toLocaleString("es-AR")}</p>
-//             </div>
-//           </button>
-//         ))}
-//       </div>
-//     </div>
-//   );
-// }
-
 // ─── QR Camera Scanner Hook ───────────────────────────────────────────────────
 // Uses the device camera + ZXing to decode real QR codes.
 // QR value format expected: "picky://product/<SKU>"
@@ -238,9 +201,8 @@ export default function ScanPage() {
   // Products from TiendaNube
   const [products, setProducts] = useState<Product[]>([]);
 
-  // Camera QR scanning state
+  // Camera QR scanning
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [cameraActive, setCameraActive] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -254,10 +216,9 @@ export default function ScanPage() {
 
   // Called by the ZXing hook when a valid "picky://product/<SKU>" is decoded
   const handleQRDecode = useCallback((sku: string) => {
-    if (status !== "scanning") return; // ignore if sheet already open
+    if (status !== "scanning") return;
     const product = products.find((p) => p.sku === sku);
     if (product) {
-      setCameraActive(false); // stop camera after successful scan
       setScannedProduct(product);
       setStatus("scanned");
       setQuantity(1);
@@ -265,23 +226,15 @@ export default function ScanPage() {
   }, [status, products]);
 
   // Activate ZXing reader only when camera mode is on and we're in scanning state
-  useQRScanner(videoRef, handleQRDecode, cameraActive && status === "scanning");
+  useQRScanner(videoRef, handleQRDecode, status === "scanning");
 
-  // Tap on the QR frame → random product (quick demo shortcut)
+  // Demo shortcut: random product
   const handleSimulateScan = () => {
-    if (cameraActive || products.length === 0) return;
+    if (products.length === 0) return;
     const randomIndex = Math.floor(Math.random() * products.length);
     setScannedProduct(products[randomIndex]);
     setStatus("scanned");
     setQuantity(1);
-  };
-
-  // Product strip tap → simulate scan for that specific product
-  const handleSelectProduct = (product: Product) => {
-    setScannedProduct(product);
-    setStatus("scanned");
-    setQuantity(1);
-    setCameraActive(false);
   };
 
   const handleReset = () => {
@@ -322,18 +275,13 @@ export default function ScanPage() {
 
       {/* 1. Camera Viewport (Background) */}
       <div className="absolute inset-0 z-0 bg-black" onClick={handleBackgroundClick}>
-        {/* Live camera feed — shown when camera mode is active */}
         <video
           ref={videoRef}
           autoPlay
           playsInline
           muted
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${cameraActive ? "opacity-80" : "opacity-0 pointer-events-none"}`}
+          className="absolute inset-0 w-full h-full object-cover"
         />
-        {/* Fallback illustration — shown in demo mode */}
-        <div className={`relative w-full h-full transition-opacity duration-500 ${cameraActive ? "opacity-0" : "opacity-60"}`}>
-          <Image src="/picky-scan.png" alt="Camera View" fill className="object-cover" priority />
-        </div>
         <div className="absolute top-0 left-0 w-full h-40 bg-gradient-to-b from-black/80 via-black/20 to-transparent" />
         <div className="absolute bottom-0 left-0 w-full h-40 bg-gradient-to-t from-black/80 to-transparent" />
       </div>
@@ -359,17 +307,6 @@ export default function ScanPage() {
                   transition={{ duration: 0.2 }}
                   className="flex items-center gap-3"
                 >
-                  {/* Camera toggle — activates ZXing to read real QR codes */}
-                  <button
-                    onClick={() => setCameraActive((v) => !v)}
-                    className={`flex items-center justify-center size-12 rounded-full backdrop-blur-md border transition-all active:scale-90 ${
-                      cameraActive
-                        ? "bg-primary/30 border-primary/50 text-primary shadow-[0_0_16px_rgba(56,189,248,0.4)]"
-                        : "bg-black/40 border-white/10 text-white"
-                    }`}
-                  >
-                    {cameraActive ? <CameraOff size={22} /> : <Camera size={22} />}
-                  </button>
                   <Link href="/cart">
                     <div className="relative flex flex-col items-center gap-0.5">
                       <button className="relative flex items-center justify-center size-12 rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-white transition-all active:scale-90">
@@ -425,60 +362,37 @@ export default function ScanPage() {
         </div>
       </div>
 
-      {/* 3. Scanning Frame + Demo Buttons */}
+      {/* 3. Scanning Viewfinder */}
       <AnimatePresence>
         {status === "scanning" && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 z-10 flex items-center justify-center"
+            className="absolute inset-0 z-10 flex flex-col items-center justify-center pointer-events-none"
           >
-            {/* QR Target Frame — tap for random product */}
-            <div
-              className="relative w-72 h-72 cursor-pointer"
-              onClick={handleSimulateScan}
-            >
-              <div className="absolute inset-0 border-4 border-white/20 rounded-[3rem]" />
-              <div className="absolute top-0 left-0 w-16 h-16 border-t-4 border-l-4 border-primary rounded-tl-[3rem]" />
-              <div className="absolute top-0 right-0 w-16 h-16 border-t-4 border-r-4 border-primary rounded-tr-[3rem]" />
-              <div className="absolute bottom-0 left-0 w-16 h-16 border-b-4 border-l-4 border-primary rounded-bl-[3rem]" />
-              <div className="absolute bottom-0 right-0 w-16 h-16 border-b-4 border-r-4 border-primary rounded-br-[3rem]" />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="absolute w-full h-1 bg-gradient-logo-full shadow-2xl animate-scan" />
+            {/* Minimal corner viewfinder */}
+            <div className="relative w-64 h-64">
+              <div className="absolute top-0 left-0 w-12 h-12 border-t-[3px] border-l-[3px] border-white/80 rounded-tl-2xl" />
+              <div className="absolute top-0 right-0 w-12 h-12 border-t-[3px] border-r-[3px] border-white/80 rounded-tr-2xl" />
+              <div className="absolute bottom-0 left-0 w-12 h-12 border-b-[3px] border-l-[3px] border-white/80 rounded-bl-2xl" />
+              <div className="absolute bottom-0 right-0 w-12 h-12 border-b-[3px] border-r-[3px] border-white/80 rounded-br-2xl" />
+              <div className="absolute inset-0 flex items-center justify-center overflow-hidden rounded-2xl">
+                <div className="absolute w-full h-0.5 bg-primary/60 shadow-[0_0_12px_rgba(139,92,246,0.6)] animate-scan" />
               </div>
             </div>
 
-            {/* Hint label: changes based on camera mode */}
-            <AnimatePresence mode="wait">
-              {cameraActive ? (
-                <motion.p
-                  key="cam-hint"
-                  initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                  className="absolute top-[calc(50%+10rem)] text-center px-6 text-white/60 text-xs font-black uppercase tracking-widest"
-                >
-                  Apuntá la cámara al QR del producto
-                </motion.p>
-              ) : (
-                <motion.p
-                  key="demo-hint"
-                  initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                  className="absolute top-[calc(50%+10rem)] text-white/40 text-xs font-black uppercase tracking-widest"
-                >
-                  Tocá el marco para producto aleatorio
-                </motion.p>
-              )}
-            </AnimatePresence>
+            <p className="text-white/50 text-[10px] font-black uppercase tracking-widest mt-6">
+              Escaneá el QR del producto
+            </p>
 
-            {/*
-              DEMO: Product strip — horizontal scrollable list at the bottom.
-              Tap a product to simulate scanning its QR code.
-              In production the camera (Camera button above) reads the real QR
-              printed from /admin/qrs and pasted on the shelf.
-            */}
-            {/* <div className="absolute bottom-8 left-0 w-full">
-              <ProductStrip onSelect={handleSelectProduct} />
-            </div> */}
+            {/* Demo shortcut */}
+            <button
+              onClick={handleSimulateScan}
+              className="pointer-events-auto mt-4 text-white/30 text-[9px] font-bold uppercase tracking-widest underline underline-offset-2 active:text-white/60 transition-colors"
+            >
+              Producto aleatorio (demo)
+            </button>
           </motion.div>
         )}
       </AnimatePresence>
