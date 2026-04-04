@@ -1,28 +1,92 @@
-# Contexto del Proyecto: Picky - Plataforma de Retail Inteligente
+# Contexto del Proyecto: Picky — Plataforma de Retail Inteligente
 
 ## 1. Visión y Propósito
-**Picky** es una plataforma de "Smart Shopping" (Scan & Go) orientada inicialmente a Corralones y tiendas físicas de gran volumen, pero expansible a cualquier formato de retail moderno. 
-Transforma la experiencia de compra física eliminando filas y puntos de dolor: los usuarios ingresan a la tienda, escanean los códigos QR de los productos reales con su teléfono móvil web, arman un carrito de compras digital in-store, aplican descuentos en vivo y abonan desde el dispositivo (o en caja rápida con código/QR). Finalmente, retiran el pedido preparado por el personal (Pickers).
+
+**Picky** es una plataforma de "Smart Shopping" (Scan & Go) orientada inicialmente a Corralones y tiendas físicas de gran volumen, expansible a cualquier formato de retail moderno.
+
+Transforma la experiencia de compra física eliminando filas: los usuarios ingresan a la tienda, escanean códigos QR de productos con su teléfono, arman un carrito digital in-store, aplican descuentos y abonan desde el dispositivo. El personal (Pickers) prepara el pedido y lo entrega en mostrador, locker o drive-thru.
 
 **Core Experience:**
-- **Cliente:** Experiencia mobile-first nativa desde el navegador (PWA). UI oscura premium, interacciones fluidas (bottom sheets arrastrables), escaneo Rápido, pagos con un toque, y una pantalla de "Status" de retiro atractiva e informativa para que pase sus tiempos muertos viendo ofertas relacionadas y cruzadas.
-- **Staff (Picker):** Interfaces preparadas para el trabajo en depósito. Optimizado en visibilidad de SKU, ubicación en depósito (Pasillos/Estantes) y flujos veloces.
-- **Admin:** Panel de métricas e inventario.
+- **Cliente:** Mobile-first desde el navegador. UI oscura premium, escaneo real de QR con cámara, pagos con animación, pantalla de retiro con QR gigante.
+- **Staff (Picker):** Kanban de órdenes, checklist de items por pasillo/estante, historial, y vista de carritos en vivo pre-compra.
+- **Admin:** Panel de inventario con toggle TiendaNube, generación masiva de QR en A4 para impresión física.
+
+---
 
 ## 2. Estado Actual del Sistema (Abril 2026)
-- **Fase MVP de Alta Fidelidad:** El prototipo visual se encuentra en su iteración suprema, con **Dark Mode por defecto**, animaciones robustas y un branding corporativo de 3 colores (Violeta, Naranja, Rosa). 
-- **Integraciones Reales:**
-  - El catálogo de productos interactúa de forma nativa con **TiendaNube** utilizando credenciales de App (OAuth / REST API), permitiendo traer productos, variantes y precios reales de una tienda demostrativa.
-- **Flujos Implementados:** Listado, detalles interactivos, carruseles horizontales snap, checkout de ofertas cruzadas (15% Cash), y la finalización (pantalla de retiro con QR full-screen).
+
+### Arquitectura de Datos
+- **Persistencia local:** Zustand `persist` con `localStorage` (keys: `picky-orders-storage`, `picky-cart-storage`).
+- **Sync cross-tab (mismo browser):** `window.addEventListener('storage', ...)` → `store.persist.rehydrate()`.
+- **Sync cross-device (mismo deployment):** API relay en memoria — `/api/sync/orders` y `/api/sync/cart` — Map global en Node.js con TTL. Polling cada 2-3s desde clientes.
+- **Producción (futuro):** Supabase Realtime reemplaza el relay. TODOs marcados en cada archivo relevante.
+
+### Flujo de Orden Completo (end-to-end funcional)
+```
+Cliente escanea QR → agrega al carrito → checkout (datos + método pago)
+  → /checkout/processing (animación por método: MP/Efectivo/Débito NFC)
+  → orden creada en PAYING → PENDING → picker la ve en Kanban
+  → picker "Toma Pedido" (PICKING) → checklist de items → READY
+  → cliente ve QR gigante en /confirmation
+  → picker escanea QR → DELIVERED → "Gracias por tu compra"
+```
+
+### Integraciones Reales
+- **TiendaNube REST API:** OAuth, fetch de productos, mapeo a formato Picky (`tiendanubeMapper.ts`), toggle en `/store`.
+- **ZXing (`@zxing/browser`):** Lectura real de QR con cámara del dispositivo en `/scan`.
+- **`qrcode.react`:** Generación de QR `picky://product/<SKU>` en `/admin/qrs`.
+
+### Rutas Implementadas
+
+| Ruta | Descripción |
+|------|-------------|
+| `/` | Home / landing |
+| `/scan` | Scanner con cámara real (ZXing) + strip de productos táctil |
+| `/product/[id]` | Detalle de producto con variantes, specs, reviews, cross-sell |
+| `/checkout` | Form en 2 pasos: entrega + pago |
+| `/checkout/processing` | Pasarela simulada animada (por método de pago) |
+| `/confirmation` | Estado de orden en tiempo real + QR de retiro |
+| `/picker` | Kanban (Pendientes / En Proceso / Listos) con sync cross-device |
+| `/picker/[orderId]` | Checklist de items por pasillo para el picker |
+| `/picker/history` | Historial DELIVERED/CANCELLED con filtros, sort, paginación |
+| `/picker/carts` | Carritos en Vivo — tabla expandible de carritos activos pre-compra |
+| `/store` | Admin: inventario + toggle TiendaNube + QR por producto |
+| `/admin` | Dashboard analytics |
+| `/admin/qrs` | Grilla A4 4×4 de QR labels para impresión física |
+| `/arrepentimiento` | Botón de arrepentimiento legal |
+
+### Archivos Clave
+
+| Archivo | Responsabilidad |
+|---------|----------------|
+| `src/stores/useOrderStore.ts` | Store de órdenes: CRUD, seed demo, sync relay, cross-tab |
+| `src/stores/useCartStore.ts` | Store de carrito: pricing, sync relay cross-device |
+| `src/app/api/sync/orders/route.ts` | Relay de órdenes (GET/POST/DELETE) |
+| `src/app/api/sync/cart/route.ts` | Relay de carritos (GET/POST) |
+| `src/app/checkout/processing/page.tsx` | Pasarela de pago simulada animada |
+| `src/app/picker/carts/page.tsx` | Vista de carritos en vivo para el picker |
+| `src/lib/tiendanubeMapper.ts` | Mapeo TiendaNube API → Product interno |
+| `src/lib/tiendanube.ts` | Cliente TiendaNube (usa tipos de tiendanubeMapper) |
+| `src/app/api/tiendanube/products/route.ts` | API route: fetch productos TN, cache 60s |
+| `docs/supabase-schema.sql` | Schema v2: enums, RLS, Realtime notes, seed data |
+
+---
 
 ## 3. Stack Tecnológico
-- **Frontend Core:** Next.js (App Router), React 18, TypeScript, Tailwind CSS v4.
-- **Animaciones & UI:** Framer Motion (Drag gestures pesados e interfaces de pantalla táctil similares a apps nativas), Lucide-React para iconos.
-- **Gestión de Estado:** Zustand (para el cart client-side y el status local).
-- **Backend & Catálogo:** Interacción directa en funciones Edge o API Routes con el ecosistema de APIs de TiendaNube.
-- **Despliegue Asumido:** Vercel o similar.
+
+- **Frontend:** Next.js 16 App Router, React 18, TypeScript, Tailwind CSS v4
+- **Animaciones:** Framer Motion — `layoutId`/`LayoutGroup` para vuelo de cards, `AnimatePresence initial={false}` para evitar flash de rehidratación
+- **Estado:** Zustand v5 con `persist` middleware
+- **QR:** `@zxing/browser` (lectura), `qrcode.react` (generación)
+- **Icons:** Lucide React
+- **Toasts:** Sonner + PickyAlert custom
+- **Despliegue:** Vercel
+
+---
 
 ## 4. Filosofía de Desarrollo & UX
-- **Mobile First Obligatorio:** Nada de vistas de cliente debe verse o sentirse mal en mobile. Los elementos interactables como carruseles y paneles bottom-sheet deben responder naturalmente al touch/pan.
-- **Diseño Premium:** Uso de glassmorphism sutil, gradientes duales controlados (ejs: *gradient-purple-pink*, *gradient-purple-orange*) para acciones clave. No usar grises planos aburridos.
-- **"Picky Smarts":** Notificaciones custom, cross-selling en carruseles antes de comprar, y comparativas automáticas con "la competencia". Todo apuntando a rentabilidad.
+
+- **Mobile First:** El flujo del consumidor es 100% mobile. El picker puede ser tablet o desktop.
+- **Diseño Premium:** Glassmorphism sutil, gradientes `gradient-purple-pink` / `gradient-purple-orange` para CTAs. No grises planos.
+- **Sin backend propio:** Todo corre en Next.js API Routes + localStorage + relay en memoria. Supabase es el siguiente paso natural.
+- **TODOs como hoja de ruta:** Cada decisión de arquitectura temporal tiene un `// TODO (Supabase):` con instrucciones explícitas para la migración.

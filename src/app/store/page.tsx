@@ -7,11 +7,10 @@ import { QRCodeSVG } from "qrcode.react";
 import {
   BarChart3, Box, Users, Settings, Search, ScanBarcode,
   Plus, QrCode, AlertTriangle, CheckCircle2, Download,
-  X, Printer, ChevronRight, Tag, Package, Zap, TrendingUp,
-  Filter, ChevronDown, Eye, Edit3, ExternalLink, MoreHorizontal, Bell
+  X, Printer, Tag, Package, Zap, TrendingUp,
+  ChevronDown, Eye, Edit3, Bell
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { products as mockProducts, categories, brands } from "@/lib/data";
 import type { Product } from "@/lib/data";
 
 const STOCK_THRESHOLD_LOW = 15;
@@ -24,9 +23,7 @@ function getStockStatus(stock: number) {
 }
 
 function QRModal({ product, onClose }: { product: Product; onClose: () => void }) {
-  const productUrl = typeof window !== "undefined"
-    ? `${window.location.origin}/product/${product.sku}`
-    : `https://picky.app/product/${product.sku}`;
+  const productUrl = `picky://product/${product.sku}`;
 
   return (
     <motion.div
@@ -125,34 +122,32 @@ export default function StoreManager() {
   const [qrProduct, setQrProduct] = useState<Product | null>(null);
   const [selectedProducts, setSelectedProducts] = useState<Set<string>>(new Set());
 
-  // TiendaNube integration toggle
-  // TODO (Supabase): Replace with a DB-backed sync flag per branch/store
-  const [useTiendaNube, setUseTiendaNube] = useState(false);
-  const [tnProducts, setTnProducts] = useState<Product[]>([]);
-  const [tnLoading, setTnLoading] = useState(false);
-  const [tnError, setTnError] = useState<string | null>(null);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Active product catalog — mock or TiendaNube
-  const products: Product[] = useTiendaNube ? tnProducts : mockProducts;
+  // Dynamic categories and brands derived from loaded products
+  const activeCategories = useMemo(() => {
+    const cats = Array.from(new Set(products.map((p) => p.category).filter(Boolean)));
+    return ["Todos", ...cats.sort()];
+  }, [products]);
 
-  useEffect(() => { setMounted(true); }, []);
+  const activeBrands = useMemo(() => {
+    const brs = Array.from(new Set(products.map((p) => p.brand).filter((b): b is string => !!b)));
+    return ["Todas", ...brs.sort()];
+  }, [products]);
 
   useEffect(() => {
-    if (!useTiendaNube) return;
-    setTnLoading(true);
-    setTnError(null);
+    setMounted(true);
     fetch("/api/tiendanube/products")
       .then((r) => r.json())
       .then((data) => {
-        if (data.error) throw new Error(data.credentialsMissing ? "Credenciales de TiendaNube no configuradas. Revisá el .env." : data.error);
-        setTnProducts(data);
+        if (data.error) throw new Error(data.credentialsMissing ? "Credenciales no configuradas. Revisá el .env." : data.error);
+        setProducts(data);
       })
-      .catch((e) => {
-        setTnError(e.message);
-        setUseTiendaNube(false);
-      })
-      .finally(() => setTnLoading(false));
-  }, [useTiendaNube]);
+      .catch((e) => setError(e.message))
+      .finally(() => setLoading(false));
+  }, []);
 
   const filtered = useMemo(() => {
     return products.filter((p: Product) => {
@@ -171,6 +166,26 @@ export default function StoreManager() {
   const lowStockCount = products.filter(p => p.stock > STOCK_THRESHOLD_CRITICAL && p.stock <= STOCK_THRESHOLD_LOW).length;
 
   if (!mounted) return null;
+
+  if (loading) return (
+    <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-[#0b1120]">
+      <div className="text-center space-y-3">
+        <div className="size-10 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
+        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Cargando productos...</p>
+      </div>
+    </div>
+  );
+
+  if (error) return (
+    <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-[#0b1120]">
+      <div className="text-center space-y-3 max-w-sm px-6">
+        <AlertTriangle size={32} className="text-red-500 mx-auto" />
+        <p className="text-sm font-black text-slate-700 dark:text-white uppercase italic tracking-tighter">Error al cargar</p>
+        <p className="text-[10px] text-slate-400 uppercase tracking-widest">{error}</p>
+        <button onClick={() => window.location.reload()} className="h-9 px-4 rounded-xl bg-primary text-white text-[10px] font-black uppercase tracking-widest">Reintentar</button>
+      </div>
+    </div>
+  );
 
   return (
     <div className="flex min-h-screen bg-slate-50 dark:bg-[#0b1120] font-display text-slate-900 dark:text-white antialiased">
@@ -248,29 +263,7 @@ export default function StoreManager() {
             <h2 className="text-xl font-black italic tracking-tighter uppercase">Gestión de Inventario</h2>
             <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">{products.length} productos registrados</p>
           </div>
-          <div className="flex items-center gap-3 flex-wrap">
-            {/* TiendaNube data source toggle */}
-            <button
-              onClick={() => setUseTiendaNube((v) => !v)}
-              disabled={tnLoading}
-              className={`h-9 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 active:scale-95 transition-all border ${
-                useTiendaNube
-                  ? "bg-primary/10 text-primary border-primary/20"
-                  : "bg-slate-100 dark:bg-slate-800 text-slate-400 border-transparent hover:text-slate-600"
-              }`}
-            >
-              <ExternalLink size={13} />
-              {tnLoading ? "Cargando..." : useTiendaNube ? "TiendaNube ✓" : "Usar TiendaNube"}
-            </button>
-
-            {/* TiendaNube error pill */}
-            {tnError && (
-              <span className="h-9 px-3 rounded-xl bg-red-500/10 text-red-500 text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 border border-red-500/20 max-w-48 truncate" title={tnError}>
-                <AlertTriangle size={12} />
-                {tnError}
-              </span>
-            )}
-
+          <div className="flex items-center gap-3">
             <button className="relative size-9 flex items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400">
               <Bell size={16} />
               {criticalCount > 0 && <span className="absolute top-1 right-1 size-2 bg-red-500 rounded-full" />}
@@ -286,7 +279,7 @@ export default function StoreManager() {
         <div className="px-8 pt-6 grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           {[
             { label: "Total Productos", value: products.length, icon: Box, color: "text-primary", bg: "bg-primary/10" },
-            { label: "Categorías", value: categories.length - 1, icon: Tag, color: "text-violet-500", bg: "bg-violet-500/10" },
+            { label: "Categorías", value: activeCategories.length - 1, icon: Tag, color: "text-violet-500", bg: "bg-violet-500/10" },
             { label: "Stock Crítico", value: criticalCount, icon: AlertTriangle, color: "text-red-500", bg: "bg-red-500/10" },
             { label: "Valor Estimado", value: "$" + (products.reduce((a, p) => a + p.price * p.stock, 0) / 1_000_000).toFixed(1) + "M", icon: TrendingUp, color: "text-emerald-500", bg: "bg-emerald-500/10" },
           ].map((kpi, i) => (
@@ -322,7 +315,19 @@ export default function StoreManager() {
               onChange={(e) => setFilterCategory(e.target.value)}
               className="h-10 pl-3 pr-8 appearance-none bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl text-[10px] font-black uppercase tracking-widest outline-none focus:ring-2 focus:ring-primary/30 cursor-pointer"
             >
-              {categories.map(c => <option key={c}>{c}</option>)}
+              {activeCategories.map(c => <option key={c}>{c}</option>)}
+            </select>
+            <ChevronDown size={12} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+          </div>
+
+          {/* Brand filter */}
+          <div className="relative">
+            <select
+              value={filterBrand}
+              onChange={(e) => setFilterBrand(e.target.value)}
+              className="h-10 pl-3 pr-8 appearance-none bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl text-[10px] font-black uppercase tracking-widest outline-none focus:ring-2 focus:ring-primary/30 cursor-pointer"
+            >
+              {activeBrands.map(b => <option key={b}>{b}</option>)}
             </select>
             <ChevronDown size={12} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
           </div>
@@ -397,9 +402,14 @@ export default function StoreManager() {
 
                       {/* Name + Brand + SKU */}
                       <div className="min-w-0">
-                        <p className="text-xs font-black uppercase italic tracking-tighter truncate">{product.name}</p>
+                        <div className="flex items-center gap-1.5">
+                          <p className="text-xs font-black uppercase italic tracking-tighter truncate">{product.name}</p>
+                          {product.id.startsWith("tn-") && (
+                            <span className="shrink-0 px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-500 text-[8px] font-black uppercase tracking-widest">TN</span>
+                          )}
+                        </div>
                         <div className="flex items-center gap-2 mt-0.5">
-                          <span className="text-[9px] font-bold text-slate-400">{product.brand}</span>
+                          <span className="text-[9px] font-bold text-slate-400">{product.brand || "—"}</span>
                           <span className="text-[9px] font-bold text-slate-300 dark:text-slate-600">·</span>
                           <span className="text-[9px] font-mono text-slate-400">{product.sku}</span>
                         </div>

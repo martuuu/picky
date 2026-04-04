@@ -1,0 +1,204 @@
+This session is being continued from a previous conversation that ran out of context. The summary below covers the earlier portion of the conversation.
+
+Summary:
+1. Primary Request and Intent:
+
+This is a continuation session for the Picky project (Scan & Go retail platform for Argentine hardware stores). The session started with implementing 6 audited issues, then evolved through multiple bug fixes and features.
+
+**Current/Final Request:** The user wants `src/app/store/page.tsx` fully developed to correctly display TiendaNube products with their tables and auto-generated QR codes. This is explicitly the last task for MVP completion: *"Mas alla de eso, si trayendo los productos ya se les genera un QR, lo unico que me queda este task y ya tenemos completo el MVP."*
+
+The specific problems to fix:
+- Category filter is hardcoded from mock data (`categories` from `lib/data.ts`) — doesn't reflect TiendaNube categories (Iluminación, Espejos, Organización, Muebles, Textiles y Deco)
+- Brand filter state (`filterBrand`) exists but **has no UI dropdown** — completely missing
+- Brands also hardcoded from mock data, not derived from loaded products
+- QR URL format wrong: currently `window.location.origin/product/${sku}` → must be `picky://product/${sku}` to match the ZXing scanner
+- KPI "Categorías" uses hardcoded `categories.length - 1` instead of dynamic count
+- No filter reset when switching between mock ↔ TiendaNube source
+
+**Previously completed this session:**
+- Fix `useMemo` in store/page.tsx (`products` added to deps)
+- Fix `TiendaNubeProduct` type mismatch (tiendanube.ts imports from tiendanubeMapper.ts)
+- Simulated payment gateway (`/checkout/processing`)
+- Fix `seedDemoOrders` (fresh IDs + toast feedback)
+- API relay for carts (`/api/sync/cart`) and orders (`/api/sync/orders`)
+- `useLiveCart` hook updated for cross-device relay
+- `/picker/carts` — dedicated "Carritos en Vivo" page with expandable table
+- Picker nav fixed (links to `/picker/carts` instead of broken anchor)
+- Documentation updated (`docs/context.md`, `docs/plan-improved.md`, `docs/audit.md`)
+
+2. Key Technical Concepts:
+- Next.js 16 App Router with TypeScript and Tailwind CSS v4
+- Zustand v5 with `persist` middleware for localStorage-backed state
+- Cross-tab sync: `window.addEventListener('storage', ...)` → `store.persist.rehydrate()`
+- Cross-device sync: in-memory API relay (`Map` on `globalThis`) with TTL, polling every 2-3s
+- Merge strategy: `updatedAt` timestamp comparison (newest wins)
+- `@zxing/browser` for real QR camera scanning
+- `qrcode.react` QRCodeSVG for QR generation — format: `picky://product/<SKU>`
+- TiendaNube REST API: OAuth, `tiendanubeMapper.ts` normalizes to internal `Product` type
+- `Product & { tiendaNubeId: number }` extended type from mapper
+- `AnimatePresence initial={false}` prevents Zustand rehydration flash
+- `useMemo` dependency arrays must include all reactive values
+- Fire-and-forget `fetch` pattern for relay sync (non-blocking)
+- `globalThis.__pickyCartRelay` / `__pickyOrderRelay` survive Next.js hot-reload
+
+3. Files and Code Sections:
+
+- **`src/app/store/page.tsx`** (CURRENT FOCUS — partially fixed, needs full update)
+  - Line 14: Still imports `categories, brands` from `lib/data.ts` (mock data) — must be removed
+  - Line 27-29: QR URL wrong format:
+    ```ts
+    const productUrl = typeof window !== "undefined"
+      ? `${window.location.origin}/product/${product.sku}`
+      : `https://picky.app/product/${product.sku}`;
+    ```
+    Must become: `picky://product/${product.sku}`
+  - Line 168: useMemo deps already fixed: `[products, search, filterCategory, filterBrand, filterStock]`
+  - Line 289: KPI hardcoded `categories.length - 1` → must use dynamic count
+  - Line 325: `{categories.map(c => <option key={c}>{c}</option>)}` → must use dynamic categories
+  - `filterBrand` state exists (line 123) but NO brand filter `<select>` in the UI
+  - TiendaNube toggle works, products load, but filters don't update to match TN categories
+
+- **`src/lib/tiendanubeMapper.ts`** (key for understanding TN product structure)
+  - `mapTiendaNubeToPickyProduct` returns `Product & { tiendaNubeId: number }`
+  - TN products: `id: "tn-${tnProduct.id}"`, `sku: variant.sku || "TN-${id}"`, `zone: undefined`
+  - Categories from first TN category or "General"
+  - Brands from `tnProduct.brand || undefined`
+
+- **`src/app/api/sync/cart/route.ts`** (NEW this session)
+  ```ts
+  const cartRelay: Map<string, CartSnapshot> =
+    globalThis.__pickyCartRelay ?? (globalThis.__pickyCartRelay = new Map());
+  // GET → returns all snapshots; POST → upserts by sessionId; empty items → delete
+  // TTL: 30 minutes
+  ```
+
+- **`src/app/api/sync/orders/route.ts`** (NEW this session)
+  ```ts
+  const orderRelay: Map<string, PickyOrder> =
+    globalThis.__pickyOrderRelay ?? (globalThis.__pickyOrderRelay = new Map());
+  // GET → all orders; POST → upsert single order; DELETE → clear all
+  // TTL: 2 hours
+  ```
+
+- **`src/stores/useOrderStore.ts`** (modified)
+  - Added `syncOrderToRelay(order)` called after every mutation
+  - Added `syncDeleteAllToRelay()` for clearAllOrders
+  - Polling at bottom of file: `setInterval(syncFromRelay, 3000)` — merges relay into local store
+  - Merge logic: `new Date(relayOrder.updatedAt) > new Date(local.updatedAt)` → keep newer
+  - `seedDemoOrders` now returns `number` (count added)
+
+- **`src/stores/useCartStore.ts`** (modified)
+  - `getSessionId()`: generates stable `session-${Date.now()}-${random}` ID in localStorage
+  - `syncCartToRelay(items)`: fire-and-forget POST to `/api/sync/cart`
+  - Called in: `addItem`, `removeItem`, `updateQuantity`, `clearCart`
+  - `// TODO (Supabase):` comment with migration instructions
+
+- **`src/app/checkout/page.tsx`** (modified)
+  - `handlePay` no longer has `setTimeout`
+  - Creates order with `status: "PAYING"` instead of "PENDING"
+  - Calls `clearCart()` then `router.push("/checkout/processing")`
+
+- **`src/app/checkout/processing/page.tsx`** (NEW)
+  ```ts
+  const MERCADOPAGO_STEPS = [
+    { icon: Shield, label: "Verificando datos", duration: 1800 },
+    { icon: CreditCard, label: "Procesando pago", duration: 2400 },
+    { icon: Fingerprint, label: "Autenticación 3DS", duration: 2000 },
+    { icon: CheckCircle2, label: "Pago confirmado", duration: 1200 },
+  ];
+  // On last step: updateOrderStatus(order.id, "PENDING") → router.push("/confirmation")
+  ```
+
+- **`src/app/picker/carts/page.tsx`** (NEW)
+  - `CartSnapshot`: `{ sessionId, items: CartItem[], updatedAt }`
+  - `CartRow` component: expandable with `AnimatePresence`
+  - Summary row: pulse dot, session ID, item count, thumbnails (5 + overflow), total, timeAgo
+  - Expanded: grid with image, name/brand/SKU, quantity, unit price, subtotal
+  - Sort: `useMemo` over `[...carts].sort(...)` by time/items/total
+  - Polls `GET /api/sync/cart` every 2s
+
+- **`src/app/picker/page.tsx`** (modified)
+  - `useLiveCart()` returns `{ items: LiveCartItem[], sessionCount: number }`
+  - Fetch from relay with localStorage fallback
+  - Desktop nav: "Carritos en Vivo" → `Link href="/picker/carts"`
+  - Mobile bottom nav: "Carritos" → `Link href="/picker/carts"`
+  - Removed mobile sheet panel (replaced by dedicated page)
+  - `handleSeedDemo()` calls `seedDemoOrders()` + `showPickyAlert()`
+
+- **`src/lib/tiendanube.ts`** (modified)
+  - Removed local `interface TiendaNubeProduct { ... }` (was duplicate/simpler)
+  - Now: `import type { TiendaNubeProduct } from './tiendanubeMapper';`
+
+- **`docs/context.md`, `docs/plan-improved.md`, `docs/audit.md`** (all updated)
+  - context.md: Full rewrite with current architecture, all routes, key files table, sync architecture
+  - plan-improved.md: 3 completed session blocks + prioritized next steps + sync diagram
+  - audit.md: Archived as resolved with per-item solutions
+
+4. Errors and fixes:
+- **`useLiveCart` hook return type mismatch**: Initially typed as `LiveCartItem[]` but was returning `{ items, sessionCount }` object → Fixed by changing signature to `function useLiveCart(): { items: LiveCartItem[]; sessionCount: number }`
+- **TiendaNubeProduct TS2345**: `tiendanube.ts` defined its own simpler version of `TiendaNubeProduct`; `mapTiendaNubeProducts` expected the full mapper type → Fixed by removing the local definition and importing from `tiendanubeMapper.ts`
+- **Broken `#carritos` anchor**: Nav item `href="#carritos"` did nothing → Fixed by creating dedicated `/picker/carts` page and using proper `Link href="/picker/carts"`
+- **showCarritosPanel unused state**: After removing mobile sheet panel, `showCarritosPanel` state was unused → Removed
+- **Picker on Vercel sees empty orders**: localStorage doesn't cross devices → Fixed with `/api/sync/orders` relay + polling in `useOrderStore`
+- All TypeScript checks passed with `npx tsc --noEmit` (zero errors) after each change
+
+5. Problem Solving:
+- **Cross-device sync without Supabase**: Solved with in-memory Map relay on `globalThis` (survives Next.js hot-reload), TTL, and polling. Both orders and carts now sync across devices on the same Vercel deployment.
+- **seedDemoOrders silent no-op**: Fixed by always generating fresh IDs so re-seeding always works regardless of previous order states.
+- **Carritos en Vivo nav UX**: Anchor `#carritos` on mobile did nothing meaningful → Created dedicated `/picker/carts` page with full table UI.
+
+6. All user messages:
+- "Excelente, te adjunte todo el audit en @picky/docs/audit.md así que me gustaría que comencemos toda la implementación tal cual, salvo estas excepciones: [exceptions about Supabase/relay/payment/carritos]"
+- "Continue from where you left off" (after context loss)
+- "Podes continuar con toda implementacion, asumiendo un rol de developer senior fullstack"
+- "Pequeño fix: cuando apreto en carrito en vivo no pasa nada. Logro ver que se agrega el id para navegar, pero nada sucede."
+- "Excelente. Entonces como veo que la API relay en memoria es algo 'facil' de hacer, hagamoslo. Dejemos el TODO a la inversa, aclarando que sera una api a supabase luego."
+- "Continue from where you left off." (second time)
+- "Podes continuar con la siguiente implementacion: [repeat of API relay request]"
+- "Cree una orden en localhost pero en el picker en Vercel (actualizado main) no le sale nada, ve todo vacio. El deploy fue correcto."
+- "esto pense que habia quedado claro: no es un componente para el sidebar, es una pagina nueva para el picker y store, para que puedan visualizar los pickers haciendo scans y agregando productos. La idea es que los carts que se crean en el localstorage, a medida que sufran cambios, se vean actualizados en la lista. La visual puede ser mas una tabla que se expande. Que se ordenen las ordenes primero por horario de confirmacion de pedido y tambien que se pueda por cantidad de items."
+- "Excelente. Te parece actualizar la documentacion con todo lo implementado. Me falta testear el uso desde Vercel/Mobile, pero de momento todo funciona y anda perfecto."
+- "Bueno, ahora necesito que vuelvas a analizar el contexto del chat un poco para que veas lo que venimos desarrollando y necesito que analices los siguientes archivos de la carpeta /docs como contexto. [...] Así que necesito que un developer senior fullstack me desarrolles toda la parte del @picky/src/app/store/page.tsx para que ahora si muestre correctamente los productos de tiendanube con sus tablas. Ya tenemos el csv @generate_csv.py que usamos para crearlas, así que sabes bien como es. Mas allá de eso, si trayendo los productos ya se les genera un QR, lo único que me queda este task y ya tenemos completo el MVP."
+
+7. Pending Tasks:
+- **CURRENT/ONLY PENDING**: Fix `src/app/store/page.tsx` to correctly display TiendaNube products:
+  1. Make category filter dynamic (derived from `products`, not hardcoded from `lib/data.ts`)
+  2. Make brand filter dynamic + add missing brand filter UI dropdown
+  3. Fix QR URL: `picky://product/${product.sku}` (matches scanner format)
+  4. Fix KPI "Categorías" to use dynamic count
+  5. Reset filters when switching between mock ↔ TiendaNube source
+  6. Handle TiendaNube-specific data gracefully (null brand, undefined zone)
+  7. Optional: TN badge on rows for TiendaNube-sourced products (`id.startsWith("tn-")`)
+
+8. Current Work:
+The work was starting on `src/app/store/page.tsx`. Both files were just read to understand the current state:
+
+Current `store/page.tsx` issues:
+- Import on line 14: `import { products as mockProducts, categories, brands } from "@/lib/data"` — `categories` and `brands` are from mock data
+- QR in `QRModal` (lines 27-29): `${window.location.origin}/product/${product.sku}` — wrong format
+- KPI line 289: `categories.length - 1` — hardcoded
+- Category filter line 325: `{categories.map(c => <option key={c}>{c}</option>)}` — hardcoded mock categories
+- `filterBrand` state exists (line 123) but NO `<select>` dropdown in the filter bar
+- No `filterBrand` reset or `filterCategory` reset when switching TN ↔ mock
+
+TiendaNube product structure (from generate_csv.py and tiendanubeMapper.ts):
+- Categories: Iluminación, Espejos, Organización, Muebles, Textiles y Deco
+- SKU: `PCK-XXXX` format
+- Brands: e.g., "Picky Deco"
+- `id` prefix: `tn-${tnProduct.id}` for TN products
+
+9. Optional Next Step:
+Directly continuing the user's most recent request: *"necesito que un developer senior fullstack me desarrolles toda la parte del @picky/src/app/store/page.tsx para que ahora si muestre correctamente los productos de tiendanube con sus tablas. Ya tenemos el csv @generate_csv.py que usamos para crearlas, así que sabes bien como es. Mas allá de eso, si trayendo los productos ya se les genera un QR, lo único que me queda este task y ya tenemos completo el MVP."*
+
+Write targeted edits to `src/app/store/page.tsx`:
+1. Remove `categories, brands` from import (keep `mockProducts`)
+2. Add `activeCategories` and `activeBrands` memos derived from `products`
+3. Fix QR value to `picky://product/${product.sku}`
+4. Update KPI to use `activeCategories.length - 1`
+5. Replace `categories.map` with `activeCategories.map` in filter
+6. Add brand filter `<select>` dropdown in the filter bar
+7. Reset `filterCategory`/`filterBrand` when TN source changes
+8. Handle TN-specific nulls gracefully in table rows
+
+If you need specific details from before compaction (like exact code snippets, error messages, or content you generated), read the full transcript at: /Users/martinnavarro/.claude/projects/-Users-martinnavarro-Documents-prototipo-picky/83793828-ff05-4d5e-9b5f-281e78edd7d6.jsonl
+Continue the conversation from where it left off without asking the user any further questions. Resume directly — do not acknowledge the summary, do not recap what was happening, do not preface with "I'll continue" or similar. Pick up the last task as if the break never happened.
