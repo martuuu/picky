@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { motion, AnimatePresence } from "framer-motion";
-import { products, Product } from "@/lib/data";
+import type { Product } from "@/lib/data";
 import { useCartStore } from "@/stores/useCartStore";
 import { CompetitorProducts } from "@/components/ui/CompetitorProducts";
 import { PromotionsSection } from "@/components/ui/PromotionsSection";
@@ -235,11 +235,20 @@ export default function ScanPage() {
   const [showDescFull, setShowDescFull] = useState(false);
   const [showCartSplash, setShowCartSplash] = useState(false);
 
+  // Products from TiendaNube
+  const [products, setProducts] = useState<Product[]>([]);
+
   // Camera QR scanning state
   const videoRef = useRef<HTMLVideoElement>(null);
   const [cameraActive, setCameraActive] = useState(false);
 
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+    fetch("/api/tiendanube/products")
+      .then((r) => r.json())
+      .then((data) => { if (Array.isArray(data)) setProducts(data); })
+      .catch(() => {});
+  }, []);
 
   const itemCount = items.reduce((acc, item) => acc + item.quantity, 0);
 
@@ -253,14 +262,14 @@ export default function ScanPage() {
       setStatus("scanned");
       setQuantity(1);
     }
-  }, [status]);
+  }, [status, products]);
 
   // Activate ZXing reader only when camera mode is on and we're in scanning state
   useQRScanner(videoRef, handleQRDecode, cameraActive && status === "scanning");
 
   // Tap on the QR frame → random product (quick demo shortcut)
   const handleSimulateScan = () => {
-    if (cameraActive) return; // let the camera do its job
+    if (cameraActive || products.length === 0) return;
     const randomIndex = Math.floor(Math.random() * products.length);
     setScannedProduct(products[randomIndex]);
     setStatus("scanned");
