@@ -156,7 +156,7 @@ export default function CheckoutPage() {
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 20 }}
                     onSubmit={handleNextStep}
-                    className="space-y-8"
+                    className="space-y-5"
                 >
                     {/* Social Login Options */}
                     {!isGuest && (
@@ -223,16 +223,16 @@ export default function CheckoutPage() {
 
                     {/* User Info - Only show if guest */}
                     {isGuest && (
-                        <div className="space-y-6">
+                        <div className="space-y-4">
                             {/* Nuevos métodos de Retiro/Envío aplicados - AHORA PRIMERO */}
                             <div className="space-y-3">
                                 <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 pl-1">Método de Entrega</h3>
-                                <div className="grid grid-cols-1 gap-2.5">
+                                <div className="grid grid-cols-1 gap-2">
                                     <label className="group cursor-pointer">
                                         <input type="radio" name="pickup" className="peer sr-only" checked={pickupMethod === "counter"} onChange={() => setPickupMethod("counter")} />
-                                        <div className="flex items-center gap-3 p-4 rounded-3xl bg-white dark:bg-slate-800 border-2 border-transparent peer-checked:border-primary peer-checked:bg-primary/5 transition-all shadow-sm">
-                                            <div className="size-10 rounded-xl bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-500 shrink-0">
-                                                <MapPin size={20} />
+                                        <div className="flex items-center gap-2.5 p-3 rounded-2xl bg-white dark:bg-slate-800 border-2 border-transparent peer-checked:border-primary peer-checked:bg-primary/5 transition-all shadow-sm">
+                                            <div className="size-8 rounded-lg bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-500 shrink-0">
+                                                <MapPin size={16} />
                                             </div>
                                             <div className="flex-1">
                                                 <p className="font-black text-xs uppercase italic">Mostrador Principal</p>
@@ -244,9 +244,9 @@ export default function CheckoutPage() {
                                     
                                     <label className="group cursor-pointer">
                                         <input type="radio" name="pickup" className="peer sr-only" checked={pickupMethod === "locker"} onChange={() => setPickupMethod("locker")} />
-                                        <div className="flex items-center gap-3 p-4 rounded-3xl bg-white dark:bg-slate-800 border-2 border-transparent peer-checked:border-primary peer-checked:bg-primary/5 transition-all shadow-sm">
-                                            <div className="size-10 rounded-xl bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-500 shrink-0">
-                                                <Lock size={20} />
+                                        <div className="flex items-center gap-2.5 p-3 rounded-2xl bg-white dark:bg-slate-800 border-2 border-transparent peer-checked:border-primary peer-checked:bg-primary/5 transition-all shadow-sm">
+                                            <div className="size-8 rounded-lg bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-500 shrink-0">
+                                                <Lock size={16} />
                                             </div>
                                             <div className="flex-1">
                                                 <p className="font-black text-xs uppercase italic">Smart Locker Picky</p>
@@ -258,10 +258,10 @@ export default function CheckoutPage() {
 
                                     <label className="group cursor-pointer">
                                         <input type="radio" name="pickup" className="peer sr-only" checked={pickupMethod === "picky-car"} onChange={() => setPickupMethod("picky-car")} />
-                                        <div className="flex items-center gap-3 p-4 rounded-3xl bg-white dark:bg-slate-800 border-2 border-transparent peer-checked:border-secondary peer-checked:bg-secondary/5 transition-all shadow-sm relative overflow-hidden">
+                                        <div className="flex items-center gap-2.5 p-3 rounded-2xl bg-white dark:bg-slate-800 border-2 border-transparent peer-checked:border-secondary peer-checked:bg-secondary/5 transition-all shadow-sm relative overflow-hidden">
                                             <div className="absolute top-0 right-0 bg-secondary text-white text-[7px] font-black uppercase px-2 py-0.5 rounded-bl-lg z-10">Nuevo</div>
-                                            <div className="size-10 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary shrink-0">
-                                                <Car size={20} />
+                                            <div className="size-8 rounded-lg bg-secondary/10 flex items-center justify-center text-secondary shrink-0">
+                                                <Car size={16} />
                                             </div>
                                             <div className="flex-1">
                                                 <p className="font-black text-xs uppercase italic">Picky Car (Drive-Thru)</p>
@@ -273,9 +273,9 @@ export default function CheckoutPage() {
 
                                     <label className="group cursor-pointer">
                                         <input type="radio" name="pickup" className="peer sr-only" checked={pickupMethod === "delivery"} onChange={() => setPickupMethod("delivery")} />
-                                        <div className="flex items-center gap-3 p-4 rounded-3xl bg-white dark:bg-slate-800 border-2 border-transparent peer-checked:border-primary peer-checked:bg-primary/5 transition-all shadow-sm">
-                                            <div className="size-10 rounded-xl bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-500 shrink-0">
-                                                <Truck size={20} />
+                                        <div className="flex items-center gap-2.5 p-3 rounded-2xl bg-white dark:bg-slate-800 border-2 border-transparent peer-checked:border-primary peer-checked:bg-primary/5 transition-all shadow-sm">
+                                            <div className="size-8 rounded-lg bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-500 shrink-0">
+                                                <Truck size={16} />
                                             </div>
                                             <div className="flex-1">
                                                 <p className="font-black text-xs uppercase italic">Envío a Domicilio</p>
@@ -288,7 +288,7 @@ export default function CheckoutPage() {
                             </div>
 
                             {/* Contact Form - AHORA SEGUNDO y MÁS PEQUEÑO */}
-                            <div className="space-y-3 bg-slate-50 dark:bg-slate-900/50 p-4 rounded-[2rem] border border-slate-100 dark:border-slate-800">
+                            <div className="space-y-2.5 bg-slate-50 dark:bg-slate-900/50 p-3 rounded-2xl border border-slate-100 dark:border-slate-800">
                                 <div className="flex items-center justify-between mb-2">
                                   <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 pl-1">Datos de Contacto</h3>
                                 </div>
@@ -302,7 +302,7 @@ export default function CheckoutPage() {
                                         setLastName("Navarro");
                                         setDni("35123456");
                                     }}
-                                    className="w-full h-10 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center gap-2 font-black text-[10px] uppercase tracking-wider hover:bg-slate-50 transition-all shadow-sm mb-4"
+                                    className="w-full h-8 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center gap-2 font-black text-[9px] uppercase tracking-wider hover:bg-slate-50 transition-all shadow-sm mb-3"
                                 >
                                     <svg className="size-3.5" viewBox="0 0 24 24">
                                         <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -312,7 +312,7 @@ export default function CheckoutPage() {
                                     </svg>
                                     Autocompletar con Google
                                 </button>
-                                <div className="space-y-2.5">
+                                <div className="space-y-2">
                                     <div className="relative">
                                         <Mail className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
                                         <input 
@@ -320,7 +320,7 @@ export default function CheckoutPage() {
                                             value={email}
                                             onChange={(e) => setEmail(e.target.value)}
                                             placeholder="Email" 
-                                            className="w-full h-12 pl-10 pr-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-bold placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/50 shadow-sm"
+                                            className="w-full h-10 pl-10 pr-3 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-bold placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/50 shadow-sm"
                                         />
                                     </div>
 
@@ -332,7 +332,7 @@ export default function CheckoutPage() {
                                                 value={firstName}
                                                 onChange={(e) => setFirstName(e.target.value)}
                                                 placeholder="Nombre" 
-                                                className="w-full h-12 pl-10 pr-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-bold placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/50 shadow-sm"
+                                                className="w-full h-10 pl-10 pr-3 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-bold placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/50 shadow-sm"
                                             />
                                         </div>
                                         <div className="relative">
@@ -341,7 +341,7 @@ export default function CheckoutPage() {
                                                 value={lastName}
                                                 onChange={(e) => setLastName(e.target.value)}
                                                 placeholder="Apellido" 
-                                                className="w-full h-12 px-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-bold placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/50 shadow-sm"
+                                                className="w-full h-10 px-3 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-bold placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/50 shadow-sm"
                                             />
                                         </div>
                                     </div>
@@ -353,15 +353,15 @@ export default function CheckoutPage() {
                                             value={dni}
                                             onChange={(e) => setDni(e.target.value)}
                                             placeholder="DNI" 
-                                            className="w-full h-12 pl-10 pr-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-bold placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/50 shadow-sm"
+                                            className="w-full h-10 pl-10 pr-3 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-bold placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/50 shadow-sm"
                                         />
                                     </div>
                                 </div>
                             </div>
 
-                            <Button type="submit" variant="gradient-purple-pink" className="w-full h-16 rounded-[2rem] text-lg font-black uppercase italic shadow-2xl">
+                            <Button type="submit" variant="gradient-purple-pink" className="w-full h-14 rounded-2xl text-sm font-black uppercase italic shadow-xl">
                                 Continuar al Pago
-                                <ChevronRight size={24} strokeWidth={3} />
+                                <ChevronRight size={20} strokeWidth={3} />
                             </Button>
 
                             {/* Botón de Arrepentimiento */}
@@ -385,26 +385,26 @@ export default function CheckoutPage() {
                     className="space-y-6"
                 >
                     {/* Order Details - Sumario Simplificado */}
-                    <div className="bg-slate-50 dark:bg-slate-900/50 rounded-[2rem] p-6 border border-slate-100 dark:border-slate-800 space-y-4">
+                    <div className="bg-slate-50 dark:bg-slate-900/50 rounded-2xl p-4 border border-slate-100 dark:border-slate-800 space-y-3">
                         <div className="flex items-center gap-3 pb-3 border-b border-slate-200 dark:border-slate-700">
-                            <div className="size-10 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-500">
-                                <User size={18} />
+                            <div className="size-8 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-500">
+                                <User size={15} />
                             </div>
                             <div>
-                                <p className="font-black text-sm uppercase italic truncate">{firstName} {lastName}</p>
-                                <p className="text-[10px] font-bold text-slate-400">{dni} · {email}</p>
+                                <p className="font-black text-xs uppercase italic truncate">{firstName} {lastName}</p>
+                                <p className="text-[9px] font-bold text-slate-400">{dni} · {email}</p>
                             </div>
                         </div>
                         
                         <div className="flex items-center gap-3">
-                            <div className="size-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                                {pickupMethod === "delivery" ? <Truck size={18} /> : 
-                                 pickupMethod === "picky-car" ? <Car size={18} /> : 
-                                 pickupMethod === "locker" ? <Lock size={18} /> : <MapPin size={18} />}
+                            <div className="size-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                                {pickupMethod === "delivery" ? <Truck size={15} /> : 
+                                 pickupMethod === "picky-car" ? <Car size={15} /> : 
+                                 pickupMethod === "locker" ? <Lock size={15} /> : <MapPin size={15} />}
                             </div>
                             <div>
-                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Entrega seleccionada</p>
-                                <p className="font-black text-sm uppercase italic">{getDeliveryName()}</p>
+                                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">Entrega seleccionada</p>
+                                <p className="font-black text-xs uppercase italic">{getDeliveryName()}</p>
                             </div>
                             <button onClick={() => setStep('details')} className="ml-auto text-[10px] font-black uppercase text-primary underline">Editar</button>
                         </div>
@@ -490,26 +490,26 @@ export default function CheckoutPage() {
                         <div className="grid grid-cols-1 gap-3">
                             <label className="group cursor-pointer">
                                 <input type="radio" name="payment" className="peer sr-only" checked={paymentMethod === "mercadopago"} onChange={() => setPaymentMethod("mercadopago")} />
-                                <div className="flex items-center gap-4 p-5 rounded-[2rem] bg-white dark:bg-slate-800 border-2 border-transparent peer-checked:border-primary peer-checked:bg-primary/5 transition-all shadow-sm">
-                                    <div className="size-12 rounded-2xl bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-500">
-                                        <CreditCard size={24} />
+                                <div className="flex items-center gap-3 p-3 rounded-2xl bg-white dark:bg-slate-800 border-2 border-transparent peer-checked:border-primary peer-checked:bg-primary/5 transition-all shadow-sm">
+                                    <div className="size-9 rounded-xl bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-500">
+                                        <CreditCard size={18} />
                                     </div>
-                                    <p className="font-black text-sm uppercase italic">Tarjeta vía Mercado Pago</p>
+                                    <p className="font-black text-xs uppercase italic">Tarjeta vía Mercado Pago</p>
                                 </div>
                             </label>
 
                             <label className="group cursor-pointer">
                                 <input type="radio" name="payment" className="peer sr-only" checked={paymentMethod === "cash"} onChange={() => setPaymentMethod("cash")} />
-                                <div className="flex items-center gap-4 p-5 rounded-[2rem] bg-white dark:bg-slate-800 border-2 border-transparent peer-checked:border-primary peer-checked:bg-primary/5 transition-all shadow-sm relative overflow-hidden">
-                                    <div className="absolute top-0 right-0 bg-emerald-500 rounded-bl-2xl text-white text-[8px] font-black px-3 py-1 uppercase shadow-md">
+                                <div className="flex items-center gap-3 p-3 rounded-2xl bg-white dark:bg-slate-800 border-2 border-transparent peer-checked:border-primary peer-checked:bg-primary/5 transition-all shadow-sm relative overflow-hidden">
+                                    <div className="absolute top-0 right-0 bg-emerald-500 rounded-bl-xl text-white text-[7px] font-black px-2 py-0.5 uppercase shadow-md">
                                         -15% OFF
                                     </div>
-                                    <div className="size-12 rounded-2xl bg-green-50 dark:bg-green-900/20 flex items-center justify-center text-green-600">
-                                        <Banknote size={24} />
+                                    <div className="size-9 rounded-xl bg-green-50 dark:bg-green-900/20 flex items-center justify-center text-green-600">
+                                        <Banknote size={18} />
                                     </div>
                                     <div className="flex-1">
-                                        <p className="font-black text-sm uppercase italic">Efectivo en Caja</p>
-                                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Abonás al retirar</p>
+                                        <p className="font-black text-xs uppercase italic">Efectivo en Caja</p>
+                                        <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Abonás al retirar</p>
                                     </div>
                                 </div>
                             </label>
@@ -518,10 +518,10 @@ export default function CheckoutPage() {
 
                     {/* Totales dinámicos por método de pago */}
                     <div className="bg-white dark:bg-slate-800 rounded-[2rem] border border-slate-100 dark:border-slate-700 overflow-hidden shadow-sm">
-                      <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-700">
+                      <div className="px-4 py-2.5 border-b border-slate-100 dark:border-slate-700">
                         <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">Resumen</p>
                       </div>
-                      <div className="px-5 py-4 space-y-2.5">
+                      <div className="px-4 py-3 space-y-2">
                         <div className="flex justify-between items-center text-[10px] font-bold text-slate-500">
                           <span className="uppercase tracking-wider">Subtotal s/ IVA</span>
                           <span className="text-slate-900 dark:text-white font-black">${subtotal.toLocaleString("es-AR")}</span>
@@ -543,15 +543,15 @@ export default function CheckoutPage() {
                               <span className="text-[10px] font-black uppercase tracking-wider text-emerald-600">Descuento efectivo (15%)</span>
                               <span className="text-[10px] font-black text-emerald-600">-${cashSaving.toLocaleString("es-AR")}</span>
                             </div>
-                            <div className="flex justify-between items-end bg-emerald-50 dark:bg-emerald-500/10 rounded-2xl px-4 py-3">
-                              <span className="text-[11px] font-black uppercase tracking-wider text-emerald-700 dark:text-emerald-400">Total Efectivo</span>
-                              <span className="text-2xl font-black italic tracking-tighter text-emerald-600 dark:text-emerald-400">${finalTotalCash.toLocaleString("es-AR")}</span>
+                            <div className="flex justify-between items-end bg-emerald-50 dark:bg-emerald-500/10 rounded-xl px-3 py-2">
+                              <span className="text-[10px] font-black uppercase tracking-wider text-emerald-700 dark:text-emerald-400">Total Efectivo</span>
+                              <span className="text-xl font-black italic tracking-tighter text-emerald-600 dark:text-emerald-400">${finalTotalCash.toLocaleString("es-AR")}</span>
                             </div>
                           </>
                         ) : (
-                          <div className="flex justify-between items-end bg-slate-50 dark:bg-slate-900/50 rounded-2xl px-4 py-3">
-                            <span className="text-[11px] font-black uppercase tracking-wider text-slate-600 dark:text-slate-300">Total con Tarjeta</span>
-                            <span className="text-2xl font-black italic tracking-tighter text-slate-900 dark:text-white">${finalTotal.toLocaleString("es-AR")}</span>
+                          <div className="flex justify-between items-end bg-slate-50 dark:bg-slate-900/50 rounded-xl px-3 py-2">
+                            <span className="text-[10px] font-black uppercase tracking-wider text-slate-600 dark:text-slate-300">Total con Tarjeta</span>
+                            <span className="text-xl font-black italic tracking-tighter text-slate-900 dark:text-white">${finalTotal.toLocaleString("es-AR")}</span>
                           </div>
                         )}
                       </div>
@@ -562,7 +562,7 @@ export default function CheckoutPage() {
                             onClick={handlePay}
                             disabled={processing}
                             variant="gradient-purple-pink"
-                            className="w-full h-18 rounded-[2rem] text-xl font-black uppercase italic shadow-2xl"
+                            className="w-full h-14 rounded-2xl text-sm font-black uppercase italic shadow-xl"
                         >
                             {processing ? "Procesando el Pago..." : `Finalizar · $${(paymentMethod === 'cash' ? finalTotalCash : finalTotal).toLocaleString("es-AR")}`}
                         </Button>

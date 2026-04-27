@@ -41,7 +41,7 @@ export function CompetitorProducts({ currentProduct, allProducts }: CompetitorPr
       <div className="mb-4">
         <div>
           <h3 className="text-lg font-black italic uppercase tracking-tighter">
-            La Competencia
+            Productos Relevantes
           </h3>
         </div>
         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">

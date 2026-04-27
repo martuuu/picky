@@ -44,38 +44,14 @@ export default function WelcomePage() {
       </div>
 
       {/* Logo */}
-      <div className="relative flex items-center pt-10 pb-2 justify-center z-10 shrink-0">
-        <div className="flex flex-col items-center gap-1.5">
-          <div className="relative w-20 h-20">
-            <Image
-              src={PickyLogo}
-              alt="Picky Logo"
-              fill
-              className="object-contain drop-shadow-2xl"
-            />
-          </div>
-          <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em]">Smart Shopping Experience</p>
-        </div>
-      </div>
-
-      {/* Hero Image — flex-1 para llenar espacio disponible sin scroll */}
-      <div className="relative px-6 py-2 z-10 flex-1 min-h-0 group flex items-center justify-center">
-        <div className="relative aspect-square w-full max-w-[280px] rounded-[3.5rem] overflow-hidden shadow-2xl transition-transform duration-700 group-hover:scale-[1.01] border-4 border-transparent bg-gradient-purple-pink p-1">
-          <div className="relative w-full h-full rounded-[3rem] overflow-hidden">
-            <Image
-              src="/picky-scan.png"
-              alt="Corralón Scanner Experience"
-              fill
-              className="object-cover"
-              priority
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-background-dark via-primary/40 to-transparent"></div>
-            <div className="absolute inset-x-0 bottom-0 p-6 flex items-end">
-              <h3 className="text-white text-xl font-black leading-tight uppercase italic tracking-tighter">
-                Experiencia Smart Shopping
-              </h3>
-            </div>
-          </div>
+      <div className="relative flex items-center justify-center z-10 flex-1 min-h-0">
+        <div className="relative w-52 h-52">
+          <Image
+            src={PickyLogo}
+            alt="Picky Logo"
+            fill
+            className="object-contain drop-shadow-2xl"
+          />
         </div>
       </div>
 

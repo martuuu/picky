@@ -60,7 +60,6 @@ function QuantityDiscountsExpandable({
         >
           <div className="flex flex-col">
             <span className="font-black text-xs italic uppercase tracking-tight">Oferta Mayorista / Promos</span>
-            <span className="text-[9px] font-bold text-slate-400">Ver descuentos por cantidad</span>
           </div>
           <motion.div animate={{ rotate: isExpanded ? 180 : 0 }}>
             <ChevronDown size={18} className="text-slate-400" />
@@ -191,11 +190,11 @@ function useQRScanner(
 export default function ScanPage() {
   const router = useRouter();
   const [status, setStatus] = useState<"scanning" | "scanned" | "expanded">("scanning");
+  const [sheetDirection, setSheetDirection] = useState<"up" | "down">("up");
   const [scannedProduct, setScannedProduct] = useState<Product | null>(null);
   const [quantity, setQuantity] = useState(1);
   const { addItem, items } = useCartStore();
   const [mounted, setMounted] = useState(false);
-  const [showDescFull, setShowDescFull] = useState(false);
   const [showCartSplash, setShowCartSplash] = useState(false);
 
   // Products from TiendaNube
@@ -240,7 +239,6 @@ export default function ScanPage() {
   const handleReset = () => {
     setStatus("scanning");
     setScannedProduct(null);
-    setShowDescFull(false);
   };
 
   const handleAddToCart = () => {
@@ -290,74 +288,53 @@ export default function ScanPage() {
       <div className="absolute top-0 left-0 w-full z-20 pt-safe-top">
         <div className="flex justify-between items-center p-6 pt-12">
           <button
-            onClick={() => status === "expanded" ? setStatus("scanned") : router.back()}
+            onClick={() => { if (status === "expanded") { setSheetDirection("down"); setStatus("scanned"); } else router.back(); }}
             className="flex items-center justify-center size-12 rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-white transition-all active:scale-90"
           >
             <ChevronLeft size={24} />
           </button>
 
           <div className="flex items-center gap-3">
-            <AnimatePresence mode="wait">
-              {status !== "expanded" ? (
-                <motion.div
-                  key="tools"
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ duration: 0.2 }}
-                  className="flex items-center gap-3"
-                >
-                  <Link href="/cart">
-                    <div className="relative flex flex-col items-center gap-0.5">
-                      <button className="relative flex items-center justify-center size-12 rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-white transition-all active:scale-90">
-                        <ShoppingBag size={22} />
-                        <AnimatePresence>
-                          {itemCount > 0 && !showCartSplash && (
-                            <motion.span
-                              initial={{ scale: 0 }}
-                              animate={{ scale: 1 }}
-                              exit={{ scale: 0 }}
-                              className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-gradient-purple-pink text-[10px] font-black text-white border-2 border-black shadow-md"
-                            >
-                              {itemCount}
-                            </motion.span>
-                          )}
-                        </AnimatePresence>
-                        <AnimatePresence>
-                          {showCartSplash && (
-                            <motion.div
-                              initial={{ scale: 0, opacity: 0 }}
-                              animate={{ scale: 1, opacity: 1 }}
-                              exit={{ scale: 1.5, opacity: 0 }}
-                              transition={{ type: "spring", stiffness: 400, damping: 20 }}
-                              className="absolute inset-0 rounded-full bg-tertiary flex items-center justify-center z-10"
-                            >
-                              <CheckCircle2 size={22} className="text-white" strokeWidth={2.5} />
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                      </button>
-                      <span className="text-[8px] font-black text-white/70 uppercase tracking-wider leading-none">Carrito</span>
-                    </div>
-                  </Link>
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="info-tecnica"
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <button
-                    onClick={handleGoToProduct}
-                    className="px-4 py-1.5 rounded-full bg-gradient-purple-pink backdrop-blur-xl border border-primary/30 glow-primary shadow-xl hover:scale-105 active:scale-95 transition-all text-white text-[9px] font-black tracking-widest uppercase"
-                  >
-                    Info Técnica
-                  </button>
-                </motion.div>
-              )}
-            </AnimatePresence>
+            <Link href="/checkout">
+              <div className="flex flex-col items-center gap-0.5">
+                <button className="flex items-center justify-center px-4 h-12 rounded-full bg-transparent border-2 border-white/70 text-white text-[9px] font-black tracking-widest uppercase shadow-lg transition-all active:scale-90 backdrop-blur-md">
+                  Finalizar compra
+                </button>
+              </div>
+            </Link>
+            <Link href="/cart">
+              <div className="relative flex flex-col items-center gap-0.5">
+                <button className="relative flex items-center justify-center size-12 rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-white transition-all active:scale-90">
+                  <ShoppingBag size={22} />
+                  <AnimatePresence>
+                    {itemCount > 0 && !showCartSplash && (
+                      <motion.span
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        exit={{ scale: 0 }}
+                        className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-gradient-purple-pink text-[10px] font-black text-white border-2 border-black shadow-md"
+                      >
+                        {itemCount}
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
+                  <AnimatePresence>
+                    {showCartSplash && (
+                      <motion.div
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        exit={{ scale: 1.5, opacity: 0 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                        className="absolute inset-0 rounded-full bg-tertiary flex items-center justify-center z-10"
+                      >
+                        <CheckCircle2 size={22} className="text-white" strokeWidth={2.5} />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </button>
+                <span className="text-[8px] font-black text-white/70 uppercase tracking-wider leading-none">Carrito</span>
+              </div>
+            </Link>
           </div>
         </div>
       </div>
@@ -421,25 +398,13 @@ export default function ScanPage() {
                 dragConstraints={{ top: 0, bottom: 0 }}
                 dragElastic={0.4}
                 onDragEnd={(_, info) => {
-                  if (status === "scanned" && (info.offset.y < -15 || info.velocity.y < -100)) setStatus("expanded");
-                  else if (status === "expanded" && (info.offset.y > 15 || info.velocity.y > 100)) setStatus("scanned");
+                  if (status === "scanned" && (info.offset.y < -15 || info.velocity.y < -100)) { setSheetDirection("up"); setStatus("expanded"); }
+                  else if (status === "expanded" && (info.offset.y > 15 || info.velocity.y > 100)) { setSheetDirection("down"); setStatus("scanned"); }
                 }}
                 className="w-full flex flex-col items-center pt-5 pb-2 cursor-grab active:cursor-grabbing group shrink-0"
-                onClick={() => setStatus(status === "scanned" ? "expanded" : "scanned")}
+                onClick={() => { if (status === "scanned") { setSheetDirection("up"); setStatus("expanded"); } else { setSheetDirection("down"); setStatus("scanned"); } }}
               >
                 <div className="h-1.5 w-14 rounded-full bg-slate-200 dark:bg-slate-800 transition-colors group-hover:bg-primary" />
-                {status === "scanned" && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 4 }}
-                    animate={{ opacity: 1, y: [0, -3, 0] }}
-                    transition={{ duration: 1.5, repeat: Infinity }}
-                    className="flex items-center gap-1 mt-1.5"
-                  >
-                    <ChevronUp size={12} className="text-slate-400" />
-                    <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Deslizá para más</span>
-                    <ChevronUp size={12} className="text-slate-400" />
-                  </motion.div>
-                )}
               </motion.div>
 
               <div className="flex-1 overflow-y-auto custom-scrollbar px-5 pb-28">
@@ -448,10 +413,10 @@ export default function ScanPage() {
                   {status === "scanned" && (
                     <motion.div
                       key="scanned"
-                      initial={{ opacity: 0, y: 10 }}
+                      initial={{ opacity: 0, y: sheetDirection === "down" ? -12 : 12 }}
                       animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      transition={{ duration: 0.2 }}
+                      exit={{ opacity: 0, y: -12 }}
+                      transition={{ duration: 0.22, ease: "easeInOut" }}
                       className="space-y-3"
                     >
                       <div className="flex items-start gap-3">
@@ -462,9 +427,7 @@ export default function ScanPage() {
                           <h2 className="text-lg font-black text-slate-900 dark:text-white leading-tight uppercase italic tracking-tighter truncate">
                             {scannedProduct.name}
                           </h2>
-                          {scannedProduct.brand && (
-                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">{scannedProduct.brand}</p>
-                          )}
+                          <p className="text-[9px] font-bold text-orange-500 uppercase tracking-widest mt-0.5">Stock: {scannedProduct.stock}</p>
                         </div>
                       </div>
 
@@ -479,10 +442,7 @@ export default function ScanPage() {
                             </p>
                           )}
                         </div>
-                        <div className="flex flex-col items-center px-3 border-x border-slate-200 dark:border-slate-700">
-                          <span className="text-[8px] font-black uppercase tracking-wider text-slate-400">Stock</span>
-                          <span className="text-xs font-black text-orange-500">{scannedProduct.stock}</span>
-                        </div>
+
                         <div className="flex items-center gap-2 bg-white dark:bg-slate-800 rounded-xl p-1 shadow-sm">
                           <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="size-7 rounded-lg flex items-center justify-center text-slate-400 hover:text-primary transition-all active:scale-90 text-sm font-black">
                             <Minus size={13} strokeWidth={3} />
@@ -502,10 +462,10 @@ export default function ScanPage() {
                   {status === "expanded" && (
                     <motion.div
                       key="expanded"
-                      initial={{ opacity: 0, y: 10 }}
+                      initial={{ opacity: 0, y: 12 }}
                       animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 10 }}
-                      transition={{ duration: 0.2 }}
+                      exit={{ opacity: 0, y: 12 }}
+                      transition={{ duration: 0.22, ease: "easeInOut" }}
                       className="space-y-5"
                     >
                       <div className="space-y-2">
@@ -514,43 +474,35 @@ export default function ScanPage() {
                             <Image src={scannedProduct.image} alt={scannedProduct.name} fill className="object-cover" unoptimized />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <h1 className="text-xl font-black tracking-tighter text-slate-900 dark:text-white leading-none uppercase italic">
+                            <h1 className="text-lg font-black tracking-tighter text-slate-900 dark:text-white leading-none uppercase italic">
                               {scannedProduct.name}
                             </h1>
-                            {scannedProduct.brand && (
-                              <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">{scannedProduct.brand}</p>
+                            <p className="text-[9px] font-bold text-orange-500 uppercase tracking-widest mt-0.5">Stock: {scannedProduct.stock}</p>
+                          </div>
+                          <div className="text-right shrink-0">
+                            <p className="font-black text-lg italic tracking-tighter text-slate-900 dark:text-white leading-none">
+                              ${effectiveUnitPrice.toLocaleString("es-AR")}
+                            </p>
+                            <span className="text-[9px] text-slate-400 font-bold">c/u</span>
+                            {activePromo && (
+                              <p className="text-[8px] font-bold text-tertiary line-through mt-0.5">${scannedProduct.price.toLocaleString("es-AR")}</p>
                             )}
                           </div>
                         </div>
-                        <div className="flex items-end gap-3">
-                          <p className="font-black text-3xl pt-1 italic tracking-tighter text-slate-900 dark:text-white">
-                            ${effectiveUnitPrice.toLocaleString("es-AR")}
-                          </p>
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="text-sm text-slate-400 font-bold">c/u</span>
-                            <span className="text-[9px] font-black text-orange-500 bg-orange-500/10 px-2 py-0.5 rounded-lg uppercase tracking-wider">Stock: {scannedProduct.stock}</span>
-                          </div>
-                        </div>
-                        {activePromo && (
-                          <p className="text-[10px] font-bold text-tertiary line-through">Precio original: ${scannedProduct.price.toLocaleString("es-AR")}</p>
-                        )}
                       </div>
 
                       <div className="space-y-4">
                         <div className="bg-slate-50 dark:bg-slate-900/30 p-4 rounded-2xl border border-slate-100 dark:border-slate-800">
-                          <p className={`text-slate-500 dark:text-slate-400 leading-relaxed text-sm font-medium ${!showDescFull ? "line-clamp-2" : ""}`}>
+                          <p className="text-slate-500 dark:text-slate-400 leading-relaxed text-sm font-medium">
                             {scannedProduct.description}
                           </p>
-                          <button onClick={() => setShowDescFull(!showDescFull)} className="text-[9px] font-black text-primary uppercase tracking-widest mt-1">
-                            {showDescFull ? "Ver menos ↑" : "Ver más ↓"}
-                          </button>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-2">
+                        <div className="grid grid-cols-2 gap-1.5">
                           {scannedProduct.specs.slice(0, 2).map((s, i) => (
-                            <div key={i} className="bg-white dark:bg-slate-800 p-3 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm">
-                              <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1 leading-none">{s.label}</p>
-                              <p className="text-xs font-bold truncate text-slate-900 dark:text-white">{s.value}</p>
+                            <div key={i} className="bg-white dark:bg-slate-800 px-3 py-2 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm">
+                              <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest leading-none mb-0.5">{s.label}</p>
+                              <p className="text-[10px] font-bold truncate text-slate-900 dark:text-white">{s.value}</p>
                             </div>
                           ))}
                         </div>
@@ -568,21 +520,19 @@ export default function ScanPage() {
                           </div>
                         ))}
 
-                        <div className="pt-2">
+                        {/* <div className="pt-2">
                           <PromotionsSection />
-                        </div>
+                        </div> */}
 
-                        <QuantityDiscountsExpandable scannedProduct={scannedProduct} quantity={quantity} setQuantity={setQuantity} />
-
-                        <div className="grid grid-cols-[1fr_auto] gap-3 items-center bg-slate-50 dark:bg-slate-900/50 p-3 rounded-2xl border border-slate-100 dark:border-slate-800">
-                          <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 pl-1">Cantidad Final</span>
-                          <div className="flex items-center gap-3 bg-white dark:bg-slate-800 rounded-xl p-1 shadow-sm">
-                            <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="size-9 rounded-lg flex items-center justify-center text-slate-400 hover:text-primary transition-all active:scale-90">
-                              <Minus size={16} strokeWidth={3} />
+                        <div className="grid grid-cols-[1fr_auto] gap-2 items-center bg-slate-50 dark:bg-slate-900/50 px-3 py-2 rounded-xl border border-slate-100 dark:border-slate-800">
+                          <span className="text-[8px] font-black uppercase tracking-widest text-slate-400 pl-1">Cantidad</span>
+                          <div className="flex items-center gap-2 bg-white dark:bg-slate-800 rounded-lg p-0.5 shadow-sm">
+                            <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="size-7 rounded-md flex items-center justify-center text-slate-400 hover:text-primary transition-all active:scale-90">
+                              <Minus size={12} strokeWidth={3} />
                             </button>
-                            <span className="text-base font-black min-w-[1rem] text-center italic">{quantity}</span>
-                            <button onClick={() => setQuantity(Math.min(scannedProduct.stock, quantity + 1))} className="size-9 rounded-lg bg-gradient-purple-pink text-white shadow-lg flex items-center justify-center active:scale-90 transition-all">
-                              <Plus size={16} strokeWidth={3} />
+                            <span className="text-sm font-black min-w-[1rem] text-center italic">{quantity}</span>
+                            <button onClick={() => setQuantity(Math.min(scannedProduct.stock, quantity + 1))} className="size-7 rounded-md bg-gradient-purple-pink text-white shadow-md flex items-center justify-center active:scale-90 transition-all">
+                              <Plus size={12} strokeWidth={3} />
                             </button>
                           </div>
                         </div>
